@@ -1,0 +1,64 @@
+{
+    "name": "keboola/notification-api-php-client",
+    "license": "MIT",
+    "type": "library",
+    "description": "Client for Notification API",
+    "keywords": [
+        "keboola",
+        "notification",
+        "client"
+    ],
+    "authors": [
+        {
+            "name": "Keboola",
+            "email": "devel@keboola.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Keboola\\NotificationClient\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Keboola\\NotificationClient\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": "^7.3",
+        "ext-json": "*",
+        "guzzlehttp/guzzle": "^6.3|^7.2",
+        "psr/log": "^1.1",
+        "symfony/validator": "^4.4|^5.2"
+    },
+    "require-dev": {
+        "infection/infection": "^0.18.2|^0.21.2",
+        "keboola/coding-standard": ">=10.0.0",
+        "php-parallel-lint/php-parallel-lint": "^1.2",
+        "phpstan/phpstan": "^0.12.80",
+        "phpunit/phpunit": "^9.5"
+    },
+    "scripts": {
+        "tests": "phpunit --coverage-clover build/logs/clover.xml --coverage-xml=build/logs/coverage-xml --log-junit=build/logs/phpunit.junit.xml",
+        "phpstan": "phpstan analyse --no-progress -c phpstan.neon",
+        "phpcs": "phpcs --extensions=php src tests",
+        "phpcbf": "phpcbf --extensions=php src tests",
+        "phplint": "parallel-lint -j 10 --exclude vendor .",
+        "infection": "infection --threads=4 --min-covered-msi=90 --coverage=build/logs",
+        "build": [
+            "@phplint",
+            "@phpcs",
+            "@phpstan",
+            "@tests",
+            "@infection"
+        ],
+        "ci": [
+            "@composer validate --no-check-all --strict",
+            "@build"
+        ]
+    },
+    "config": {
+        "sort-packages": true,
+        "process-timeout": 3600
+    }
+}
