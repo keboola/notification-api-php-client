@@ -180,7 +180,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: dev-mysql-service
-  namespace: dev-dev-notification-client
+  namespace: dev-notification-client
 spec:
   type: LoadBalancer
   selector:
