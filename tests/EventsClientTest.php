@@ -9,13 +9,11 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use Keboola\NotificationClient\Client;
 use Keboola\NotificationClient\EventsClient;
 use Keboola\NotificationClient\Exception\ClientException;
 use Keboola\NotificationClient\Requests\PostEvent\FailedJobEventData;
 use Keboola\NotificationClient\Requests\PostEvent\JobData;
 use Keboola\NotificationClient\Requests\PostEventRequest;
-use Keboola\NotificationClient\Responses\TriggerEventResponse;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Psr\Log\Test\TestLogger;
@@ -128,8 +126,7 @@ class EventsClientTest extends BaseTest
         $stack = HandlerStack::create($mock);
         $stack->push($history);
         $client = $this->getClient(['handler' => $stack]);
-        $response = $client->triggerEvent($this->getTriggerEvent());
-        self::assertInstanceOf(TriggerEventResponse::class, $response);
+        $client->triggerEvent($this->getTriggerEvent());
         /** @var Request $request */
         $request = $requestHistory[0]['request'];
         self::assertEquals('http://example.com/events/job_failed', $request->getUri()->__toString());
@@ -166,7 +163,7 @@ class EventsClientTest extends BaseTest
         $stack->push($history);
         $logger = new TestLogger();
         $client = $this->getClient(['handler' => $stack, 'logger' => $logger, 'userAgent' => 'test agent']);
-        $response = $client->triggerEvent($this->getTriggerEvent());
+        $client->triggerEvent($this->getTriggerEvent());
         /** @var Request $request */
         $request = $requestHistory[0]['request'];
         self::assertEquals('test agent', $request->getHeader('User-Agent')[0]);
@@ -210,8 +207,7 @@ class EventsClientTest extends BaseTest
         $stack = HandlerStack::create($mock);
         $stack->push($history);
         $client = $this->getClient(['handler' => $stack]);
-        $response = $client->triggerEvent($this->getTriggerEvent());
-        self::assertInstanceOf(TriggerEventResponse::class, $response);
+        $client->triggerEvent($this->getTriggerEvent());
         self::assertCount(3, $requestHistory);
         /** @var Request $request */
         $request = $requestHistory[0]['request'];
@@ -240,7 +236,7 @@ class EventsClientTest extends BaseTest
         $stack->push($history);
         $client = $this->getClient(['handler' => $stack, 'backoffMaxTries' => 1]);
         try {
-            $response = $client->triggerEvent($this->getTriggerEvent());
+            $client->triggerEvent($this->getTriggerEvent());
             self::fail('Must throw exception');
         } catch (ClientException $e) {
             self::assertStringContainsString('500 Internal Server Error', $e->getMessage());
@@ -266,7 +262,7 @@ class EventsClientTest extends BaseTest
         $stack->push($history);
         $client = $this->getClient(['handler' => $stack, 'backoffMaxTries' => 3]);
         try {
-            $response = $client->triggerEvent($this->getTriggerEvent());
+            $client->triggerEvent($this->getTriggerEvent());
             self::fail('Must throw exception');
         } catch (ClientException $e) {
             self::assertStringContainsString('500 Internal Server Error', $e->getMessage());
@@ -291,6 +287,6 @@ class EventsClientTest extends BaseTest
         $client = $this->getClient(['handler' => $stack]);
         self::expectException(ClientException::class);
         self::expectExceptionMessage('{"message" => "Unauthorized"}');
-        $response = $client->triggerEvent($this->getTriggerEvent());
+        $client->triggerEvent($this->getTriggerEvent());
     }
 }
