@@ -32,6 +32,12 @@ stages:
               set -Eeuo pipefail
 
               ./provisioning/ci-setup-cluster.sh
+              NOTIFICATION_API_IP=$(kubectl get svc \
+              --output jsonpath \
+              --template "{.items[?(@.metadata.name==\"dev-notification-service\")].status.loadBalancer.ingress[].ip}" \
+              --namespace="$KUBERNETES_NAMESPACE")
+
+              printf "API IP:%s" "$NOTIFICATION_API_IP"
               echo "##vso[task.setvariable variable=NOTIFICATION_API_IP;isOutput=true]$NOTIFICATION_API_IP"
             displayName: 'Prepare cluster'
             name: prepare_cluster

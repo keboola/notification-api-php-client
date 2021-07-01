@@ -25,11 +25,3 @@ kubectl rollout status deployment/dev-notification-api --namespace="$KUBERNETES_
 
 # wait for ingress to get ip
 sleep 10
-
-NOTIFICATION_API_IP=$(kubectl get svc \
-  --output jsonpath \
-  --template "{.items[?(@.metadata.name==\"dev-notification-service\")].status.loadBalancer.ingress[].ip}" \
-  --namespace="$KUBERNETES_NAMESPACE")
-
-printf "API IP:%s" "$NOTIFICATION_API_IP"
-export NOTIFICATION_API_IP
