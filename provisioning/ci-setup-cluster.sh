@@ -8,7 +8,9 @@ DB_PASSWORD_URLENCODED_RAW=$(urlencode "$DB_PASSWORD_RAW")
 # for mysql database, we need the password to be base64 encoded to be stored in k8s secrets
 DATABASE_PASSWORD_BASE64=$(printf "%s" "$DB_PASSWORD_RAW" | base64 --wrap=0)
 # for notification api, we need to construct the database url
-DATABASE_URL_BASE64=$(printf "mysql://root:%s@dev-mysql-service:3310/notifications?serverVersion=8.0" "$DB_PASSWORD_RAW" | base64 --wrap=0)
+DATABASE_URL_BASE64=$(printf \
+  "mysql://root:%s@dev-mysql-service:3310/notifications?serverVersion=8.0" "$DB_PASSWORD_URLENCODED_RAW" \
+  | base64 --wrap=0)
 TEST_AWS_SECRET_ACCESS_KEY_BASE64=$(printf "%s" "$TEST_AWS_SECRET_ACCESS_KEY" | base64 --wrap=0)
 
 export DATABASE_URL_BASE64
@@ -30,3 +32,4 @@ NOTIFICATION_API_IP=$(kubectl get svc \
   --namespace="$KUBERNETES_NAMESPACE")
 
 printf "API IP:%s" "$NOTIFICATION_API_IP"
+export NOTIFICATION_API_IP
