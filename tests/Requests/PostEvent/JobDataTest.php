@@ -11,7 +11,14 @@ class JobDataTest extends TestCase
 {
     public function testCreate(): void
     {
-        $jobData = new JobData('test-project', '23456', 'http://someUrl', '2020-01-01', '2020-02-02', 'my-orchestration');
+        $jobData = new JobData(
+            'test-project',
+            '23456',
+            'http://someUrl',
+            '2020-01-01',
+            '2020-02-02',
+            'my-orchestration'
+        );
         self::assertSame(
             [
                 'project' => [

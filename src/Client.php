@@ -133,5 +133,4 @@ abstract class Client
             throw new NotificationClientException('Unable to parse response body into JSON: ' . $e->getMessage());
         }
     }
-
 }

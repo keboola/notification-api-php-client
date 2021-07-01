@@ -41,27 +41,6 @@ stages:
               TEST_AWS_ACCESS_KEY_ID: $(TEST_AWS_ACCESS_KEY_ID)
               TEST_AWS_SECRET_ACCESS_KEY: $(TEST_AWS_SECRET_ACCESS_KEY)
 
-  - stage: tests73
-    dependsOn: prepare
-    displayName: Build & Test PHP 7.3
-    jobs:
-      - job: test
-        displayName: 'Test'
-        variables:
-          QUEUE_PUBLIC_API_IP: $[ stageDependencies.prepare.services_setup.outputs['prepare_cluster.QUEUE_PUBLIC_API_IP'] ]
-        steps:
-          - script: |
-              set -Eeuo pipefail
-
-              echo "Public API URL: $public_queue_api_url"
-
-              docker-compose build --pull
-              docker-compose run --rm tests73
-            displayName: 'Build & Run Tests'
-            env:
-              test_storage_api_token: $(test_storage_api_token)
-              public_queue_api_url: http://$(QUEUE_PUBLIC_API_IP):94
-
   - stage: tests
     dependsOn: prepare
     displayName: Build & Test
@@ -69,19 +48,20 @@ stages:
       - job: test
         displayName: 'Test'
         variables:
-          QUEUE_PUBLIC_API_IP: $[ stageDependencies.prepare.services_setup.outputs['prepare_cluster.QUEUE_PUBLIC_API_IP'] ]
+          NOTIFICATION_API_IP: $[ stageDependencies.prepare.services_setup.outputs['prepare_cluster.NOTIFICATION_API_IP'] ]
         steps:
           - script: |
               set -Eeuo pipefail
 
-              echo "Public API URL: $public_queue_api_url"
+              echo "Public API URL: $NOTIFICATION_API_IP"
 
               docker-compose build --pull
               docker-compose run --rm tests
             displayName: 'Build & Run Tests'
             env:
-              test_storage_api_token: $(test_storage_api_token)
-              public_queue_api_url: http://$(QUEUE_PUBLIC_API_IP):94
+              TEST_STORAGE_API_TOKEN: $(TEST_STORAGE_API_TOKEN)
+              TEST_MANAGE_API_APPLICATION_TOKEN: $(TEST_MANAGE_API_APPLICATION_TOKEN)
+              TEST_NOTIFICATION_API_URL: http://$(NOTIFICATION_API_IP):8181
 
           - task: PublishTestResults@2
             displayName: 'Publish Test results'

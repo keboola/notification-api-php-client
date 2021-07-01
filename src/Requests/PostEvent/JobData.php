@@ -31,7 +31,10 @@ class JobData implements JsonSerializable
         $this->orchestrationName = $orchestrationName;
     }
 
-    function jsonSerialize()
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize()
     {
         return [
             'project' => [

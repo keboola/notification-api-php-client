@@ -108,7 +108,8 @@ class EventsClientTest extends BaseTest
             'job_failed',
             new FailedJobEventData(
                 'job failed',
-                new JobData('my-project', '123', 'http://someUrl', '2020-01-02', '2020-01-01', 'my-orchestration'))
+                new JobData('my-project', '123', 'http://someUrl', '2020-01-02', '2020-01-01', 'my-orchestration')
+            )
         );
     }
 

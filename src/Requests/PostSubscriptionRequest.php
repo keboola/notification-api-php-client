@@ -38,6 +38,9 @@ class PostSubscriptionRequest implements JsonSerializable
         $this->filters = $filters;
     }
 
+    /**
+     * @return mixed
+     */
     public function jsonSerialize()
     {
         $filters = array_map(

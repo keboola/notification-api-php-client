@@ -15,7 +15,10 @@ class EmailRecipient implements JsonSerializable
         $this->address = $address;
     }
 
-    function jsonSerialize()
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize()
     {
         return [
             'channel' => 'email',

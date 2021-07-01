@@ -17,7 +17,10 @@ class Filter implements JsonSerializable
         $this->value = $value;
     }
 
-    function jsonSerialize()
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize()
     {
         return [
             'name' => $this->name,

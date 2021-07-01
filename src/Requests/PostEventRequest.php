@@ -17,6 +17,9 @@ class PostEventRequest implements JsonSerializable
         $this->eventData = $eventData;
     }
 
+    /**
+     * @return mixed
+     */
     public function jsonSerialize()
     {
         return $this->eventData->jsonSerialize();
