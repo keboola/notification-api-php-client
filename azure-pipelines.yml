@@ -53,7 +53,7 @@ stages:
           - script: |
               set -Eeuo pipefail
 
-              echo "Public API URL: $NOTIFICATION_API_IP"
+              echo "Notification API URL: $NOTIFICATION_API_IP"
 
               docker-compose build --pull
               docker-compose run --rm tests
