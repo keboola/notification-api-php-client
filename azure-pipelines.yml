@@ -30,7 +30,7 @@ stages:
               command: login
           - script: |
               set -Eeuo pipefail
-          
+
               ./provisioning/ci-setup-cluster.sh
               echo "##vso[task.setvariable variable=NOTIFICATION_API_IP;isOutput=true]$NOTIFICATION_API_IP"
             displayName: 'Prepare cluster'
@@ -91,12 +91,12 @@ stages:
           - script: |
               set -Eeuo pipefail
 
-              #kubectl delete deployment dev-mysql --namespace=$KUBERNETES_NAMESPACE
-              #kubectl delete deployment dev-notification-api --namespace=$KUBERNETES_NAMESPACE
-              #kubectl delete service dev-mysql-service --namespace=$KUBERNETES_NAMESPACE
-              #kubectl delete service dev-notification-service --namespace=$KUBERNETES_NAMESPACE
-              #kubectl delete secret dev-notification-environments --namespace=$KUBERNETES_NAMESPACE
-              #kubectl delete configmap dev-notification-environments --namespace=$KUBERNETES_NAMESPACE
+              kubectl delete deployment dev-mysql --namespace=$KUBERNETES_NAMESPACE
+              kubectl delete deployment dev-notification-api --namespace=$KUBERNETES_NAMESPACE
+              kubectl delete service dev-mysql-service --namespace=$KUBERNETES_NAMESPACE
+              kubectl delete service dev-notification-service --namespace=$KUBERNETES_NAMESPACE
+              kubectl delete secret dev-notification-environments --namespace=$KUBERNETES_NAMESPACE
+              kubectl delete configmap dev-notification-environments --namespace=$KUBERNETES_NAMESPACE
             displayName: Cleanup cluster
             env:
               KUBERNETES_NAMESPACE: $(k8sNamespace)
