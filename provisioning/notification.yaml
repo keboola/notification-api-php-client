@@ -137,6 +137,8 @@ spec:
                 secretKeyRef:
                   name: dev-notification-environments
                   key: databaseUrl
+            - name: MAILER_DSN
+              value: 'null://null'
 
           readinessProbe:
             httpGet:

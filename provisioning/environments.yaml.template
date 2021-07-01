@@ -30,4 +30,3 @@ data:
   azureClientId: '$TEST_AZURE_CLIENT_ID'
   azureTenantId: '$TEST_AZURE_TENANT_ID'
   storageApiUrl: '$STORAGE_API_URL'
-

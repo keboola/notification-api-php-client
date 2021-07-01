@@ -31,23 +31,25 @@ class JobData implements JsonSerializable
         $this->orchestrationName = $orchestrationName;
     }
 
+    public function getProject(): array
+    {
+        return [
+            'name' => $this->projectName,
+        ];
+    }
+
     /**
      * @return mixed
      */
     public function jsonSerialize()
     {
         return [
-            'project' => [
-                'name' => $this->projectName,
-            ],
-            'job' => [
-                'id' => $this->jobId,
-                'url' => $this->jobUrl,
-                'startTime' => $this->jobStartTime,
-                'endTime' => $this->jobEndTime,
-                'orchestrationName' => $this->orchestrationName,
-                'tasks' => [],
-            ],
+            'id' => $this->jobId,
+            'url' => $this->jobUrl,
+            'startTime' => $this->jobStartTime,
+            'endTime' => $this->jobEndTime,
+            'orchestrationName' => $this->orchestrationName,
+            'tasks' => [],
         ];
     }
 }

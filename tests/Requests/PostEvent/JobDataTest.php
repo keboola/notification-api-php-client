@@ -21,17 +21,12 @@ class JobDataTest extends TestCase
         );
         self::assertSame(
             [
-                'project' => [
-                    'name' => 'test-project',
-                ],
-                'job' => [
-                    'id' => '23456',
-                    'url' => 'http://someUrl',
-                    'startTime' => '2020-01-01',
-                    'endTime' => '2020-02-02',
-                    'orchestrationName' => 'my-orchestration',
-                    'tasks' => [],
-                ],
+                'id' => '23456',
+                'url' => 'http://someUrl',
+                'startTime' => '2020-01-01',
+                'endTime' => '2020-02-02',
+                'orchestrationName' => 'my-orchestration',
+                'tasks' => [],
             ],
             $jobData->jsonSerialize()
         );

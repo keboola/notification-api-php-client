@@ -26,7 +26,7 @@ class EventsClient extends Client
         parent::__construct($logger, $notificationApiUrl, $applicationToken, $options);
     }
 
-    public function triggerEvent(PostEventRequest $requestData): void
+    public function postEvent(PostEventRequest $requestData): void
     {
         try {
             $jobDataJson = json_encode($requestData->jsonSerialize(), JSON_THROW_ON_ERROR);

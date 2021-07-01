@@ -9,15 +9,14 @@ use Keboola\NotificationClient\Requests\PostSubscriptionRequest;
 use Keboola\NotificationClient\SubscriptionClient;
 use Psr\Log\NullLogger;
 
-class ClientFunctionalTest extends BaseTest
+class SubscriptionClientFunctionalTest extends BaseTest
 {
-    private function getClient(array $options = []): SubscriptionClient
+    private function getClient(): SubscriptionClient
     {
         return new SubscriptionClient(
             new NullLogger(),
             (string) getenv('TEST_NOTIFICATION_API_URL'),
-            (string) getenv('TEST_STORAGE_API_TOKEN'),
-            $options
+            (string) getenv('TEST_STORAGE_API_TOKEN')
         );
     }
 

@@ -24,7 +24,8 @@ class FailedJobEventData implements JsonSerializable
     {
         return [
             'errorMessage' => $this->errorMessage,
-            'jobData' => $this->jobData->jsonSerialize(),
+            'job' => $this->jobData->jsonSerialize(),
+            'project' => $this->jobData->getProject(),
         ];
     }
 }

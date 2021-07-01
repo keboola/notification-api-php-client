@@ -22,11 +22,9 @@ class PostEventRequestTest extends TestCase
         );
         self::assertSame(
             [
-                'errorMessage' => 'My failed job',
-                'jobData' => [
-                    'project' => [
-                        'name' => 'my-project',
-                    ],
+                'name' => 'failed_job',
+                'data' => [
+                    'errorMessage' => 'My failed job',
                     'job' => [
                         'id' => '123',
                         'url' => 'http://someUrl',
@@ -34,6 +32,9 @@ class PostEventRequestTest extends TestCase
                         'endTime' => '2020-01-01',
                         'orchestrationName' => 'orchestration-name',
                         'tasks' => [],
+                    ],
+                    'project' => [
+                        'name' => 'my-project',
                     ],
                 ],
             ],

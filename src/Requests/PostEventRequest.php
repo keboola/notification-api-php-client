@@ -22,7 +22,9 @@ class PostEventRequest implements JsonSerializable
      */
     public function jsonSerialize()
     {
-        return $this->eventData->jsonSerialize();
+        $data['name'] = $this->eventType;
+        $data['data'] = $this->eventData->jsonSerialize();
+        return $data;
     }
 
     public function getEventType(): string

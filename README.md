@@ -3,26 +3,34 @@
 PHP client for the Notification API ([API docs](https://app.swaggerhub.com/apis/odinuv/notifications-service/1.0.0)).
 
 ## Usage
+The client uses two kinds of authorizations - Storage API token for Subscription API (`SubscriptionClient` class) and 
+Manage API Application token with scope `notifications:push-event` for the Events API (`EventsClient` class).
+
 ```bash
 composer require keboola/notification-api-php-client
 ```
 
 ```php
-use Keboola\JobQueueClient\Client;
-use Keboola\JobQueueClient\JobData;use Psr\Log\NullLogger;
+use Keboola\NotificationClient\EventsClient;
+use Keboola\NotificationClient\Requests\PostEvent\FailedJobEventData;
+use Keboola\NotificationClient\Requests\PostEvent\JobData;
+use Keboola\NotificationClient\Requests\PostEventRequest;
+use Psr\Log\NullLogger;
 
-$client = new Client(
+$client = new EventsClient(
     new NullLogger(),
-    'http://queue.conenection.keboola.com/',
+    'http://notifications.connection.keboola.com/',
     'xxx-xxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 );
-$result = $client->createJob(new JobData(
-    'keboola.ex-db-snowflake',
-    '123',
-    [],
-    'run'
-));
-var_dump($result['id']);
+$client->postEvent(
+    new PostEventRequest(
+        'job_failed',
+        new FailedJobEventData(
+            'job failed',
+            new JobData('my-project', '123', 'http://someUrl', '2020-01-02', '2020-01-01', 'my-orchestration')
+        )
+    )
+);
 ```
 
 ## Development
@@ -45,7 +53,7 @@ var_dump($result['id']);
 - Add the credentials to the k8s cluster:
 
     ```bash
-        kubectl create secret docker-registry regcred --docker-server="https://keboolapes.azurecr.io" --docker-username="$SP_APP_ID" --docker-password="$SP_PASSWORD" --namespace dev-job-queue-api-php-client
+        kubectl create secret docker-registry regcred --docker-server="https://keboolapes.azurecr.io" --docker-username="$SP_APP_ID" --docker-password="$SP_PASSWORD" --namespace dev-notification-client
         kubectl patch serviceaccount default -p "{\"imagePullSecrets\":[{\"name\":\"regcred\"}]}" --namespace dev-notification-client
     ```
 
@@ -70,33 +78,33 @@ var_dump($result['id']);
 - Create a resource group:
     ```bash
     az account set --subscription "Keboola DEV PS Team CI"
-    az group create --name testing-job-queue-api-php-client --location "East US"
+    az group create --name testing-notification-api-php-client --location "East US"
     ```
 
 - Create a service principal:
     ```bash
-    az ad sp create-for-rbac --name testing-job-queue-api-php-client
+    az ad sp create-for-rbac --name testing-notification-api-php-client
     ```
 
-- Use the response to set values `test_azure_client_id`, `test_azure_client_secret` and `test_azure_tenant_id` in the `set-env.sh` file:
+- Use the response to set values `TEST_AZURE_CLIENT_ID`, `TEST_AZURE_CLIENT_SECRET` and `TEST_AZURE_TENANT_ID` in the `set-env.sh` file:
     ```json 
     {
-      "appId": "268a6f05-xxxxxxxxxxxxxxxxxxxxxxxxxxx", //-> test_azure_client_id
-      "displayName": "testing-job-queue-internal-api-php-client",
-      "name": "http://testing-job-queue-internal-api-php-client",
-      "password": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", //-> test_azure_client_secret
-      "tenant": "9b85ee6f-xxxxxxxxxxxxxxxxxxxxxxxxxxx" //-> test_azure_tenant_id
+      "appId": "268a6f05-xxxxxxxxxxxxxxxxxxxxxxxxxxx", //-> TEST_AZURE_CLIENT_ID
+      "displayName": "testing-notification-api-php-client",
+      "name": "http://testing-notification-api-php-client",
+      "password": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", //-> TEST_AZURE_CLIENT_SECRET
+      "tenant": "9b85ee6f-xxxxxxxxxxxxxxxxxxxxxxxxxxx" //-> TEST_AZURE_TENANT_ID
     }
     ```
 
 - Get ID of the service principal:
     ```bash
-    SERVICE_PRINCIPAL_ID=$(az ad sp list --display-name testing-job-queue-api-php-client --query "[0].objectId" --output tsv)
+    SERVICE_PRINCIPAL_ID=$(az ad sp list --display-name testing-notification-api-php-client --query "[0].objectId" --output tsv)
     ```
  
 - Deploy the key vault, provide tenant ID, service principal ID and group ID from the previous commands:
     ```bash
-    az deployment group create --resource-group testing-job-queue-api-php-client --template-file provisioning/azure.json --parameters vault_name=test-job-queue-client tenant_id=$test_azure_tenant_id service_principal_object_id=$SERVICE_PRINCIPAL_ID
+    az deployment group create --resource-group testing-job-queue-api-php-client --template-file provisioning/azure.json --parameters vault_name=test-job-queue-client tenant_id=$TEST_AZURE_TENANT_ID service_principal_object_id=$SERVICE_PRINCIPAL_ID
     ```
   
 - Show Key Vault URL
@@ -118,7 +126,8 @@ export AZURE_LOGS_ABS_CONNECTION_STRING_BASE64=$(printf "%s" "$AZURE_LOGS_ABS_CO
 
 ./set-env.sh
 envsubst < provisioning/environments.yaml.template > provisioning/environments.yaml
-kubectl apply -f ./notification.yaml
+kubectl apply -f provisioning/environments.yaml
+kubectl apply -f provisioning/notification.yaml
 TEST_NOTIFICATION_API_IP=`kubectl get svc --output jsonpath --template "{.items[?(@.metadata.name==\"dev-notification-service\")].status.loadBalancer.ingress[].ip}" --namespace=dev-notification-client`
 
 printf "TEST_NOTIFICATION_API_URL: http://%s:8181" "$TEST_NOTIFICATION_API_IP"
