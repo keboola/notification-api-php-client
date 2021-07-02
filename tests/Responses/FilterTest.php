@@ -20,7 +20,10 @@ class FilterTest extends TestCase
     public function testInvalidData(): void
     {
         self::expectException(ClientException::class);
-        self::expectExceptionMessage('$field must be string, null used');
+        self::expectExceptionMessage(
+            'Unrecognized response: Typed property Keboola\NotificationClient\Responses\Filter::' .
+            '$field must be string, null used'
+        );
         new Filter(['boo']);
     }
 }
