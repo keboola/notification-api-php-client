@@ -20,7 +20,7 @@ class FilterTest extends TestCase
     public function testInvalidData(): void
     {
         self::expectException(ClientException::class);
-        self::expectExceptionMessage('Unrecognized response: Undefined index: field');
+        self::expectExceptionMessage('$field must be string, null used');
         new Filter(['boo']);
     }
 }
