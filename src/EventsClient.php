@@ -7,7 +7,7 @@ namespace Keboola\NotificationClient;
 use GuzzleHttp\Psr7\Request;
 use JsonException;
 use Keboola\NotificationClient\Exception\ClientException;
-use Keboola\NotificationClient\Requests\PostEventRequest;
+use Keboola\NotificationClient\Requests\Event;
 use Psr\Log\LoggerInterface;
 
 class EventsClient extends Client
@@ -25,7 +25,7 @@ class EventsClient extends Client
         parent::__construct($notificationApiUrl, $applicationToken, $options);
     }
 
-    public function postEvent(PostEventRequest $requestData): void
+    public function postEvent(Event $requestData): void
     {
         try {
             $jobDataJson = json_encode($requestData->jsonSerialize(), JSON_THROW_ON_ERROR);

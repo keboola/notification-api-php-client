@@ -7,8 +7,8 @@ namespace Keboola\NotificationClient;
 use GuzzleHttp\Psr7\Request;
 use JsonException;
 use Keboola\NotificationClient\Exception\ClientException;
-use Keboola\NotificationClient\Requests\PostSubscriptionRequest;
-use Psr\Log\LoggerInterface;
+use Keboola\NotificationClient\Requests\Subscription as RequestSubscription;
+use Keboola\NotificationClient\Responses\Subscription as ResponseSubscription;
 
 class SubscriptionClient extends Client
 {
@@ -25,7 +25,7 @@ class SubscriptionClient extends Client
         parent::__construct($notificationApiUrl, $storageApiToken, $options);
     }
 
-    public function createSubscription(PostSubscriptionRequest $requestData): array
+    public function createSubscription(RequestSubscription $requestData): ResponseSubscription
     {
         try {
             $jobDataJson = json_encode($requestData->jsonSerialize(), JSON_THROW_ON_ERROR);
@@ -33,6 +33,6 @@ class SubscriptionClient extends Client
         } catch (JsonException $e) {
             throw new ClientException('Invalid job data: ' . $e->getMessage(), $e->getCode(), $e);
         }
-        return $this->sendRequest($request);
+        return new ResponseSubscription($this->sendRequest($request));
     }
 }

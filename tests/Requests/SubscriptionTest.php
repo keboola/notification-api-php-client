@@ -6,14 +6,14 @@ namespace Keboola\NotificationClient\Tests\Requests;
 
 use Keboola\NotificationClient\Requests\PostSubscription\EmailRecipient;
 use Keboola\NotificationClient\Requests\PostSubscription\Filter;
-use Keboola\NotificationClient\Requests\PostSubscriptionRequest;
+use Keboola\NotificationClient\Requests\Subscription;
 use PHPUnit\Framework\TestCase;
 
-class PostSubscriptionRequestTest extends TestCase
+class SubscriptionTest extends TestCase
 {
     public function testJsonSerialize(): void
     {
-        $subscriptionRequest = new PostSubscriptionRequest(
+        $subscriptionRequest = new Subscription(
             'job_failed',
             new EmailRecipient('john.doe@example.com'),
             [new Filter('foo', 'bar')]
@@ -38,7 +38,7 @@ class PostSubscriptionRequestTest extends TestCase
 
     public function testJsonSerializeStrangeFilters(): void
     {
-        $subscriptionRequest = new PostSubscriptionRequest(
+        $subscriptionRequest = new Subscription(
             'job_failed',
             new EmailRecipient('john.doe@example.com'),
             ['a' => new Filter('foo', 'bar'), '4filter' => new Filter('bar', 'Kochba')]
@@ -54,7 +54,7 @@ class PostSubscriptionRequestTest extends TestCase
                     [
                         'field' => 'bar',
                         'value' => 'Kochba',
-                    ]
+                    ],
                 ],
                 'recipient' => [
                     'channel' => 'email',

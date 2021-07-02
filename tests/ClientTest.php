@@ -13,10 +13,11 @@ use Keboola\NotificationClient\EventsClient;
 use Keboola\NotificationClient\Exception\ClientException;
 use Keboola\NotificationClient\Requests\PostEvent\FailedJobEventData;
 use Keboola\NotificationClient\Requests\PostEvent\JobData;
-use Keboola\NotificationClient\Requests\PostEventRequest;
+use Keboola\NotificationClient\Requests\Event;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\Test\TestLogger;
 
-class ClientTest extends BaseTest
+class ClientTest extends TestCase
 {
     private function getClient(array $options): EventsClient
     {
@@ -94,9 +95,9 @@ class ClientTest extends BaseTest
         new EventsClient('invalid url', '');
     }
 
-    private function getPostEventData(): PostEventRequest
+    private function getPostEventData(): Event
     {
-        return new PostEventRequest(
+        return new Event(
             'job_failed',
             new FailedJobEventData(
                 'job failed',

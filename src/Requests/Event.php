@@ -6,7 +6,7 @@ namespace Keboola\NotificationClient\Requests;
 
 use JsonSerializable;
 
-class PostEventRequest implements JsonSerializable
+class Event implements JsonSerializable
 {
     private JsonSerializable $eventData;
     private string $eventType;
@@ -22,9 +22,7 @@ class PostEventRequest implements JsonSerializable
      */
     public function jsonSerialize()
     {
-        //$data['name'] = $this->eventType;
-        $data['data'] = $this->eventData->jsonSerialize();
-        return $data;
+        return $this->eventData->jsonSerialize();
     }
 
     public function getEventType(): string

@@ -7,10 +7,10 @@ namespace Keboola\NotificationClient\Tests;
 use Keboola\NotificationClient\EventsClient;
 use Keboola\NotificationClient\Requests\PostEvent\FailedJobEventData;
 use Keboola\NotificationClient\Requests\PostEvent\JobData;
-use Keboola\NotificationClient\Requests\PostEventRequest;
-use Psr\Log\NullLogger;
+use Keboola\NotificationClient\Requests\Event;
+use PHPUnit\Framework\TestCase;
 
-class EventsClientFunctionalTest extends BaseTest
+class EventsClientFunctionalTest extends TestCase
 {
     private function getClient(): EventsClient
     {
@@ -23,7 +23,7 @@ class EventsClientFunctionalTest extends BaseTest
     public function testPostEvent(): void
     {
         $client = $this->getClient();
-        $client->postEvent(new PostEventRequest(
+        $client->postEvent(new Event(
             'job_failed',
             new FailedJobEventData(
                 'job failed',

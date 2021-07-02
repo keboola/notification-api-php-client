@@ -9,7 +9,7 @@ use Keboola\NotificationClient\Exception\ClientException;
 use Keboola\NotificationClient\Requests\PostSubscription\EmailRecipient;
 use Keboola\NotificationClient\Requests\PostSubscription\Filter;
 
-class PostSubscriptionRequest implements JsonSerializable
+class Subscription implements JsonSerializable
 {
     private const VALID_EVENT_TYPES = ['job_failed'];
 
@@ -43,10 +43,10 @@ class PostSubscriptionRequest implements JsonSerializable
      */
     public function jsonSerialize()
     {
-        $filters = array_map(
+        $filters = array_values(array_map(
             fn (Filter $v) => $v->jsonSerialize(),
             $this->filters
-        );
+        ));
         return [
             'event' => $this->eventType,
             'filters' => $filters,

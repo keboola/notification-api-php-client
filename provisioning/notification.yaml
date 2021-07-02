@@ -138,7 +138,10 @@ spec:
                   name: dev-notification-environments
                   key: databaseUrl
             - name: MAILER_DSN
-              value: 'null://null'
+              valueFrom:
+                configMapKeyRef:
+                  name: dev-notification-environments
+                  key: mailerUrl
 
           readinessProbe:
             httpGet:

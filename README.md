@@ -14,7 +14,7 @@ composer require keboola/notification-api-php-client
 use Keboola\NotificationClient\EventsClient;
 use Keboola\NotificationClient\Requests\PostEvent\FailedJobEventData;
 use Keboola\NotificationClient\Requests\PostEvent\JobData;
-use Keboola\NotificationClient\Requests\PostEventRequest;
+use Keboola\NotificationClient\Requests\Event;
 use Psr\Log\NullLogger;
 
 $client = new EventsClient(
@@ -23,7 +23,7 @@ $client = new EventsClient(
     'xxx-xxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 );
 $client->postEvent(
-    new PostEventRequest(
+    new Event(
         'job_failed',
         new FailedJobEventData(
             'job failed',

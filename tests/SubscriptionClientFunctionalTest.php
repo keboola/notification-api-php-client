@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Keboola\NotificationClient\Tests;
 
 use Keboola\NotificationClient\Requests\PostSubscription\EmailRecipient;
-use Keboola\NotificationClient\Requests\PostSubscriptionRequest;
+use Keboola\NotificationClient\Requests\PostSubscription\Filter;
+use Keboola\NotificationClient\Requests\Subscription;
 use Keboola\NotificationClient\SubscriptionClient;
-use Psr\Log\NullLogger;
+use PHPUnit\Framework\TestCase;
 
-class SubscriptionClientFunctionalTest extends BaseTest
+class SubscriptionClientFunctionalTest extends TestCase
 {
     private function getClient(): SubscriptionClient
     {
@@ -22,16 +23,17 @@ class SubscriptionClientFunctionalTest extends BaseTest
     public function testCreateSubscription(): void
     {
         $client = $this->getClient();
-        $response = $client->createSubscription(new PostSubscriptionRequest(
+        $response = $client->createSubscription(new Subscription(
             'job_failed',
             new EmailRecipient('johnDoe@example.com'),
-            []
+            [new Filter('foo', 'bar')]
         ));
 
-        self::assertNotEmpty($response['id']);
-        self::assertSame('job_failed', $response['event']);
-        self::assertSame([], $response['filters']);
-        self::assertSame('johnDoe@example.com', $response['recipient']['address']);
-        self::assertSame('email', $response['recipient']['channel']);
+        self::assertNotEmpty($response->getId());
+        self::assertSame('job_failed', $response->getEvent());
+        self::assertSame('foo', $response->getFilters()[0]->getField());
+        self::assertSame('bar', $response->getFilters()[0]->getValue());
+        self::assertSame('johnDoe@example.com', $response->getRecipientAddress());
+        self::assertSame('email', $response->getRecipientChannel());
     }
 }
