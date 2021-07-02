@@ -97,6 +97,7 @@ stages:
           - script: |
               set -Eeuo pipefail
 
+              ls -laR
               kubectl delete -f ./provisioning/environments.yaml
               kubectl delete -f ./provisioning/notification.yaml
             displayName: Cleanup cluster
