@@ -18,12 +18,11 @@ class EventsClient extends Client
     }
 
     public function __construct(
-        LoggerInterface $logger,
         string $notificationApiUrl,
         string $applicationToken,
         array $options = []
     ) {
-        parent::__construct($logger, $notificationApiUrl, $applicationToken, $options);
+        parent::__construct($notificationApiUrl, $applicationToken, $options);
     }
 
     public function postEvent(PostEventRequest $requestData): void

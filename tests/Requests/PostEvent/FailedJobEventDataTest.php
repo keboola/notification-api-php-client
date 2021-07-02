@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class FailedJobEventDataTest extends TestCase
 {
-    public function testCreate(): void
+    public function testJsonSerialize(): void
     {
         $jobData = new JobData(
             'test-project',

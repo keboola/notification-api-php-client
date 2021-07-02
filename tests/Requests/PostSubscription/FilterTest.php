@@ -9,12 +9,12 @@ use PHPUnit\Framework\TestCase;
 
 class FilterTest extends TestCase
 {
-    public function testCreate(): void
+    public function testJsonSerialize(): void
     {
         $filter = new Filter('someName', 'someValue');
         self::assertSame(
             [
-                'name' => 'someName',
+                'field' => 'someName',
                 'value' => 'someValue',
             ],
             $filter->jsonSerialize()

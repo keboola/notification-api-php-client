@@ -13,10 +13,10 @@ class PostSubscriptionRequest implements JsonSerializable
 {
     private const VALID_EVENT_TYPES = ['job_failed'];
 
-    protected string $eventType;
-    protected EmailRecipient $recipient;
+    private string $eventType;
+    private EmailRecipient $recipient;
     /** @var array<Filter> */
-    protected array $filters;
+    private array $filters;
 
     /**
      * PostSubscriptionRequest constructor.
@@ -44,9 +44,7 @@ class PostSubscriptionRequest implements JsonSerializable
     public function jsonSerialize()
     {
         $filters = array_map(
-            function (Filter $v) {
-                return $v->jsonSerialize();
-            },
+            fn (Filter $v) => $v->jsonSerialize(),
             $this->filters
         );
         return [

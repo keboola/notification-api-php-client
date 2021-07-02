@@ -29,14 +29,9 @@ abstract class Client
     private const DEFAULT_BACKOFF_RETRIES = 3;
     private const JSON_DEPTH = 512;
 
-    /** @var GuzzleClient */
-    protected $guzzle;
-    /** @var LoggerInterface */
-    // phpcs:ignore
-    private $logger;
+    protected GuzzleClient $guzzle;
 
     public function __construct(
-        LoggerInterface $logger,
         string $notificationApiUrl,
         string $token,
         array $options = []
@@ -64,7 +59,6 @@ abstract class Client
             throw new NotificationClientException('Invalid parameters when creating client: ' . $messages);
         }
         $this->guzzle = $this->initClient($notificationApiUrl, $token, $options);
-        $this->logger = $logger;
     }
 
     private function createDefaultDecider(int $maxRetries): Closure

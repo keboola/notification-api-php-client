@@ -14,16 +14,13 @@ use Keboola\NotificationClient\Exception\ClientException;
 use Keboola\NotificationClient\Requests\PostEvent\FailedJobEventData;
 use Keboola\NotificationClient\Requests\PostEvent\JobData;
 use Keboola\NotificationClient\Requests\PostEventRequest;
-use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 use Psr\Log\Test\TestLogger;
 
 class ClientTest extends BaseTest
 {
-    private function getClient(array $options, ?LoggerInterface $logger = null): EventsClient
+    private function getClient(array $options): EventsClient
     {
         return new EventsClient(
-            $logger ?? new NullLogger(),
             'http://example.com/',
             'testToken',
             $options
@@ -37,7 +34,6 @@ class ClientTest extends BaseTest
             'Invalid parameters when creating client: Value "abc" is invalid: This value should be a valid number'
         );
         new EventsClient(
-            new NullLogger(),
             'http://example.com/',
             'testToken',
             ['backoffMaxTries' => 'abc']
@@ -51,7 +47,6 @@ class ClientTest extends BaseTest
             'Invalid parameters when creating client: Value "-1" is invalid: This value should be between 0 and 100.'
         );
         new EventsClient(
-            new NullLogger(),
             'http://example.com/',
             'testToken',
             ['backoffMaxTries' => -1]
@@ -65,7 +60,6 @@ class ClientTest extends BaseTest
             'Invalid parameters when creating client: Value "101" is invalid: This value should be between 0 and 100.'
         );
         new EventsClient(
-            new NullLogger(),
             'http://example.com/',
             'testToken',
             ['backoffMaxTries' => 101]
@@ -78,7 +72,7 @@ class ClientTest extends BaseTest
         self::expectExceptionMessage(
             'Invalid parameters when creating client: Value "" is invalid: This value should not be blank.'
         );
-        new EventsClient(new NullLogger(), 'http://example.com/', '');
+        new EventsClient('http://example.com/', '');
     }
 
     public function testCreateClientInvalidUrl(): void
@@ -87,7 +81,7 @@ class ClientTest extends BaseTest
         self::expectExceptionMessage(
             'Invalid parameters when creating client: Value "invalid url" is invalid: This value is not a valid URL.'
         );
-        new EventsClient(new NullLogger(), 'invalid url', 'testToken');
+        new EventsClient('invalid url', 'testToken');
     }
 
     public function testCreateClientMultipleErrors(): void
@@ -97,7 +91,7 @@ class ClientTest extends BaseTest
             'Invalid parameters when creating client: Value "invalid url" is invalid: This value is not a valid URL.'
             . "\n" . 'Value "" is invalid: This value should not be blank.' . "\n"
         );
-        new EventsClient(new NullLogger(), 'invalid url', '');
+        new EventsClient('invalid url', '');
     }
 
     private function getPostEventData(): PostEventRequest
@@ -221,7 +215,7 @@ class ClientTest extends BaseTest
     public function testRetryFailure(): void
     {
         $responses = [];
-        for ($i = 0; $i < 30; $i++) {
+        for ($i = 0; $i < 2; $i++) {
             $responses[] = new Response(
                 500,
                 ['Content-Type' => 'application/json'],
@@ -242,32 +236,6 @@ class ClientTest extends BaseTest
             self::assertStringContainsString('500 Internal Server Error', $e->getMessage());
         }
         self::assertCount(2, $requestHistory);
-    }
-
-    public function testRetryFailureReducedBackoff(): void
-    {
-        $responses = [];
-        for ($i = 0; $i < 30; $i++) {
-            $responses[] = new Response(
-                500,
-                ['Content-Type' => 'application/json'],
-                '{"message" => "Out of order"}'
-            );
-        }
-        $mock = new MockHandler($responses);
-        // Add the history middleware to the handler stack.
-        $requestHistory = [];
-        $history = Middleware::history($requestHistory);
-        $stack = HandlerStack::create($mock);
-        $stack->push($history);
-        $client = $this->getClient(['handler' => $stack, 'backoffMaxTries' => 3]);
-        try {
-            $client->postEvent($this->getPostEventData());
-            self::fail('Must throw exception');
-        } catch (ClientException $e) {
-            self::assertStringContainsString('500 Internal Server Error', $e->getMessage());
-        }
-        self::assertCount(4, $requestHistory);
     }
 
     public function testNoRetry(): void

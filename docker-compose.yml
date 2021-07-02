@@ -3,9 +3,7 @@ version: "3"
 services:
   tests: &tests
     image: keboola/dev-notification-api-php-client
-    build:
-      context: .
-      dockerfile: Dockerfile
+    build: .
     volumes:
       - ./build/logs/:/code/build/logs/
     environment:

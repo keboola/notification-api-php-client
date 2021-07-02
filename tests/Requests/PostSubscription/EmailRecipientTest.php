@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class EmailRecipientTest extends TestCase
 {
-    public function testCrate(): void
+    public function testJsonSerialize(): void
     {
         $emailRecipient = new EmailRecipient('John.Doe@example.com');
         self::assertSame(

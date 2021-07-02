@@ -18,12 +18,11 @@ class SubscriptionClient extends Client
     }
 
     public function __construct(
-        LoggerInterface $logger,
         string $notificationApiUrl,
         string $storageApiToken,
         array $options = []
     ) {
-        parent::__construct($logger, $notificationApiUrl, $storageApiToken, $options);
+        parent::__construct($notificationApiUrl, $storageApiToken, $options);
     }
 
     public function createSubscription(PostSubscriptionRequest $requestData): array

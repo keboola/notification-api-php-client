@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class JobDataTest extends TestCase
 {
-    public function testCreate(): void
+    public function testJsonSerialize(): void
     {
         $jobData = new JobData(
             'test-project',

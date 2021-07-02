@@ -15,7 +15,6 @@ class EventsClientFunctionalTest extends BaseTest
     private function getClient(): EventsClient
     {
         return new EventsClient(
-            new NullLogger(),
             (string) getenv('TEST_NOTIFICATION_API_URL'),
             (string) getenv('TEST_MANAGE_API_APPLICATION_TOKEN')
         );
@@ -38,6 +37,6 @@ class EventsClientFunctionalTest extends BaseTest
                 )
             )
         ));
-        self:self::assertTrue(true);
+        self::assertTrue(true);
     }
 }

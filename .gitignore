@@ -1,7 +1,5 @@
 vendor/
 .idea/
-cache/
-docs/
 composer.lock
 /.php_cs.cache
 /build/logs

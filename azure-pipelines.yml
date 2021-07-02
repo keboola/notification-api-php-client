@@ -97,12 +97,8 @@ stages:
           - script: |
               set -Eeuo pipefail
 
-              kubectl delete deployment dev-mysql --namespace=$KUBERNETES_NAMESPACE
-              kubectl delete deployment dev-notification-api --namespace=$KUBERNETES_NAMESPACE
-              kubectl delete service dev-mysql-service --namespace=$KUBERNETES_NAMESPACE
-              kubectl delete service dev-notification-service --namespace=$KUBERNETES_NAMESPACE
-              kubectl delete secret dev-notification-environments --namespace=$KUBERNETES_NAMESPACE
-              kubectl delete configmap dev-notification-environments --namespace=$KUBERNETES_NAMESPACE
+              kubectl delete -f ./provisioning/environments.yaml
+              kubectl delete -f ./provisioning/notification.yaml
             displayName: Cleanup cluster
             env:
               KUBERNETES_NAMESPACE: $(k8sNamespace)

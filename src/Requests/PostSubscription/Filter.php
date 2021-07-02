@@ -8,12 +8,12 @@ use JsonSerializable;
 
 class Filter implements JsonSerializable
 {
-    private string $name;
+    private string $field;
     private string $value;
 
-    public function __construct(string $name, string $value)
+    public function __construct(string $field, string $value)
     {
-        $this->name = $name;
+        $this->field = $field;
         $this->value = $value;
     }
 
@@ -23,7 +23,7 @@ class Filter implements JsonSerializable
     public function jsonSerialize()
     {
         return [
-            'name' => $this->name,
+            'field' => $this->field,
             'value' => $this->value,
         ];
     }

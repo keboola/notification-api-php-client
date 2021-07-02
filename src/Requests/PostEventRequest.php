@@ -8,8 +8,8 @@ use JsonSerializable;
 
 class PostEventRequest implements JsonSerializable
 {
-    protected JsonSerializable $eventData;
-    protected string $eventType;
+    private JsonSerializable $eventData;
+    private string $eventType;
 
     public function __construct(string $eventType, JsonSerializable $eventData)
     {
@@ -22,7 +22,7 @@ class PostEventRequest implements JsonSerializable
      */
     public function jsonSerialize()
     {
-        $data['name'] = $this->eventType;
+        //$data['name'] = $this->eventType;
         $data['data'] = $this->eventData->jsonSerialize();
         return $data;
     }

@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 class PostEventRequestTest extends TestCase
 {
-    public function testCreate(): void
+    public function testJsonSerialize(): void
     {
         $postEventRequest = new PostEventRequest(
             'failed_job',
