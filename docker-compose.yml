@@ -1,0 +1,18 @@
+version: "3"
+
+services:
+  tests: &tests
+    image: keboola/dev-notification-api-php-client
+    build: .
+    volumes:
+      - ./build/logs/:/code/build/logs/
+    environment:
+      TEST_NOTIFICATION_API_URL:
+      TEST_STORAGE_API_TOKEN:
+      TEST_MANAGE_API_APPLICATION_TOKEN:
+    command: ['composer', 'ci']
+
+  tests-local:
+    <<: *tests
+    volumes:
+      - .:/code

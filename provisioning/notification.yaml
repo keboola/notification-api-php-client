@@ -1,0 +1,197 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: dev-mysql
+  namespace: dev-notification-client
+  labels:
+    app: dev-mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dev-mysql
+  template:
+    metadata:
+      labels:
+        app: dev-mysql
+      annotations:
+        log: "true"
+    spec:
+      containers:
+        - name: dev-mysql
+          image: mysql:8
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "512Mi"
+          ports:
+            - containerPort: 3306
+          args:
+            - --default-authentication-plugin=mysql_native_password
+          env:
+            - name: MYSQL_DATABASE
+              value: notifications
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: dev-notification-environments
+                  key: databasePassword
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: dev-notification-api
+  namespace: dev-notification-client
+  labels:
+    app: dev-notification-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dev-notification-api
+  template:
+    metadata:
+      labels:
+        app: dev-notification-api
+      annotations:
+        log: "true"
+    spec:
+      containers:
+        - name: dev-notification-api
+          image: keboolapes.azurecr.io/notification-service:latest
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
+          ports:
+            - containerPort: 80
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - 'php bin/console doctrine:migrations:migrate --no-interaction && apache2-foreground'
+          env:
+            - name: AWS_LOGS_S3_BUCKET
+              valueFrom:
+                configMapKeyRef:
+                  name: dev-notification-environments
+                  key: awsLogsS3Bucket
+            - name: AWS_REGION
+              valueFrom:
+                configMapKeyRef:
+                  name: dev-notification-environments
+                  key: awsRegion
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: dev-notification-environments
+                  key: awsAccessKeyId
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: dev-notification-environments
+                  key: awsSecretAccessKey
+
+            - name: AZURE_LOGS_ABS_CONTAINER
+              valueFrom:
+                configMapKeyRef:
+                  name: dev-notification-environments
+                  key: azureLogsAbsContainer
+            - name: AZURE_LOGS_ABS_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: dev-notification-environments
+                  key: azureLogsAbsConnectionString
+            - name: AZURE_CLIENT_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: dev-notification-environments
+                  key: azureClientId
+            - name: AZURE_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: dev-notification-environments
+                  key: azureClientSecret
+            - name: AZURE_TENANT_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: dev-notification-environments
+                  key: azureTenantId
+
+
+            - name: STORAGE_API_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: dev-notification-environments
+                  key: storageApiUrl
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: dev-notification-environments
+                  key: databaseUrl
+            - name: MAILER_DSN
+              valueFrom:
+                configMapKeyRef:
+                  name: dev-notification-environments
+                  key: mailerUrl
+
+          readinessProbe:
+            httpGet:
+              path: /health-check
+              port: 80
+              httpHeaders:
+                - name: Host
+                  value: KubernetesReadinessProbe
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            successThreshold: 1
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              port: 80
+              path: /health-check
+              httpHeaders:
+                - name: Host
+                  value: KubernetesLivelinessProbe
+            initialDelaySeconds: 60
+            periodSeconds: 100
+            successThreshold: 1
+            failureThreshold:
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: dev-notification-service
+  namespace: dev-notification-client
+spec:
+  type: LoadBalancer
+  selector:
+    app: dev-notification-api
+  ports:
+    - port: 8181
+      targetPort: 80
+      protocol: TCP
+      name: http
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: dev-mysql-service
+  namespace: dev-notification-client
+spec:
+  type: LoadBalancer
+  selector:
+    app: dev-mysql
+  ports:
+    - port: 3310
+      targetPort: 3306
+      protocol: TCP
+      name: mysql

@@ -1,0 +1,89 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vault_name": {
+            "type": "String"
+        },
+        "tenant_id": {
+            "type": "String"
+        },
+        "service_principal_object_id": {
+            "type": "String"
+        },
+        "group_object_id": {
+            "type": "String"
+        },
+        "storage_account_name": {
+            "type": "String"
+        },
+        "container_name": {
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "name": "[parameters('storage_account_name')]",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Standard_LRS"
+            },
+            "kind": "StorageV2",
+            "properties": {
+                "accessTier": "Cool"
+            },
+            "resources": [
+                {
+                    "type": "blobServices/containers",
+                    "apiVersion": "2018-07-01",
+                    "name": "[concat('default/', parameters('container_name'))]",
+                    "dependsOn": [
+                        "[parameters('storage_account_name')]"
+                    ],
+                    "properties": {
+                        "publicAccess": "None"
+                    }
+                },
+                {
+                    "name": "default",
+                    "type": "managementPolicies",
+                    "apiVersion": "2019-04-01",
+                    "dependsOn": [
+                        "[parameters('storage_account_name')]"
+                    ],
+                    "properties": {
+                        "policy": {
+                            "rules": [
+                                {
+                                    "enabled": true,
+                                    "name": "logs-expire",
+                                    "type": "Lifecycle",
+                                    "definition": {
+                                        "actions": {
+                                            "baseBlob": {
+                                                "delete": {
+                                                    "daysAfterModificationGreaterThan": 2
+                                                }
+                                            }
+                                        },
+                                        "filters": {
+                                            "blobTypes": [
+                                                "blockBlob"
+                                            ],
+                                            "prefixMatch": [
+                                                "[parameters('container_name')]"
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

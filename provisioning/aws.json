@@ -1,0 +1,99 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Resources for Notification Tests",
+    "Parameters": {},
+    "Resources": {
+        "NotificationS3LogsBucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "LifecycleConfiguration": {
+                    "Rules": [
+                        {
+                            "Id": "Delete debug files",
+                            "Prefix": "debug-files/",
+                            "ExpirationInDays": 7,
+                            "Status": "Enabled"
+                        }
+                    ]
+                },
+                "Tags": [
+                    {
+                        "Key": "KeboolaStack",
+                        "Value": {
+                            "Ref": "AWS::StackName"
+                        }
+                    }
+                ]
+            }
+        },
+        "NotificationUser": {
+            "Type": "AWS::IAM::User",
+            "DeletionPolicy": "Delete",
+            "Properties": {
+                "Path": "/",
+                "Policies": [
+                    {
+                        "PolicyName": "UseS3BucketPolicy",
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Sid": "UseS3Bucket",
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "s3:PutObject",
+                                        "s3:GetObject",
+                                        "s3:ListBucket",
+                                        "s3:DeleteObject"
+                                    ],
+                                    "Resource": [
+                                        {
+                                            "Fn::Join": [
+                                                "",
+                                                [
+                                                    "",
+                                                    {
+                                                        "Fn::GetAtt": [
+                                                            "NotificationS3LogsBucket",
+                                                            "Arn"
+                                                        ]
+                                                    },
+                                                    "/*"
+                                                ]
+                                            ]
+                                        },
+                                        {
+                                            "Fn::GetAtt": [
+                                                "NotificationS3LogsBucket",
+                                                "Arn"
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "DependsOn": [
+                "NotificationS3LogsBucket"
+            ]
+        }
+    },
+    "Outputs": {
+        "User": {
+            "Value": {
+                "Ref": "NotificationUser"
+            }
+        },
+        "Region": {
+            "Value": {
+                "Ref": "AWS::Region"
+            }
+        },
+        "S3LogsBucket": {
+            "Value": {
+                "Ref": "NotificationS3LogsBucket"
+            }
+        }
+    }
+}
