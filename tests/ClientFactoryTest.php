@@ -17,7 +17,7 @@ use Psr\Log\Test\TestLogger;
 
 class ClientFactoryTest extends TestCase
 {
-    public function getEventsClient(): void
+    public function testGetClient(): void
     {
         $mock = new MockHandler([
             new Response(
@@ -43,7 +43,7 @@ class ClientFactoryTest extends TestCase
                         "features": [
                             "use-different-stack-payg-wizard",
                             "use-payg-wizard-instead-of-registration"
-                        ],
+                        ]
                     }'
             ),
         ]);
