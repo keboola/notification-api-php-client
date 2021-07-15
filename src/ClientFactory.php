@@ -6,7 +6,7 @@ namespace Keboola\NotificationClient;
 
 class ClientFactory
 {
-    const NOTIFICATION_SERVICE_NAME = 'notification';
+    private const NOTIFICATION_SERVICE_NAME = 'notification';
     private string $notificationUrl;
 
     public function __construct(string $connectionUrl, array $connectionClientOptions = [])
