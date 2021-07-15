@@ -71,7 +71,7 @@ class ClientTest extends TestCase
     {
         self::expectException(ClientException::class);
         self::expectExceptionMessage(
-            'Invalid parameters when creating client: Value "" is invalid: This value should not be blank.'
+            'Application token must be non-empty, "" provided.'
         );
         new EventsClient('http://example.com/', '');
     }
@@ -80,7 +80,7 @@ class ClientTest extends TestCase
     {
         self::expectException(ClientException::class);
         self::expectExceptionMessage(
-            'Invalid parameters when creating client: Value "invalid url" is invalid: This value is not a valid URL.'
+            'Value "invalid url" is invalid: This value is not a valid URL'
         );
         new EventsClient('invalid url', 'testToken');
     }
@@ -90,9 +90,9 @@ class ClientTest extends TestCase
         self::expectException(ClientException::class);
         self::expectExceptionMessage(
             'Invalid parameters when creating client: Value "invalid url" is invalid: This value is not a valid URL.'
-            . "\n" . 'Value "" is invalid: This value should not be blank.' . "\n"
+            . "\n" . 'Value "abc" is invalid: This value should be a valid number.'
         );
-        new EventsClient('invalid url', '');
+        new EventsClient('invalid url', 'SomeToken', ['backoffMaxTries' => 'abc']);
     }
 
     private function getPostEventData(): Event

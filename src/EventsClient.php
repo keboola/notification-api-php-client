@@ -8,7 +8,6 @@ use GuzzleHttp\Psr7\Request;
 use JsonException;
 use Keboola\NotificationClient\Exception\ClientException;
 use Keboola\NotificationClient\Requests\Event;
-use Psr\Log\LoggerInterface;
 
 class EventsClient extends Client
 {
@@ -22,6 +21,12 @@ class EventsClient extends Client
         string $applicationToken,
         array $options = []
     ) {
+        if (empty($applicationToken)) {
+            throw new ClientException(sprintf(
+                'Application token must be non-empty, %s provided.',
+                json_encode($applicationToken)
+            ));
+        }
         parent::__construct($notificationApiUrl, $applicationToken, $options);
     }
 

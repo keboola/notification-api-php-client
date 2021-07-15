@@ -21,8 +21,7 @@ class FilterTest extends TestCase
     {
         self::expectException(ClientException::class);
         self::expectExceptionMessage(
-            'Unrecognized response: Typed property Keboola\NotificationClient\Responses\Filter::' .
-            '$field must be string, null used'
+            'Unrecognized response: Undefined index: field'
         );
         new Filter(['boo']);
     }

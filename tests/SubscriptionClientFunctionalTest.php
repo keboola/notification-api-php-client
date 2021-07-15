@@ -26,13 +26,13 @@ class SubscriptionClientFunctionalTest extends TestCase
         $response = $client->createSubscription(new Subscription(
             'job_failed',
             new EmailRecipient('johnDoe@example.com'),
-            [new Filter('foo', 'bar')]
+            [new Filter('projectId', (string) getenv('TEST_STORAGE_API_PROJECT_ID'))]
         ));
 
         self::assertNotEmpty($response->getId());
         self::assertSame('job_failed', $response->getEvent());
-        self::assertSame('foo', $response->getFilters()[0]->getField());
-        self::assertSame('bar', $response->getFilters()[0]->getValue());
+        self::assertSame('projectId', $response->getFilters()[0]->getField());
+        self::assertSame((string) getenv('TEST_STORAGE_API_PROJECT_ID'), $response->getFilters()[0]->getValue());
         self::assertSame('johnDoe@example.com', $response->getRecipientAddress());
         self::assertSame('email', $response->getRecipientChannel());
     }

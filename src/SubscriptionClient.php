@@ -22,6 +22,12 @@ class SubscriptionClient extends Client
         string $storageApiToken,
         array $options = []
     ) {
+        if (empty($storageApiToken)) {
+            throw new ClientException(sprintf(
+                'Storage API token must be non-empty, %s provided.',
+                json_encode($storageApiToken)
+            ));
+        }
         parent::__construct($notificationApiUrl, $storageApiToken, $options);
     }
 

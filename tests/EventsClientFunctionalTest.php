@@ -24,13 +24,13 @@ class EventsClientFunctionalTest extends TestCase
     {
         $client = $this->getClient();
         $client->postEvent(new Event(
-            'job_failed',
+            'jobFailed',
             new FailedJobEventData(
                 'job failed',
                 new JobData(
                     'my-project',
                     '123',
-                    'http://someUrl',
+                    'https://someUrl',
                     '2021-06-07T10:00:00Z',
                     '2021-06-07T10:00:00Z',
                     'my-orchestration'

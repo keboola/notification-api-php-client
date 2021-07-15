@@ -33,6 +33,15 @@ $client->postEvent(
 );
 ```
 
+or use a factory to create the client
+
+```php
+use Keboola\NotificationClient\ClientFactory;
+
+$clientFactory = new ClientFactory('https://connection.keboola.com');
+$clientFactory->getEventsClient('xxx-xxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+```
+
 ## Development
 - Create an Azure service principal to download the required images and login:
 
@@ -61,6 +70,7 @@ $client->postEvent(
     - `STORAGE_API_URL` - Keboola Connection URL.
     - `TEST_STORAGE_API_TOKEN` - Token to a test project.
     - `TEST_MANAGE_API_APPLICATION_TOKEN` - Application token with scope `notifications:push-event`.
+    - `TEST_STORAGE_API_URL` - Storage API URL to arbitrary stack where the notification service is registered.
 
 - Set one of Azure or AWS resources (or both, but only one is needed).  
 

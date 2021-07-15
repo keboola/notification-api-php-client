@@ -17,7 +17,6 @@ use Keboola\NotificationClient\Exception\ClientException as NotificationClientEx
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\ConstraintViolationInterface;
@@ -32,15 +31,12 @@ abstract class Client
     protected GuzzleClient $guzzle;
 
     public function __construct(
-        string $notificationApiUrl,
-        string $token,
+        string $baseUrl,
+        ?string $token,
         array $options = []
     ) {
         $validator = Validation::createValidator();
-        $errors = $validator->validate($notificationApiUrl, [new Url()]);
-        $errors->addAll(
-            $validator->validate($token, [new NotBlank()])
-        );
+        $errors = $validator->validate($baseUrl, [new Url()]);
         if (!empty($options['backoffMaxTries'])) {
             $errors->addAll($validator->validate($options['backoffMaxTries'], [new Range(['min' => 0, 'max' => 100])]));
             $options['backoffMaxTries'] = intval($options['backoffMaxTries']);
@@ -58,7 +54,7 @@ abstract class Client
             }
             throw new NotificationClientException('Invalid parameters when creating client: ' . $messages);
         }
-        $this->guzzle = $this->initClient($notificationApiUrl, $token, $options);
+        $this->guzzle = $this->initClient($baseUrl, $token, $options);
     }
 
     private function createDefaultDecider(int $maxRetries): Closure
@@ -79,9 +75,9 @@ abstract class Client
         };
     }
 
-    abstract protected function getTokenHeaderName(): string;
+    abstract protected function getTokenHeaderName(): ?string;
 
-    private function initClient(string $url, string $token, array $options = []): GuzzleClient
+    private function initClient(string $url, ?string $token, array $options = []): GuzzleClient
     {
         // Initialize handlers (start with those supplied in constructor)
         $handlerStack = HandlerStack::create($options['handler'] ?? null);
@@ -90,10 +86,16 @@ abstract class Client
         // Set handler to set default headers
         $handlerStack->push(Middleware::mapRequest(
             function (RequestInterface $request) use ($token, $options) {
-                return $request
-                    ->withHeader('User-Agent', $options['userAgent'])
-                    ->withHeader($this->getTokenHeaderName(), $token)
-                    ->withHeader('Content-type', 'application/json');
+                if ($this->getTokenHeaderName()) {
+                    return $request
+                        ->withHeader('User-Agent', $options['userAgent'])
+                        ->withHeader((string) $this->getTokenHeaderName(), (string) $token)
+                        ->withHeader('Content-type', 'application/json');
+                } else {
+                    return $request
+                        ->withHeader('User-Agent', $options['userAgent'])
+                        ->withHeader('Content-type', 'application/json');
+                }
             }
         ));
         // Set client logger
