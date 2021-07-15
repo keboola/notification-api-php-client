@@ -23,6 +23,7 @@ class FilterTest extends TestCase
         self::expectExceptionMessage(
             'Unrecognized response: Typed property Keboola\NotificationClient\Responses\Filter::$field must be string'
         );
+        self::expectExceptionCode(0);
         new Filter(['boo']);
     }
 }

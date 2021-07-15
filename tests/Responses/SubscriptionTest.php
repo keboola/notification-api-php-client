@@ -20,7 +20,7 @@ class SubscriptionTest extends TestCase
                 'address' => 'foo',
             ],
             'filters' => [
-                [
+                2 => [
                     'field' => 'bar',
                     'value' => 'Kochba',
                 ],
@@ -44,6 +44,7 @@ class SubscriptionTest extends TestCase
         ];
         self::expectException(ClientException::class);
         self::expectExceptionMessage('$id must be string, int used');
+        self::expectExceptionCode(0);
         new Subscription($data);
     }
 }

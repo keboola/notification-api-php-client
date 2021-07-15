@@ -79,6 +79,17 @@ spec:
             - "-c"
             - 'php bin/console doctrine:migrations:migrate --no-interaction && apache2-foreground'
           env:
+            - name: APP_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: dev-notification-environments
+                  key: appEnv
+            - name: KEBOOLA_STACK
+              valueFrom:
+                configMapKeyRef:
+                  name: dev-notification-environments
+                  key: keboolaStack
+
             - name: AWS_LOGS_S3_BUCKET
               valueFrom:
                 configMapKeyRef:
@@ -138,7 +149,10 @@ spec:
                   name: dev-notification-environments
                   key: databaseUrl
             - name: DATABASE_SSL_VERIFY_ENABLED
-              value: '0'
+              valueFrom:
+                configMapKeyRef:
+                  name: dev-notification-environments
+                  key: databaseSslVerifyEnabled
             - name: MESSENGER_TRANSPORT_DSN
               valueFrom:
                 configMapKeyRef:
@@ -149,13 +163,7 @@ spec:
                 configMapKeyRef:
                   name: dev-notification-environments
                   key: mailerDsn
-            - name: APP_ENV
-              valueFrom:
-                configMapKeyRef:
-                  name: dev-notification-environments
-                  key: appEnv
-            - name: KEBOOLA_STACK
-              value: test
+
 
           readinessProbe:
             tcpSocket:
