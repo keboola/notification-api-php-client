@@ -86,16 +86,13 @@ abstract class Client
         // Set handler to set default headers
         $handlerStack->push(Middleware::mapRequest(
             function (RequestInterface $request) use ($token, $options) {
+                $request = $request
+                    ->withHeader('User-Agent', $options['userAgent'])
+                    ->withHeader('Content-type', 'application/json');
                 if ($this->getTokenHeaderName()) {
-                    return $request
-                        ->withHeader('User-Agent', $options['userAgent'])
-                        ->withHeader((string) $this->getTokenHeaderName(), (string) $token)
-                        ->withHeader('Content-type', 'application/json');
-                } else {
-                    return $request
-                        ->withHeader('User-Agent', $options['userAgent'])
-                        ->withHeader('Content-type', 'application/json');
+                    $request = $request->withHeader((string) $this->getTokenHeaderName(), (string) $token);
                 }
+                return $request;
             }
         ));
         // Set client logger

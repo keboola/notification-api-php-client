@@ -8,20 +8,31 @@ class ClientFactory
 {
     private const NOTIFICATION_SERVICE_NAME = 'notification';
     private string $notificationUrl;
+    private string $connectionUrl;
+    private array $connectionClientOptions;
 
     public function __construct(string $connectionUrl, array $connectionClientOptions = [])
     {
-        $storageApiIndexClient = new StorageApiIndexClient($connectionUrl, $connectionClientOptions);
-        $this->notificationUrl = $storageApiIndexClient->getServiceUrl(self::NOTIFICATION_SERVICE_NAME);
+        $this->connectionUrl = $connectionUrl;
+        $this->connectionClientOptions = $connectionClientOptions;
+    }
+
+    private function getNotificationUrl(): string
+    {
+        if ($this->notificationUrl !== null) {
+            $storageApiIndexClient = new StorageApiIndexClient($this->connectionUrl, $this->connectionClientOptions);
+            $this->notificationUrl = $storageApiIndexClient->getServiceUrl(self::NOTIFICATION_SERVICE_NAME);
+        }
+        return $this->notificationUrl;
     }
 
     public function getEventsClient(string $applicationToken, array $options = []): EventsClient
     {
-        return new EventsClient($this->notificationUrl, $applicationToken, $options);
+        return new EventsClient($this->getNotificationUrl(), $applicationToken, $options);
     }
 
     public function getSubscriptionClient(string $storageApiToken, array $options = []): SubscriptionClient
     {
-        return new SubscriptionClient($this->notificationUrl, $storageApiToken, $options);
+        return new SubscriptionClient($this->getNotificationUrl(), $storageApiToken, $options);
     }
 }
