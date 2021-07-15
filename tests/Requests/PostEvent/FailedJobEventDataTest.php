@@ -13,14 +13,16 @@ class FailedJobEventDataTest extends TestCase
     public function testJsonSerialize(): void
     {
         $jobData = new JobData(
-            'test-project',
             '23456',
             'http://someUrl',
             '2020-01-01',
             '2020-02-02',
-            'my-orchestration'
+            'keboola.orchestrator',
+            'Orchestrator',
+            'my-configuration',
+            'My configuration'
         );
-        $failedEventData = new FailedJobEventData('someMessage', $jobData);
+        $failedEventData = new FailedJobEventData('1234', 'My project', 'someMessage', $jobData);
         self::assertSame(
             [
                 'errorMessage' => 'someMessage',
@@ -29,11 +31,19 @@ class FailedJobEventDataTest extends TestCase
                     'url' => 'http://someUrl',
                     'startTime' => '2020-01-01',
                     'endTime' => '2020-02-02',
-                    'orchestrationName' => 'my-orchestration',
+                    'component' => [
+                        'id' => 'keboola.orchestrator',
+                        'name' => 'Orchestrator',
+                    ],
+                    'configuration' => [
+                        'id' => 'my-configuration',
+                        'name' => 'My configuration',
+                    ],
                     'tasks' => [],
                 ],
                 'project' => [
-                    'name' => 'test-project',
+                    'id' => '1234',
+                    'name' => 'My project',
                 ],
             ],
             $failedEventData->jsonSerialize()

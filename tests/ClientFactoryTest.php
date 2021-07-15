@@ -60,14 +60,14 @@ class ClientFactoryTest extends TestCase
             'https://dummy',
             ['handler' => $stack, 'logger' => $logger, 'userAgent' => 'test agent']
         );
+        self::assertInstanceOf(SubscriptionClient::class, $clientFactory->getSubscriptionClient('dummy'));
+        self::assertInstanceOf(EventsClient::class, $clientFactory->getEventsClient('dummy'));
 
         /** @var Request $request */
         $request = $requestHistory[0]['request'];
         self::assertEquals('test agent', $request->getHeader('User-Agent')[0]);
         self::assertTrue($logger->hasInfoThatContains('"GET  /1.1" 200 '));
         self::assertTrue($logger->hasInfoThatContains('test agent'));
-        self::assertInstanceOf(SubscriptionClient::class, $clientFactory->getSubscriptionClient('dummy'));
-        self::assertInstanceOf(EventsClient::class, $clientFactory->getEventsClient('dummy'));
     }
 
     public function testGetClientLazy(): void

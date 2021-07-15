@@ -11,9 +11,9 @@ class Event implements JsonSerializable
     private JsonSerializable $eventData;
     private string $eventType;
 
-    public function __construct(string $eventType, JsonSerializable $eventData)
+    public function __construct(EventDataInterface $eventData)
     {
-        $this->eventType = $eventType;
+        $this->eventType = $eventData::getEventTypeName();
         $this->eventData = $eventData;
     }
 

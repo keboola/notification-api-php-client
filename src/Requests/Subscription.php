@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace Keboola\NotificationClient\Requests;
 
 use JsonSerializable;
+use Keboola\NotificationClient\ClientFactory;
 use Keboola\NotificationClient\Exception\ClientException;
+use Keboola\NotificationClient\Requests\PostEvent\FailedJobEventData;
 use Keboola\NotificationClient\Requests\PostSubscription\EmailRecipient;
 use Keboola\NotificationClient\Requests\PostSubscription\Filter;
 
 class Subscription implements JsonSerializable
 {
-    private const VALID_EVENT_TYPES = ['job_failed'];
-
     private string $eventType;
     private EmailRecipient $recipient;
     /** @var array<Filter> */
@@ -26,11 +26,11 @@ class Subscription implements JsonSerializable
      */
     public function __construct(string $eventType, EmailRecipient $recipient, array $filters)
     {
-        if (!in_array($eventType, self::VALID_EVENT_TYPES)) {
+        if (!in_array($eventType, [FailedJobEventData::getEventTypeName()])) {
             throw new ClientException(sprintf(
                 'Invalid event type "%s", valid types are: "%s".',
                 $eventType,
-                implode(', ', self::VALID_EVENT_TYPES)
+                implode(', ', [FailedJobEventData::getEventTypeName()])
             ));
         }
         $this->eventType = $eventType;
