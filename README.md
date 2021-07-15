@@ -67,10 +67,9 @@ $clientFactory->getEventsClient('xxx-xxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     ```
 
 - Set the following environment variables in `set-env.sh` file (use `set-env.template.sh` as sample):
-    - `STORAGE_API_URL` - Keboola Connection URL.
+    - `STORAGE_API_URL` - Keboola Connection URL URL to arbitrary stack where the notification service is registered.
     - `TEST_STORAGE_API_TOKEN` - Token to a test project.
     - `TEST_MANAGE_API_APPLICATION_TOKEN` - Application token with scope `notifications:push-event`.
-    - `TEST_STORAGE_API_URL` - Storage API URL to arbitrary stack where the notification service is registered.
 
 - Set one of Azure or AWS resources (or both, but only one is needed).  
 

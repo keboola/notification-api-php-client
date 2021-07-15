@@ -19,7 +19,7 @@ class StorageApiIndexClientTest extends TestCase
     public function testFunctional(): void
     {
         $client = new StorageApiIndexClient(
-            (string) getenv('TEST_STORAGE_API_URL'),
+            (string) getenv('STORAGE_API_URL'),
         );
         self::assertStringStartsWith('https://notification.', $client->getServiceUrl('notification'));
     }
