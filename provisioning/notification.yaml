@@ -164,6 +164,7 @@ spec:
                   name: dev-notification-environments
                   key: mailerDsn
 
+
           readinessProbe:
             tcpSocket:
               port: 8080
