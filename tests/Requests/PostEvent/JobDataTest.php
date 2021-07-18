@@ -12,12 +12,14 @@ class JobDataTest extends TestCase
     public function testJsonSerialize(): void
     {
         $jobData = new JobData(
-            'test-project',
             '23456',
             'http://someUrl',
             '2020-01-01',
             '2020-02-02',
-            'my-orchestration'
+            'keboola.orchestrator',
+            'Orchestrator',
+            'my-configuration',
+            'My configuration'
         );
         self::assertSame(
             [
@@ -25,7 +27,14 @@ class JobDataTest extends TestCase
                 'url' => 'http://someUrl',
                 'startTime' => '2020-01-01',
                 'endTime' => '2020-02-02',
-                'orchestrationName' => 'my-orchestration',
+                'component' => [
+                    'id' => 'keboola.orchestrator',
+                    'name' => 'Orchestrator',
+                ],
+                'configuration' => [
+                    'id' => 'my-configuration',
+                    'name' => 'My configuration',
+                ],
                 'tasks' => [],
             ],
             $jobData->jsonSerialize()

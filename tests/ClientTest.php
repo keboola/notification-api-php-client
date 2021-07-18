@@ -11,9 +11,9 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Keboola\NotificationClient\EventsClient;
 use Keboola\NotificationClient\Exception\ClientException;
+use Keboola\NotificationClient\Requests\Event;
 use Keboola\NotificationClient\Requests\PostEvent\FailedJobEventData;
 use Keboola\NotificationClient\Requests\PostEvent\JobData;
-use Keboola\NotificationClient\Requests\Event;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\Test\TestLogger;
 
@@ -98,10 +98,20 @@ class ClientTest extends TestCase
     private function getPostEventData(): Event
     {
         return new Event(
-            'job_failed',
             new FailedJobEventData(
-                'job failed',
-                new JobData('my-project', '123', 'http://someUrl', '2020-01-02', '2020-01-01', 'my-orchestration')
+                '1234',
+                'My project',
+                'Some Error',
+                new JobData(
+                    '23456',
+                    'http://someUrl',
+                    '2020-01-01',
+                    '2020-02-02',
+                    'keboola.orchestrator',
+                    'Orchestrator',
+                    'my-configuration',
+                    'My configuration'
+                )
             )
         );
     }
@@ -124,7 +134,7 @@ class ClientTest extends TestCase
         $client->postEvent($this->getPostEventData());
         /** @var Request $request */
         $request = $requestHistory[0]['request'];
-        self::assertEquals('http://example.com/events/job_failed', $request->getUri()->__toString());
+        self::assertEquals('http://example.com/events/job-failed', $request->getUri()->__toString());
         self::assertEquals('POST', $request->getMethod());
         self::assertEquals('testToken', $request->getHeader('X-Kbc-ManageApiToken')[0]);
         self::assertEquals('Notification PHP Client', $request->getHeader('User-Agent')[0]);
@@ -206,11 +216,11 @@ class ClientTest extends TestCase
         self::assertCount(3, $requestHistory);
         /** @var Request $request */
         $request = $requestHistory[0]['request'];
-        self::assertEquals('http://example.com/events/job_failed', $request->getUri()->__toString());
+        self::assertEquals('http://example.com/events/job-failed', $request->getUri()->__toString());
         $request = $requestHistory[1]['request'];
-        self::assertEquals('http://example.com/events/job_failed', $request->getUri()->__toString());
+        self::assertEquals('http://example.com/events/job-failed', $request->getUri()->__toString());
         $request = $requestHistory[2]['request'];
-        self::assertEquals('http://example.com/events/job_failed', $request->getUri()->__toString());
+        self::assertEquals('http://example.com/events/job-failed', $request->getUri()->__toString());
     }
 
     public function testRetryFailure(): void

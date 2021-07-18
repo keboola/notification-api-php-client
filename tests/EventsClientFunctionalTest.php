@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Keboola\NotificationClient\Tests;
 
 use Keboola\NotificationClient\EventsClient;
+use Keboola\NotificationClient\Requests\Event;
 use Keboola\NotificationClient\Requests\PostEvent\FailedJobEventData;
 use Keboola\NotificationClient\Requests\PostEvent\JobData;
-use Keboola\NotificationClient\Requests\Event;
 use PHPUnit\Framework\TestCase;
 
 class EventsClientFunctionalTest extends TestCase
@@ -24,16 +24,19 @@ class EventsClientFunctionalTest extends TestCase
     {
         $client = $this->getClient();
         $client->postEvent(new Event(
-            'jobFailed',
             new FailedJobEventData(
+                '1234',
+                'My project',
                 'job failed',
                 new JobData(
-                    'my-project',
-                    '123',
-                    'https://someUrl',
-                    '2021-06-07T10:00:00Z',
-                    '2021-06-07T10:00:00Z',
-                    'my-orchestration'
+                    '23456',
+                    'http://someUrl',
+                    '2020-01-01T12:00:01Z',
+                    '2020-02-02T15:15:15Z',
+                    'keboola.orchestrator',
+                    'Orchestrator',
+                    'my-configuration',
+                    'My configuration'
                 )
             )
         ));

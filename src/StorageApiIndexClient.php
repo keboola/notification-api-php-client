@@ -16,7 +16,7 @@ class StorageApiIndexClient extends Client
 
     public function getIndex(): array
     {
-        $request = new Request('GET', 'v2/storage');
+        $request = new Request('GET', 'v2/storage?exclude=components');
         return $this->sendRequest($request);
     }
 

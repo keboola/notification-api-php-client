@@ -8,34 +8,33 @@ use JsonSerializable;
 
 class JobData implements JsonSerializable
 {
-    private string $jobEndTime;
-    private string $jobStartTime;
-    private string $jobUrl;
     private string $jobId;
-    private string $projectName;
-    private string $orchestrationName;
+    private string $jobUrl;
+    private string $jobStartTime;
+    private string $jobEndTime;
+    private string $componentId;
+    private string $componentName;
+    private string $configurationId;
+    private string $configurationName;
 
     public function __construct(
-        string $projectName,
         string $jobId,
         string $jobUrl,
         string $jobStartTime,
         string $jobEndTime,
-        string $orchestrationName
+        string $componentId,
+        string $componentName,
+        string $configurationId,
+        string $configurationName
     ) {
-        $this->projectName = $projectName;
         $this->jobId = $jobId;
         $this->jobUrl = $jobUrl;
         $this->jobStartTime = $jobStartTime;
         $this->jobEndTime = $jobEndTime;
-        $this->orchestrationName = $orchestrationName;
-    }
-
-    public function getProject(): array
-    {
-        return [
-            'name' => $this->projectName,
-        ];
+        $this->componentId = $componentId;
+        $this->componentName = $componentName;
+        $this->configurationId = $configurationId;
+        $this->configurationName = $configurationName;
     }
 
     /**
@@ -48,7 +47,14 @@ class JobData implements JsonSerializable
             'url' => $this->jobUrl,
             'startTime' => $this->jobStartTime,
             'endTime' => $this->jobEndTime,
-            'orchestrationName' => $this->orchestrationName,
+            'component' => [
+                'id' => $this->componentId,
+                'name' => $this->componentName,
+            ],
+            'configuration' => [
+                'id' => $this->configurationId,
+                'name' => $this->configurationName,
+            ],
             'tasks' => [],
         ];
     }
