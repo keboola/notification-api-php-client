@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Keboola\NotificationClient\Tests\Requests\PostEvent;
 
 use DateTimeImmutable;
+use Generator;
 use Keboola\NotificationClient\Requests\PostEvent\JobData;
 use PHPUnit\Framework\TestCase;
 
@@ -18,7 +19,7 @@ class JobDataTest extends TestCase
         self::assertSame($expected, $jobData->jsonSerialize());
     }
 
-    public function jobDataProvider()
+    public function jobDataProvider(): Generator
     {
         yield 'full data' => [
             new JobData(
@@ -45,7 +46,7 @@ class JobDataTest extends TestCase
                     'id' => 'my-configuration',
                     'name' => 'My configuration',
                 ],
-            ]
+            ],
         ];
         yield 'null configuration id' => [
             new JobData(
