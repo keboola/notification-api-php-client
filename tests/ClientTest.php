@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\NotificationClient\Tests;
 
+use DateTimeImmutable;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
@@ -11,9 +12,9 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Keboola\NotificationClient\EventsClient;
 use Keboola\NotificationClient\Exception\ClientException;
+use Keboola\NotificationClient\Requests\Event;
 use Keboola\NotificationClient\Requests\PostEvent\FailedJobEventData;
 use Keboola\NotificationClient\Requests\PostEvent\JobData;
-use Keboola\NotificationClient\Requests\Event;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\Test\TestLogger;
 
@@ -71,7 +72,7 @@ class ClientTest extends TestCase
     {
         self::expectException(ClientException::class);
         self::expectExceptionMessage(
-            'Invalid parameters when creating client: Value "" is invalid: This value should not be blank.'
+            'Application token must be non-empty, "" provided.'
         );
         new EventsClient('http://example.com/', '');
     }
@@ -80,7 +81,7 @@ class ClientTest extends TestCase
     {
         self::expectException(ClientException::class);
         self::expectExceptionMessage(
-            'Invalid parameters when creating client: Value "invalid url" is invalid: This value is not a valid URL.'
+            'Value "invalid url" is invalid: This value is not a valid URL'
         );
         new EventsClient('invalid url', 'testToken');
     }
@@ -90,18 +91,28 @@ class ClientTest extends TestCase
         self::expectException(ClientException::class);
         self::expectExceptionMessage(
             'Invalid parameters when creating client: Value "invalid url" is invalid: This value is not a valid URL.'
-            . "\n" . 'Value "" is invalid: This value should not be blank.' . "\n"
+            . "\n" . 'Value "abc" is invalid: This value should be a valid number.'
         );
-        new EventsClient('invalid url', '');
+        new EventsClient('invalid url', 'SomeToken', ['backoffMaxTries' => 'abc']);
     }
 
     private function getPostEventData(): Event
     {
         return new Event(
-            'job_failed',
             new FailedJobEventData(
-                'job failed',
-                new JobData('my-project', '123', 'http://someUrl', '2020-01-02', '2020-01-01', 'my-orchestration')
+                '1234',
+                'My project',
+                'Some Error',
+                new JobData(
+                    '23456',
+                    'http://someUrl',
+                    new DateTimeImmutable('2020-01-01T11:11:00+00:00'),
+                    new DateTimeImmutable('2020-01-01T11:12:00+00:00'),
+                    'keboola.orchestrator',
+                    'Orchestrator',
+                    'my-configuration',
+                    'My configuration'
+                )
             )
         );
     }
@@ -124,7 +135,7 @@ class ClientTest extends TestCase
         $client->postEvent($this->getPostEventData());
         /** @var Request $request */
         $request = $requestHistory[0]['request'];
-        self::assertEquals('http://example.com/events/job_failed', $request->getUri()->__toString());
+        self::assertEquals('http://example.com/events/job-failed', $request->getUri()->__toString());
         self::assertEquals('POST', $request->getMethod());
         self::assertEquals('testToken', $request->getHeader('X-Kbc-ManageApiToken')[0]);
         self::assertEquals('Notification PHP Client', $request->getHeader('User-Agent')[0]);
@@ -206,11 +217,11 @@ class ClientTest extends TestCase
         self::assertCount(3, $requestHistory);
         /** @var Request $request */
         $request = $requestHistory[0]['request'];
-        self::assertEquals('http://example.com/events/job_failed', $request->getUri()->__toString());
+        self::assertEquals('http://example.com/events/job-failed', $request->getUri()->__toString());
         $request = $requestHistory[1]['request'];
-        self::assertEquals('http://example.com/events/job_failed', $request->getUri()->__toString());
+        self::assertEquals('http://example.com/events/job-failed', $request->getUri()->__toString());
         $request = $requestHistory[2]['request'];
-        self::assertEquals('http://example.com/events/job_failed', $request->getUri()->__toString());
+        self::assertEquals('http://example.com/events/job-failed', $request->getUri()->__toString());
     }
 
     public function testRetryFailure(): void

@@ -10,6 +10,8 @@ services:
       TEST_NOTIFICATION_API_URL:
       TEST_STORAGE_API_TOKEN:
       TEST_MANAGE_API_APPLICATION_TOKEN:
+      STORAGE_API_URL:
+      TEST_STORAGE_API_PROJECT_ID:
     command: ['composer', 'ci']
 
   tests-local:

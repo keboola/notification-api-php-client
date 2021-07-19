@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Keboola\NotificationClient\Tests\Requests;
 
+use DateTimeImmutable;
+use Keboola\NotificationClient\Requests\Event;
 use Keboola\NotificationClient\Requests\PostEvent\FailedJobEventData;
 use Keboola\NotificationClient\Requests\PostEvent\JobData;
-use Keboola\NotificationClient\Requests\Event;
 use PHPUnit\Framework\TestCase;
 
 class EventTest extends TestCase
@@ -14,29 +15,47 @@ class EventTest extends TestCase
     public function testJsonSerialize(): void
     {
         $postEventRequest = new Event(
-            'failed_job',
             new FailedJobEventData(
+                '1234',
+                'My Project',
                 'My failed job',
-                new JobData('my-project', '123', 'http://someUrl', '2020-01-01', '2020-01-01', 'orchestration-name')
+                new JobData(
+                    '23456',
+                    'http://someUrl',
+                    new DateTimeImmutable('2020-01-01T11:11:00+00:00'),
+                    new DateTimeImmutable('2020-01-01T12:11:00+00:00'),
+                    'keboola.orchestrator',
+                    'Orchestrator',
+                    'my-configuration',
+                    'My configuration'
+                )
             )
         );
         self::assertSame(
             [
                 'errorMessage' => 'My failed job',
                 'job' => [
-                    'id' => '123',
+                    'id' => '23456',
                     'url' => 'http://someUrl',
-                    'startTime' => '2020-01-01',
-                    'endTime' => '2020-01-01',
-                    'orchestrationName' => 'orchestration-name',
+                    'component' => [
+                        'id' => 'keboola.orchestrator',
+                        'name' => 'Orchestrator',
+                    ],
                     'tasks' => [],
+                    'startTime' => '2020-01-01T11:11:00+00:00',
+                    'endTime' => '2020-01-01T12:11:00+00:00',
+                    'configuration' => [
+                        'id' => 'my-configuration',
+                        'name' => 'My configuration',
+                    ],
                 ],
                 'project' => [
-                    'name' => 'my-project',
+                    'id' => '1234',
+                    'name' => 'My Project',
                 ],
             ],
             $postEventRequest->jsonSerialize()
         );
-        self::assertSame('failed_job', $postEventRequest->getEventType());
+        self::assertSame('job-failed', $postEventRequest->getEventType());
     }
 }

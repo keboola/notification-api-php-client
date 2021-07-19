@@ -14,13 +14,13 @@ class SubscriptionTest extends TestCase
     public function testJsonSerialize(): void
     {
         $subscriptionRequest = new Subscription(
-            'job_failed',
+            'job-failed',
             new EmailRecipient('john.doe@example.com'),
             [new Filter('foo', 'bar')]
         );
         self::assertSame(
             [
-                'event' => 'job_failed',
+                'event' => 'job-failed',
                 'filters' => [
                     [
                         'field' => 'foo',
@@ -39,13 +39,13 @@ class SubscriptionTest extends TestCase
     public function testJsonSerializeStrangeFilters(): void
     {
         $subscriptionRequest = new Subscription(
-            'job_failed',
+            'job-failed',
             new EmailRecipient('john.doe@example.com'),
             ['a' => new Filter('foo', 'bar'), '4filter' => new Filter('bar', 'Kochba')]
         );
         self::assertSame(
             [
-                'event' => 'job_failed',
+                'event' => 'job-failed',
                 'filters' => [
                     [
                         'field' => 'foo',

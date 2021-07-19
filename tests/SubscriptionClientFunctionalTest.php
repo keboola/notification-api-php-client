@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\NotificationClient\Tests;
 
+use Keboola\NotificationClient\Exception\ClientException;
 use Keboola\NotificationClient\Requests\PostSubscription\EmailRecipient;
 use Keboola\NotificationClient\Requests\PostSubscription\Filter;
 use Keboola\NotificationClient\Requests\Subscription;
@@ -24,16 +25,28 @@ class SubscriptionClientFunctionalTest extends TestCase
     {
         $client = $this->getClient();
         $response = $client->createSubscription(new Subscription(
-            'job_failed',
+            'job-failed',
             new EmailRecipient('johnDoe@example.com'),
-            [new Filter('foo', 'bar')]
+            [new Filter('projectId', (string) getenv('TEST_STORAGE_API_PROJECT_ID'))]
         ));
 
         self::assertNotEmpty($response->getId());
-        self::assertSame('job_failed', $response->getEvent());
-        self::assertSame('foo', $response->getFilters()[0]->getField());
-        self::assertSame('bar', $response->getFilters()[0]->getValue());
+        self::assertSame('job-failed', $response->getEvent());
+        self::assertSame('projectId', $response->getFilters()[0]->getField());
+        self::assertSame((string) getenv('TEST_STORAGE_API_PROJECT_ID'), $response->getFilters()[0]->getValue());
         self::assertSame('johnDoe@example.com', $response->getRecipientAddress());
         self::assertSame('email', $response->getRecipientChannel());
+    }
+
+    public function testCreateInvalidSubscription(): void
+    {
+        $client = $this->getClient();
+        self::expectException(ClientException::class);
+        self::expectExceptionMessage('Invalid event type "dummy-event", valid types are: "job-failed".');
+        $client->createSubscription(new Subscription(
+            'dummy-event',
+            new EmailRecipient('johnDoe@example.com'),
+            [new Filter('projectId', (string) getenv('TEST_STORAGE_API_PROJECT_ID'))]
+        ));
     }
 }

@@ -72,13 +72,24 @@ spec:
               cpu: "250m"
               memory: "256Mi"
           ports:
-            - containerPort: 80
+            - containerPort: 8080
           command:
             - "/bin/sh"
           args:
             - "-c"
             - 'php bin/console doctrine:migrations:migrate --no-interaction && apache2-foreground'
           env:
+            - name: APP_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: dev-notification-environments
+                  key: appEnv
+            - name: KEBOOLA_STACK
+              valueFrom:
+                configMapKeyRef:
+                  name: dev-notification-environments
+                  key: keboolaStack
+
             - name: AWS_LOGS_S3_BUCKET
               valueFrom:
                 configMapKeyRef:
@@ -137,34 +148,37 @@ spec:
                 secretKeyRef:
                   name: dev-notification-environments
                   key: databaseUrl
+            - name: DATABASE_SSL_VERIFY_ENABLED
+              valueFrom:
+                configMapKeyRef:
+                  name: dev-notification-environments
+                  key: databaseSslVerifyEnabled
+            - name: MESSENGER_TRANSPORT_DSN
+              valueFrom:
+                configMapKeyRef:
+                  name: dev-notification-environments
+                  key: messengerTransportDsn
             - name: MAILER_DSN
               valueFrom:
                 configMapKeyRef:
                   name: dev-notification-environments
-                  key: mailerUrl
+                  key: mailerDsn
+
 
           readinessProbe:
-            httpGet:
-              path: /health-check
-              port: 80
-              httpHeaders:
-                - name: Host
-                  value: KubernetesReadinessProbe
-            initialDelaySeconds: 60
-            periodSeconds: 30
-            successThreshold: 1
-            failureThreshold: 3
-          livenessProbe:
-            httpGet:
-              port: 80
-              path: /health-check
-              httpHeaders:
-                - name: Host
-                  value: KubernetesLivelinessProbe
-            initialDelaySeconds: 60
-            periodSeconds: 100
-            successThreshold: 1
-            failureThreshold:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            # until https://keboola.atlassian.net/browse/PS-2344 is fixed
+#            httpGet:
+#              path: /health-check
+#              port: 8080
+#              httpHeaders:
+#                - name: Host
+#                  value: KubernetesReadinessProbe
+#            initialDelaySeconds: 60
+#            periodSeconds: 30
 ---
 kind: Service
 apiVersion: v1
@@ -177,7 +191,7 @@ spec:
     app: dev-notification-api
   ports:
     - port: 8181
-      targetPort: 80
+      targetPort: 8080
       protocol: TCP
       name: http
 ---

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\NotificationClient\Tests\Requests\PostEvent;
 
+use DateTimeImmutable;
 use Keboola\NotificationClient\Requests\PostEvent\FailedJobEventData;
 use Keboola\NotificationClient\Requests\PostEvent\JobData;
 use PHPUnit\Framework\TestCase;
@@ -13,27 +14,37 @@ class FailedJobEventDataTest extends TestCase
     public function testJsonSerialize(): void
     {
         $jobData = new JobData(
-            'test-project',
             '23456',
             'http://someUrl',
-            '2020-01-01',
-            '2020-02-02',
-            'my-orchestration'
+            new DateTimeImmutable('2020-01-01T11:11:00+00:00'),
+            new DateTimeImmutable('2020-01-01T12:11:00+00:00'),
+            'keboola.orchestrator',
+            'Orchestrator',
+            'my-configuration',
+            'My configuration'
         );
-        $failedEventData = new FailedJobEventData('someMessage', $jobData);
+        $failedEventData = new FailedJobEventData('1234', 'My project', 'someMessage', $jobData);
         self::assertSame(
             [
                 'errorMessage' => 'someMessage',
                 'job' => [
                     'id' => '23456',
                     'url' => 'http://someUrl',
-                    'startTime' => '2020-01-01',
-                    'endTime' => '2020-02-02',
-                    'orchestrationName' => 'my-orchestration',
+                    'component' => [
+                        'id' => 'keboola.orchestrator',
+                        'name' => 'Orchestrator',
+                    ],
                     'tasks' => [],
+                    'startTime' => '2020-01-01T11:11:00+00:00',
+                    'endTime' => '2020-01-01T12:11:00+00:00',
+                    'configuration' => [
+                        'id' => 'my-configuration',
+                        'name' => 'My configuration',
+                    ],
                 ],
                 'project' => [
-                    'name' => 'test-project',
+                    'id' => '1234',
+                    'name' => 'My project',
                 ],
             ],
             $failedEventData->jsonSerialize()

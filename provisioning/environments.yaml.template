@@ -23,6 +23,8 @@ metadata:
   name: dev-notification-environments
   namespace: dev-notification-client
 data:
+  appEnv: 'dev'
+  keboolaStack: 'local'
   awsAccessKeyId: '$TEST_AWS_ACCESS_KEY_ID'
   awsLogsS3Bucket: '$AWS_LOGS_S3_BUCKET'
   awsRegion: '$AWS_REGION'
@@ -30,4 +32,6 @@ data:
   azureClientId: '$TEST_AZURE_CLIENT_ID'
   azureTenantId: '$TEST_AZURE_TENANT_ID'
   storageApiUrl: '$STORAGE_API_URL'
-  mailerUrl: 'null://null'
+  databaseSslVerifyEnabled: '0'
+  messengerTransportDsn: 'doctrine://default'
+  mailerDsn: 'null://null'

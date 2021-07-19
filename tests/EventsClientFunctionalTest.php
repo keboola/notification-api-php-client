@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Keboola\NotificationClient\Tests;
 
+use DateTimeImmutable;
 use Keboola\NotificationClient\EventsClient;
+use Keboola\NotificationClient\Requests\Event;
 use Keboola\NotificationClient\Requests\PostEvent\FailedJobEventData;
 use Keboola\NotificationClient\Requests\PostEvent\JobData;
-use Keboola\NotificationClient\Requests\Event;
 use PHPUnit\Framework\TestCase;
 
 class EventsClientFunctionalTest extends TestCase
@@ -24,16 +25,19 @@ class EventsClientFunctionalTest extends TestCase
     {
         $client = $this->getClient();
         $client->postEvent(new Event(
-            'job_failed',
             new FailedJobEventData(
+                '1234',
+                'My project',
                 'job failed',
                 new JobData(
-                    'my-project',
-                    '123',
+                    '23456',
                     'http://someUrl',
-                    '2021-06-07T10:00:00Z',
-                    '2021-06-07T10:00:00Z',
-                    'my-orchestration'
+                    new DateTimeImmutable('2020-01-01T11:11:00+00:00'),
+                    new DateTimeImmutable('2020-01-01T12:11:00+00:00'),
+                    'keboola.orchestrator',
+                    'Orchestrator',
+                    'my-configuration',
+                    'My configuration'
                 )
             )
         ));
