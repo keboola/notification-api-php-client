@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\NotificationClient\Tests;
 
+use DateTimeImmutable;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
@@ -105,8 +106,8 @@ class ClientTest extends TestCase
                 new JobData(
                     '23456',
                     'http://someUrl',
-                    '2020-01-01',
-                    '2020-02-02',
+                    new DateTimeImmutable('2020-01-01T11:11:00+00:00'),
+                    new DateTimeImmutable('2020-01-01T11:12:00+00:00'),
                     'keboola.orchestrator',
                     'Orchestrator',
                     'my-configuration',

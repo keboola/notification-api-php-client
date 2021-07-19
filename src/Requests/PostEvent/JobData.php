@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace Keboola\NotificationClient\Requests\PostEvent;
 
+use DateTimeInterface;
 use JsonSerializable;
 
 class JobData implements JsonSerializable
 {
     private string $jobId;
     private string $jobUrl;
-    private string $jobStartTime;
-    private string $jobEndTime;
+    private ?DateTimeInterface $jobStartTime;
+    private ?DateTimeInterface $jobEndTime;
     private string $componentId;
     private string $componentName;
     private ?string $configurationId;
@@ -20,8 +21,8 @@ class JobData implements JsonSerializable
     public function __construct(
         string $jobId,
         string $jobUrl,
-        string $jobStartTime,
-        string $jobEndTime,
+        ?DateTimeInterface $jobStartTime,
+        ?DateTimeInterface $jobEndTime,
         string $componentId,
         string $componentName,
         ?string $configurationId,
@@ -45,14 +46,19 @@ class JobData implements JsonSerializable
         $result = [
             'id' => $this->jobId,
             'url' => $this->jobUrl,
-            'startTime' => $this->jobStartTime,
-            'endTime' => $this->jobEndTime,
             'component' => [
                 'id' => $this->componentId,
                 'name' => $this->componentName,
             ],
             'tasks' => [],
         ];
+        if (!is_null($this->jobStartTime)) {
+            $result['startTime'] = $this->jobStartTime->format(DateTimeInterface::ATOM);
+        }
+        if (!is_null($this->jobEndTime)) {
+            $result['endTime'] = $this->jobEndTime->format(DateTimeInterface::ATOM);
+        }
+
         if ($this->configurationId && $this->configurationName) {
             $result['configuration'] = [
                 'id' => $this->configurationId,

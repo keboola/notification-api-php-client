@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\NotificationClient\Tests\Requests;
 
+use DateTimeImmutable;
 use Keboola\NotificationClient\Requests\Event;
 use Keboola\NotificationClient\Requests\PostEvent\FailedJobEventData;
 use Keboola\NotificationClient\Requests\PostEvent\JobData;
@@ -21,8 +22,8 @@ class EventTest extends TestCase
                 new JobData(
                     '23456',
                     'http://someUrl',
-                    '2020-01-01',
-                    '2020-02-02',
+                    new DateTimeImmutable('2020-01-01T11:11:00+00:00'),
+                    new DateTimeImmutable('2020-01-01T12:11:00+00:00'),
                     'keboola.orchestrator',
                     'Orchestrator',
                     'my-configuration',
@@ -36,17 +37,17 @@ class EventTest extends TestCase
                 'job' => [
                     'id' => '23456',
                     'url' => 'http://someUrl',
-                    'startTime' => '2020-01-01',
-                    'endTime' => '2020-02-02',
                     'component' => [
                         'id' => 'keboola.orchestrator',
                         'name' => 'Orchestrator',
                     ],
+                    'tasks' => [],
+                    'startTime' => '2020-01-01T11:11:00+00:00',
+                    'endTime' => '2020-01-01T12:11:00+00:00',
                     'configuration' => [
                         'id' => 'my-configuration',
                         'name' => 'My configuration',
                     ],
-                    'tasks' => [],
                 ],
                 'project' => [
                     'id' => '1234',

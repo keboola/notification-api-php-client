@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\NotificationClient\Tests;
 
+use DateTimeImmutable;
 use Keboola\NotificationClient\EventsClient;
 use Keboola\NotificationClient\Requests\Event;
 use Keboola\NotificationClient\Requests\PostEvent\FailedJobEventData;
@@ -31,8 +32,8 @@ class EventsClientFunctionalTest extends TestCase
                 new JobData(
                     '23456',
                     'http://someUrl',
-                    '2020-01-01T12:00:01Z',
-                    '2020-02-02T15:15:15Z',
+                    new DateTimeImmutable('2020-01-01T11:11:00+00:00'),
+                    new DateTimeImmutable('2020-01-01T12:11:00+00:00'),
                     'keboola.orchestrator',
                     'Orchestrator',
                     'my-configuration',
