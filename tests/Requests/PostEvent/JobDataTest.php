@@ -40,4 +40,60 @@ class JobDataTest extends TestCase
             $jobData->jsonSerialize()
         );
     }
+
+    public function testJsonSerializeEmptyConfigurationId(): void
+    {
+        $jobData = new JobData(
+            '23456',
+            'http://someUrl',
+            '2020-01-01',
+            '2020-02-02',
+            'keboola.orchestrator',
+            'Orchestrator',
+            null,
+            'My configuration'
+        );
+        self::assertSame(
+            [
+                'id' => '23456',
+                'url' => 'http://someUrl',
+                'startTime' => '2020-01-01',
+                'endTime' => '2020-02-02',
+                'component' => [
+                    'id' => 'keboola.orchestrator',
+                    'name' => 'Orchestrator',
+                ],
+                'tasks' => [],
+            ],
+            $jobData->jsonSerialize()
+        );
+    }
+
+    public function testJsonSerializeEmptyConfigurationName(): void
+    {
+        $jobData = new JobData(
+            '23456',
+            'http://someUrl',
+            '2020-01-01',
+            '2020-02-02',
+            'keboola.orchestrator',
+            'Orchestrator',
+            '1234',
+            null
+        );
+        self::assertSame(
+            [
+                'id' => '23456',
+                'url' => 'http://someUrl',
+                'startTime' => '2020-01-01',
+                'endTime' => '2020-02-02',
+                'component' => [
+                    'id' => 'keboola.orchestrator',
+                    'name' => 'Orchestrator',
+                ],
+                'tasks' => [],
+            ],
+            $jobData->jsonSerialize()
+        );
+    }
 }

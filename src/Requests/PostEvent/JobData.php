@@ -14,8 +14,8 @@ class JobData implements JsonSerializable
     private string $jobEndTime;
     private string $componentId;
     private string $componentName;
-    private string $configurationId;
-    private string $configurationName;
+    private ?string $configurationId;
+    private ?string $configurationName;
 
     public function __construct(
         string $jobId,
@@ -24,8 +24,8 @@ class JobData implements JsonSerializable
         string $jobEndTime,
         string $componentId,
         string $componentName,
-        string $configurationId,
-        string $configurationName
+        ?string $configurationId,
+        ?string $configurationName
     ) {
         $this->jobId = $jobId;
         $this->jobUrl = $jobUrl;
@@ -42,7 +42,7 @@ class JobData implements JsonSerializable
      */
     public function jsonSerialize()
     {
-        return [
+        $result = [
             'id' => $this->jobId,
             'url' => $this->jobUrl,
             'startTime' => $this->jobStartTime,
@@ -51,11 +51,14 @@ class JobData implements JsonSerializable
                 'id' => $this->componentId,
                 'name' => $this->componentName,
             ],
-            'configuration' => [
-                'id' => $this->configurationId,
-                'name' => $this->configurationName,
-            ],
             'tasks' => [],
         ];
+        if ($this->configurationId && $this->configurationName) {
+            $result['configuration'] = [
+                'id' => $this->configurationId,
+                'name' => $this->configurationName,
+            ];
+        }
+        return $result;
     }
 }
