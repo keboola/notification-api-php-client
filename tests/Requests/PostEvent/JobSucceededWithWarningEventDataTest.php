@@ -2,38 +2,38 @@
 
 declare(strict_types=1);
 
-namespace Keboola\NotificationClient\Tests\Requests;
+namespace Keboola\NotificationClient\Tests\Requests\PostEvent;
 
 use DateTimeImmutable;
-use Keboola\NotificationClient\Requests\Event;
 use Keboola\NotificationClient\Requests\PostEvent\JobFailedEventData;
 use Keboola\NotificationClient\Requests\PostEvent\JobData;
+use Keboola\NotificationClient\Requests\PostEvent\JobSucceededWithWarningEventData;
 use PHPUnit\Framework\TestCase;
 
-class EventTest extends TestCase
+class JobSucceededWithWarningEventDataTest extends TestCase
 {
     public function testJsonSerialize(): void
     {
-        $postEventRequest = new Event(
-            new JobFailedEventData(
-                '1234',
-                'My Project',
-                'My failed job',
-                new JobData(
-                    '23456',
-                    'http://someUrl',
-                    new DateTimeImmutable('2020-01-01T11:11:00+00:00'),
-                    new DateTimeImmutable('2020-01-01T12:11:00+00:00'),
-                    'keboola.orchestrator',
-                    'Orchestrator',
-                    'my-configuration',
-                    'My configuration'
-                )
-            )
+        $jobData = new JobData(
+            '23456',
+            'http://someUrl',
+            new DateTimeImmutable('2020-01-01T11:11:00+00:00'),
+            new DateTimeImmutable('2020-01-01T12:11:00+00:00'),
+            'keboola.orchestrator',
+            'Orchestrator',
+            'my-configuration',
+            'My configuration'
         );
+        $failedEventData = new JobSucceededWithWarningEventData(
+            '1234',
+            'My project',
+            'someMessage',
+            $jobData
+        );
+
         self::assertSame(
             [
-                'errorMessage' => 'My failed job',
+                'errorMessage' => 'someMessage',
                 'job' => [
                     'id' => '23456',
                     'url' => 'http://someUrl',
@@ -51,11 +51,10 @@ class EventTest extends TestCase
                 ],
                 'project' => [
                     'id' => '1234',
-                    'name' => 'My Project',
+                    'name' => 'My project',
                 ],
             ],
-            $postEventRequest->jsonSerialize()
+            $failedEventData->jsonSerialize()
         );
-        self::assertSame('job-failed', $postEventRequest->getEventType());
     }
 }

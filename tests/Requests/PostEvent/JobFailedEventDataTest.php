@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Keboola\NotificationClient\Tests\Requests\PostEvent;
 
 use DateTimeImmutable;
-use Keboola\NotificationClient\Requests\PostEvent\FailedJobEventData;
+use Keboola\NotificationClient\Requests\PostEvent\JobFailedEventData;
 use Keboola\NotificationClient\Requests\PostEvent\JobData;
 use PHPUnit\Framework\TestCase;
 
-class FailedJobEventDataTest extends TestCase
+class JobFailedEventDataTest extends TestCase
 {
     public function testJsonSerialize(): void
     {
@@ -23,7 +23,7 @@ class FailedJobEventDataTest extends TestCase
             'my-configuration',
             'My configuration'
         );
-        $failedEventData = new FailedJobEventData('1234', 'My project', 'someMessage', $jobData);
+        $failedEventData = new JobFailedEventData('1234', 'My project', 'someMessage', $jobData);
         self::assertSame(
             [
                 'errorMessage' => 'someMessage',

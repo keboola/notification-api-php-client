@@ -12,7 +12,7 @@ composer require keboola/notification-api-php-client
 
 ```php
 use Keboola\NotificationClient\EventsClient;
-use Keboola\NotificationClient\Requests\PostEvent\FailedJobEventData;
+use Keboola\NotificationClient\Requests\PostEvent\JobFailedEventData;
 use Keboola\NotificationClient\Requests\PostEvent\JobData;
 use Keboola\NotificationClient\Requests\Event;
 use Psr\Log\NullLogger;
@@ -23,10 +23,11 @@ $client = new EventsClient(
     'xxx-xxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 );
 $client->postEvent(
-    new Event(
-        'job_failed',
-        new FailedJobEventData(
-            'job failed',
+    new Event(        
+        new JobFailedEventData(
+            '123',
+            'My Project',
+            'Job finished with error',
             new JobData('my-project', '123', 'http://someUrl', '2020-01-02', '2020-01-01', 'my-orchestration')
         )
     )

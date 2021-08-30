@@ -6,7 +6,7 @@ namespace Keboola\NotificationClient\Requests\PostEvent;
 
 use Keboola\NotificationClient\Requests\EventDataInterface;
 
-class FailedJobEventData implements EventDataInterface
+class JobFailedEventData implements EventDataInterface
 {
     private string $projectId;
     private string $projectName;
