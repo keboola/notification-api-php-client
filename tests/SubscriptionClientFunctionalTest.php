@@ -28,7 +28,7 @@ class SubscriptionClientFunctionalTest extends TestCase
             'job-failed',
             new EmailRecipient('johnDoe@example.com'),
             [
-                new Filter('project.id', (string) getenv('TEST_STORAGE_API_PROJECT_ID'))
+                new Filter('project.id', (string) getenv('TEST_STORAGE_API_PROJECT_ID')),
             ]
         ));
 
