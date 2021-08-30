@@ -113,18 +113,19 @@ $clientFactory->getEventsClient('xxx-xxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     SERVICE_PRINCIPAL_ID=$(az ad sp list --display-name testing-notification-api-php-client --query "[0].objectId" --output tsv)
     ```
  
-- Deploy the key vault, provide tenant ID, service principal ID and group ID from the previous commands:
+- Deploy the Storage Account for logs, provide tenant ID, service principal ID and group ID from the previous commands:
     ```bash
     az deployment group create --resource-group testing-notification-api-php-client --template-file provisioning/azure.json --parameters vault_name=test-notification-client tenant_id=$TEST_AZURE_TENANT_ID service_principal_object_id=$SERVICE_PRINCIPAL_ID
     ```
   
-- Show Key Vault URL
+- Get the connection string
     ```bash
-    az keyvault show --name test-notification-client --query "properties.vaultUri" --output tsv
+    az storage account show-connection-string -g testing-notification-api-php-client -n mirontfcnacc2 --query "connectionString" --output tsv
     ```
 
-returns e.g. `https://test-job-queue-client.vault.azure.net/`, use this to set values in `set-env.sh` file:
-    - `test_azure_key_vault_url` - https://test-job-queue-client.vault.azure.net/
+Set the connection string and container name you provided as parameter to the create command to following environment variables in the `set-env.sh` file:
+ - AZURE_LOGS_ABS_CONTAINER 
+ - AZURE_LOGS_ABS_CONNECTION_STRING
 
 ## Generate environment configuration
 
