@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\NotificationClient;
 
-use Keboola\NotificationClient\Requests\PostEvent\FailedJobEventData;
+use Keboola\NotificationClient\Requests\PostEvent\JobFailedEventData;
 
 class ClientFactory
 {

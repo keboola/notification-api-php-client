@@ -7,8 +7,8 @@ namespace Keboola\NotificationClient\Tests;
 use DateTimeImmutable;
 use Keboola\NotificationClient\EventsClient;
 use Keboola\NotificationClient\Requests\Event;
-use Keboola\NotificationClient\Requests\PostEvent\FailedJobEventData;
 use Keboola\NotificationClient\Requests\PostEvent\JobData;
+use Keboola\NotificationClient\Requests\PostEvent\JobFailedEventData;
 use PHPUnit\Framework\TestCase;
 
 class EventsClientFunctionalTest extends TestCase
@@ -25,7 +25,7 @@ class EventsClientFunctionalTest extends TestCase
     {
         $client = $this->getClient();
         $client->postEvent(new Event(
-            new FailedJobEventData(
+            new JobFailedEventData(
                 '1234',
                 'My project',
                 'job failed',

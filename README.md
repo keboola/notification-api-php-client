@@ -12,7 +12,7 @@ composer require keboola/notification-api-php-client
 
 ```php
 use Keboola\NotificationClient\EventsClient;
-use Keboola\NotificationClient\Requests\PostEvent\FailedJobEventData;
+use Keboola\NotificationClient\Requests\PostEvent\JobFailedEventData;
 use Keboola\NotificationClient\Requests\PostEvent\JobData;
 use Keboola\NotificationClient\Requests\Event;
 use Psr\Log\NullLogger;
@@ -23,10 +23,11 @@ $client = new EventsClient(
     'xxx-xxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 );
 $client->postEvent(
-    new Event(
-        'job_failed',
-        new FailedJobEventData(
-            'job failed',
+    new Event(        
+        new JobFailedEventData(
+            '123',
+            'My Project',
+            'Job finished with error',
             new JobData('my-project', '123', 'http://someUrl', '2020-01-02', '2020-01-01', 'my-orchestration')
         )
     )
@@ -68,7 +69,8 @@ $clientFactory->getEventsClient('xxx-xxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 - Set the following environment variables in `set-env.sh` file (use `set-env.template.sh` as sample):
     - `STORAGE_API_URL` - Keboola Connection URL to arbitrary stack where the notification service is registered.
-    - `TEST_STORAGE_API_TOKEN` - Token to a test project.
+    - `TEST_STORAGE_API_TOKEN` - Token to a test project. 
+    - `TEST_STORAGE_API_PROJECT_ID` - Project ID of the test project.
     - `TEST_MANAGE_API_APPLICATION_TOKEN` - Application token with scope `notifications:push-event`.
 
 - Set one of Azure or AWS resources (or both, but only one is needed).  
@@ -111,18 +113,19 @@ $clientFactory->getEventsClient('xxx-xxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     SERVICE_PRINCIPAL_ID=$(az ad sp list --display-name testing-notification-api-php-client --query "[0].objectId" --output tsv)
     ```
  
-- Deploy the key vault, provide tenant ID, service principal ID and group ID from the previous commands:
+- Deploy the Storage Account for logs, provide tenant ID, service principal ID and group ID from the previous commands:
     ```bash
-    az deployment group create --resource-group testing-job-queue-api-php-client --template-file provisioning/azure.json --parameters vault_name=test-job-queue-client tenant_id=$TEST_AZURE_TENANT_ID service_principal_object_id=$SERVICE_PRINCIPAL_ID
+    az deployment group create --resource-group testing-notification-api-php-client --template-file provisioning/azure.json --parameters vault_name=test-notification-client tenant_id=$TEST_AZURE_TENANT_ID service_principal_object_id=$SERVICE_PRINCIPAL_ID
     ```
   
-- Show Key Vault URL
+- Get the connection string
     ```bash
-    az keyvault show --name test-job-queue-client --query "properties.vaultUri" --output tsv
+    az storage account show-connection-string -g testing-notification-api-php-client -n mirontfcnacc2 --query "connectionString" --output tsv
     ```
 
-returns e.g. `https://test-job-queue-client.vault.azure.net/`, use this to set values in `set-env.sh` file:
-    - `test_azure_key_vault_url` - https://test-job-queue-client.vault.azure.net/
+Set the connection string and container name you provided as parameter to the create command to following environment variables in the `set-env.sh` file:
+ - AZURE_LOGS_ABS_CONTAINER 
+ - AZURE_LOGS_ABS_CONNECTION_STRING
 
 ## Generate environment configuration
 

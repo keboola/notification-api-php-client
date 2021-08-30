@@ -6,7 +6,7 @@ namespace Keboola\NotificationClient\Requests\PostEvent;
 
 use Keboola\NotificationClient\Requests\EventDataInterface;
 
-class FailedJobEventData implements EventDataInterface
+class JobSucceededWithWarningEventData implements EventDataInterface
 {
     private string $projectId;
     private string $projectName;
@@ -21,10 +21,7 @@ class FailedJobEventData implements EventDataInterface
         $this->jobData = $jobData;
     }
 
-    /**
-     * @return mixed
-     */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'errorMessage' => $this->errorMessage,
@@ -38,6 +35,6 @@ class FailedJobEventData implements EventDataInterface
 
     public static function getEventTypeName(): string
     {
-        return 'job-failed';
+        return 'job-succeeded-with-warning';
     }
 }

@@ -27,12 +27,14 @@ class SubscriptionClientFunctionalTest extends TestCase
         $response = $client->createSubscription(new Subscription(
             'job-failed',
             new EmailRecipient('johnDoe@example.com'),
-            [new Filter('projectId', (string) getenv('TEST_STORAGE_API_PROJECT_ID'))]
+            [
+                new Filter('project.id', (string) getenv('TEST_STORAGE_API_PROJECT_ID')),
+            ]
         ));
 
         self::assertNotEmpty($response->getId());
         self::assertSame('job-failed', $response->getEvent());
-        self::assertSame('projectId', $response->getFilters()[0]->getField());
+        self::assertSame('project.id', $response->getFilters()[0]->getField());
         self::assertSame((string) getenv('TEST_STORAGE_API_PROJECT_ID'), $response->getFilters()[0]->getValue());
         self::assertSame('johnDoe@example.com', $response->getRecipientAddress());
         self::assertSame('email', $response->getRecipientChannel());
@@ -42,7 +44,9 @@ class SubscriptionClientFunctionalTest extends TestCase
     {
         $client = $this->getClient();
         self::expectException(ClientException::class);
-        self::expectExceptionMessage('Invalid event type "dummy-event", valid types are: "job-failed".');
+        self::expectExceptionMessage(
+            'Invalid event type "dummy-event", valid types are: "job-failed, job-succeeded-with-warning".'
+        );
         $client->createSubscription(new Subscription(
             'dummy-event',
             new EmailRecipient('johnDoe@example.com'),
