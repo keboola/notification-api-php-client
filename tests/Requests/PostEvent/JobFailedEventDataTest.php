@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Keboola\NotificationClient\Tests\Requests\PostEvent;
 
 use DateTimeImmutable;
-use Keboola\NotificationClient\Requests\PostEvent\JobFailedEventData;
 use Keboola\NotificationClient\Requests\PostEvent\JobData;
+use Keboola\NotificationClient\Requests\PostEvent\JobFailedEventData;
 use PHPUnit\Framework\TestCase;
 
 class JobFailedEventDataTest extends TestCase

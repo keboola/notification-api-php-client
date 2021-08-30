@@ -21,10 +21,7 @@ class JobSucceededWithWarningEventData implements EventDataInterface
         $this->jobData = $jobData;
     }
 
-    /**
-     * @return mixed
-     */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'errorMessage' => $this->errorMessage,
