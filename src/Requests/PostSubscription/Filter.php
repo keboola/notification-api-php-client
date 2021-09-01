@@ -10,21 +10,26 @@ class Filter implements JsonSerializable
 {
     private string $field;
     private string $value;
+    private ?FilterOperator $operator;
 
-    public function __construct(string $field, string $value)
+    public function __construct(string $field, string $value, ?FilterOperator $operator = null)
     {
         $this->field = $field;
         $this->value = $value;
+        $this->operator = $operator;
     }
 
-    /**
-     * @return mixed
-     */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
-        return [
+        $data = [
             'field' => $this->field,
             'value' => $this->value,
         ];
+
+        if ($this->operator !== null) {
+            $data['operator'] = $this->operator->getValue();
+        }
+
+        return $data;
     }
 }
