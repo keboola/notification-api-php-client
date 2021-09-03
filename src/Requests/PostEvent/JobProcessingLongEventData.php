@@ -16,11 +16,11 @@ class JobProcessingLongEventData implements EventDataInterface
     private JobData $jobData;
 
     public function __construct(
-        string  $projectId,
-        string  $projectName,
-        float   $prolongation,
-        float   $averageDuration,
-        int   $currentDuration,
+        string $projectId,
+        string $projectName,
+        float $prolongation,
+        float $averageDuration,
+        int $currentDuration,
         JobData $jobData
     ) {
         $this->projectId = $projectId;
