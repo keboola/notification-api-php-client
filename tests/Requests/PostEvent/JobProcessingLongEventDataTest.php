@@ -24,11 +24,11 @@ class JobProcessingLongEventDataTest extends TestCase
             'my-configuration',
             'My configuration'
         );
-        $failedEventData = new JobProcessingLongEventData('1234', 'My project', 12.534, 23.854, 12, $jobData);
+        $failedEventData = new JobProcessingLongEventData('1234', 'My project', 12.534, 23.854, 12.0, $jobData);
         self::assertSame(
             [
                 'averageDuration' => 23.854,
-                'currentDuration' => 12,
+                'currentDuration' => 12.0,
                 'durationOvertimePercentage' => 12.534,
                 'job' => [
                     'id' => '23456',
