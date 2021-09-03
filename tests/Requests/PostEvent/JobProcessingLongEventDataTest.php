@@ -7,10 +7,10 @@ namespace Keboola\NotificationClient\Tests\Requests\PostEvent;
 use DateTimeImmutable;
 use Keboola\NotificationClient\Requests\PostEvent\JobData;
 use Keboola\NotificationClient\Requests\PostEvent\JobFailedEventData;
-use Keboola\NotificationClient\Requests\PostEvent\JobLongProcessingEventData;
+use Keboola\NotificationClient\Requests\PostEvent\JobProcessingLongEventData;
 use PHPUnit\Framework\TestCase;
 
-class JobLongProcessingEventDataTest extends TestCase
+class JobProcessingLongEventDataTest extends TestCase
 {
     public function testJsonSerialize(): void
     {
@@ -24,10 +24,12 @@ class JobLongProcessingEventDataTest extends TestCase
             'my-configuration',
             'My configuration'
         );
-        $failedEventData = new JobLongProcessingEventData('1234', 'My project', 12.534, $jobData);
+        $failedEventData = new JobProcessingLongEventData('1234', 'My project', 12.534, 23.854, 12, $jobData);
         self::assertSame(
             [
-                'prolongation' => 12.534,
+                'averageDuration' => 23.854,
+                'currentDuration' => 12,
+                'durationOvertimePercentage' => 12.534,
                 'job' => [
                     'id' => '23456',
                     'url' => 'http://someUrl',
@@ -50,5 +52,6 @@ class JobLongProcessingEventDataTest extends TestCase
             ],
             $failedEventData->jsonSerialize()
         );
+        self::assertEquals('job-processing-long', $failedEventData::getEventTypeName());
     }
 }
