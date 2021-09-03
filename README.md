@@ -1,4 +1,4 @@
-# Notification API PHP Client [![Build Status]
+# Notification API PHP Client [![Build Status](https://dev.azure.com/keboola-dev/notification-api-php-client/_apis/build/status/keboola.notification-api-php-client?branchName=main)](https://dev.azure.com/keboola-dev/notification-api-php-client/_build/latest?definitionId=82&branchName=main)
 
 PHP client for the Notification API ([API docs](https://app.swaggerhub.com/apis/odinuv/notifications-service/1.0.0)).
 
