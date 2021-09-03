@@ -10,7 +10,7 @@ class JobProcessingLongEventData implements EventDataInterface
 {
     private string $projectId;
     private string $projectName;
-    private float $prolongation;
+    private float $durationOvertimePercentage;
     private float $averageDuration;
     private int $currentDuration;
     private JobData $jobData;
@@ -18,14 +18,14 @@ class JobProcessingLongEventData implements EventDataInterface
     public function __construct(
         string $projectId,
         string $projectName,
-        float $prolongation,
+        float $durationOvertimePercentage,
         float $averageDuration,
         int $currentDuration,
         JobData $jobData
     ) {
         $this->projectId = $projectId;
         $this->projectName = $projectName;
-        $this->prolongation = $prolongation;
+        $this->durationOvertimePercentage = $durationOvertimePercentage;
         $this->jobData = $jobData;
         $this->averageDuration = $averageDuration;
         $this->currentDuration = $currentDuration;
@@ -36,7 +36,7 @@ class JobProcessingLongEventData implements EventDataInterface
         return [
             'averageDuration' => $this->averageDuration,
             'currentDuration' => $this->currentDuration,
-            'durationOvertimePercentage' => $this->prolongation,
+            'durationOvertimePercentage' => $this->durationOvertimePercentage,
             'job' => $this->jobData->jsonSerialize(),
             'project' => [
                 'id' => $this->projectId,
