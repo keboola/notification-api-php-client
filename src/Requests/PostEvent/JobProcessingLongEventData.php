@@ -42,6 +42,7 @@ class JobProcessingLongEventData implements EventDataInterface
                 'id' => $this->projectId,
                 'name' => $this->projectName,
             ],
+            'uniqueId' => $this->jobData->getJobId(),
         ];
     }
 
