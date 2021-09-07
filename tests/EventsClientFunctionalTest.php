@@ -59,7 +59,7 @@ class EventsClientFunctionalTest extends TestCase
                     '23456',
                     'http://someUrl',
                     new DateTimeImmutable('2020-01-01T11:11:00+00:00'),
-                    new DateTimeImmutable('2020-01-01T12:11:00+00:00'),
+                    null,
                     'keboola.orchestrator',
                     'Orchestrator',
                     'my-configuration',
