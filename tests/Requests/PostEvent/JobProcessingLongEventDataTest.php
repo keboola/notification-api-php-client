@@ -27,6 +27,9 @@ class JobProcessingLongEventDataTest extends TestCase
         $failedEventData = new JobProcessingLongEventData('1234', 'My project', 12.534, 23.854, 12.0, $jobData);
         self::assertSame(
             [
+                'averageDuration' => 23.854,
+                'currentDuration' => 12.0,
+                'durationOvertimePercentage' => 12.534,
                 'job' => [
                     'id' => '23456',
                     'url' => 'http://someUrl',
@@ -46,9 +49,6 @@ class JobProcessingLongEventDataTest extends TestCase
                     'id' => '1234',
                     'name' => 'My project',
                 ],
-                'averageDuration' => 23.854,
-                'currentDuration' => 12.0,
-                'durationOvertimePercentage' => 12.534,
                 'uniqueId' => '23456',
             ],
             $failedEventData->jsonSerialize()
