@@ -41,14 +41,15 @@ class JobProcessingLongEventDataTest extends TestCase
                         'id' => 'my-configuration',
                         'name' => 'My configuration',
                     ],
-                    'averageDuration' => 23.854,
-                    'currentDuration' => 12.0,
-                    'durationOvertimePercentage' => 12.534,
                 ],
                 'project' => [
                     'id' => '1234',
                     'name' => 'My project',
                 ],
+                'averageDuration' => 23.854,
+                'currentDuration' => 12.0,
+                'durationOvertimePercentage' => 12.534,
+                'uniqueId' => '23456'
             ],
             $failedEventData->jsonSerialize()
         );

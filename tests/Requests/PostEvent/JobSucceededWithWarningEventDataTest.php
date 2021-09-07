@@ -53,7 +53,6 @@ class JobSucceededWithWarningEventDataTest extends TestCase
                     'id' => '1234',
                     'name' => 'My project',
                 ],
-                'uniqueId' => '23456',
             ],
             $failedEventData->jsonSerialize()
         );
