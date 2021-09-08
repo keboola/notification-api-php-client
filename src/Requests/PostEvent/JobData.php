@@ -67,4 +67,9 @@ class JobData implements JsonSerializable
         }
         return $result;
     }
+
+    public function getJobId(): string
+    {
+        return $this->jobId;
+    }
 }
