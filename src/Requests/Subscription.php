@@ -8,6 +8,7 @@ use JsonSerializable;
 use Keboola\NotificationClient\ClientFactory;
 use Keboola\NotificationClient\Exception\ClientException;
 use Keboola\NotificationClient\Requests\PostEvent\JobFailedEventData;
+use Keboola\NotificationClient\Requests\PostEvent\JobProcessingLongEventData;
 use Keboola\NotificationClient\Requests\PostEvent\JobSucceededWithWarningEventData;
 use Keboola\NotificationClient\Requests\PostSubscription\EmailRecipient;
 use Keboola\NotificationClient\Requests\PostSubscription\Filter;
@@ -54,6 +55,7 @@ class Subscription implements JsonSerializable
         $validEventTypes = [
             JobFailedEventData::getEventTypeName(),
             JobSucceededWithWarningEventData::getEventTypeName(),
+            JobProcessingLongEventData::getEventTypeName(),
         ];
 
         if (!in_array($eventType, $validEventTypes)) {
