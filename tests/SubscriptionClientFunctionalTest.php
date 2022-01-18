@@ -46,7 +46,7 @@ class SubscriptionClientFunctionalTest extends TestCase
         self::expectException(ClientException::class);
         self::expectExceptionMessage(
             'Invalid event type "dummy-event", valid types are: ' .
-            '"job-failed, job-succeeded-with-warning, job-processing-long".'
+            '"job-failed, job-succeeded-with-warning, job-processing-long, phase-job-failed".'
         );
         $client->createSubscription(new Subscription(
             'dummy-event',

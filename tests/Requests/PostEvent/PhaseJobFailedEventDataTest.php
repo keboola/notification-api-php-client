@@ -26,7 +26,8 @@ class PhaseJobFailedEventDataTest extends TestCase
         $failedEventData = new PhaseJobFailedEventData(
             '1234',
             'My project',
-            'extractors',
+            'Lithium Extractors',
+            '123',
             'someMessage',
             $jobData
         );
@@ -47,6 +48,10 @@ class PhaseJobFailedEventDataTest extends TestCase
                         'id' => 'my-configuration',
                         'name' => 'My configuration',
                     ],
+                ],
+                'phase' => [
+                    'id' => '123',
+                    'name' => 'Lithium Extractors',
                 ],
                 'project' => [
                     'id' => '1234',

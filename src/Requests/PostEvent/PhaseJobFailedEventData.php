@@ -13,11 +13,13 @@ class PhaseJobFailedEventData implements EventDataInterface
     private string $errorMessage;
     private JobData $jobData;
     private string $phaseName;
+    private string $phaseId;
 
     public function __construct(
         string $projectId,
         string $projectName,
         string $phaseName,
+        string $phaseId,
         string $errorMessage,
         JobData $jobData
     ) {
@@ -26,6 +28,7 @@ class PhaseJobFailedEventData implements EventDataInterface
         $this->errorMessage = $errorMessage;
         $this->jobData = $jobData;
         $this->phaseName = $phaseName;
+        $this->phaseId = $phaseId;
     }
 
     public function jsonSerialize(): array
@@ -33,7 +36,10 @@ class PhaseJobFailedEventData implements EventDataInterface
         return [
             'errorMessage' => $this->errorMessage,
             'job' => $this->jobData->jsonSerialize(),
-            'phaseName' => $this->phaseName,
+            'phase' => [
+                'id' => $this->phaseId,
+                'name' => $this->phaseName,
+            ],
             'project' => [
                 'id' => $this->projectId,
                 'name' => $this->projectName,
