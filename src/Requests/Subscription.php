@@ -11,6 +11,8 @@ use Keboola\NotificationClient\Requests\PostEvent\JobFailedEventData;
 use Keboola\NotificationClient\Requests\PostEvent\JobProcessingLongEventData;
 use Keboola\NotificationClient\Requests\PostEvent\JobSucceededWithWarningEventData;
 use Keboola\NotificationClient\Requests\PostEvent\PhaseJobFailedEventData;
+use Keboola\NotificationClient\Requests\PostEvent\PhaseJobProcessingLongEventData;
+use Keboola\NotificationClient\Requests\PostEvent\PhaseJobSucceededWithWarningEventData;
 use Keboola\NotificationClient\Requests\PostSubscription\EmailRecipient;
 use Keboola\NotificationClient\Requests\PostSubscription\Filter;
 
@@ -58,6 +60,8 @@ class Subscription implements JsonSerializable
             JobSucceededWithWarningEventData::getEventTypeName(),
             JobProcessingLongEventData::getEventTypeName(),
             PhaseJobFailedEventData::getEventTypeName(),
+            PhaseJobSucceededWithWarningEventData::getEventTypeName(),
+            PhaseJobProcessingLongEventData::getEventTypeName(),
         ];
 
         if (!in_array($eventType, $validEventTypes)) {

@@ -65,10 +65,120 @@ class SubscriptionTest extends TestCase
         );
     }
 
-    public function testPhaseJobSubscription(): void
+    public function testPhaseJobFailedSubscription(): void
     {
         $subscriptionRequest = new Subscription(
             'phase-job-failed',
+            new EmailRecipient('john.doe@example.com'),
+            [
+                new Filter('job.component.id', 'my.component'),
+                new Filter('job.configuration.id', '12345'),
+                new Filter('phase.id', '123'),
+            ]
+        );
+        self::assertSame(
+            [
+                'event' => 'phase-job-failed',
+                'filters' => [
+                    [
+                        'field' => 'job.component.id',
+                        'value' => 'my.component',
+                    ],
+                    [
+                        'field' => 'job.configuration.id',
+                        'value' => '12345',
+                    ],
+                    [
+                        'field' => 'phase.id',
+                        'value' => '123',
+                    ],
+                ],
+                'recipient' => [
+                    'channel' => 'email',
+                    'address' => 'john.doe@example.com',
+                ],
+            ],
+            $subscriptionRequest->jsonSerialize()
+        );
+    }
+
+    public function testPhaseJobSucceededWithWarningSubscription(): void
+    {
+        $subscriptionRequest = new Subscription(
+            'phase-job-failed',
+            new EmailRecipient('john.doe@example.com'),
+            [
+                new Filter('job.component.id', 'my.component'),
+                new Filter('job.configuration.id', '12345'),
+                new Filter('phase.id', '123'),
+            ]
+        );
+        self::assertSame(
+            [
+                'event' => 'phase-job-failed',
+                'filters' => [
+                    [
+                        'field' => 'job.component.id',
+                        'value' => 'my.component',
+                    ],
+                    [
+                        'field' => 'job.configuration.id',
+                        'value' => '12345',
+                    ],
+                    [
+                        'field' => 'phase.id',
+                        'value' => '123',
+                    ],
+                ],
+                'recipient' => [
+                    'channel' => 'email',
+                    'address' => 'john.doe@example.com',
+                ],
+            ],
+            $subscriptionRequest->jsonSerialize()
+        );
+    }
+    public function testPhaseJobSubscription(): void
+    {
+        $subscriptionRequest = new Subscription(
+            'phase-job-succeeded-with-warning',
+            new EmailRecipient('john.doe@example.com'),
+            [
+                new Filter('job.component.id', 'my.component'),
+                new Filter('job.configuration.id', '12345'),
+                new Filter('phase.id', '123'),
+            ]
+        );
+        self::assertSame(
+            [
+                'event' => 'phase-job-failed',
+                'filters' => [
+                    [
+                        'field' => 'job.component.id',
+                        'value' => 'my.component',
+                    ],
+                    [
+                        'field' => 'job.configuration.id',
+                        'value' => '12345',
+                    ],
+                    [
+                        'field' => 'phase.id',
+                        'value' => '123',
+                    ],
+                ],
+                'recipient' => [
+                    'channel' => 'email',
+                    'address' => 'john.doe@example.com',
+                ],
+            ],
+            $subscriptionRequest->jsonSerialize()
+        );
+    }
+
+    public function testPhaseJobProcessingLongSubscription(): void
+    {
+        $subscriptionRequest = new Subscription(
+            'phase-job-processing-long',
             new EmailRecipient('john.doe@example.com'),
             [
                 new Filter('job.component.id', 'my.component'),
