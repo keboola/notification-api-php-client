@@ -151,7 +151,7 @@ class SubscriptionTest extends TestCase
         );
         self::assertSame(
             [
-                'event' => 'phase-job-failed',
+                'event' => 'phase-job-processing-long',
                 'filters' => [
                     [
                         'field' => 'job.component.id',
@@ -188,7 +188,7 @@ class SubscriptionTest extends TestCase
         );
         self::assertSame(
             [
-                'event' => 'phase-job-failed',
+                'event' => 'phase-job-processing-long',
                 'filters' => [
                     [
                         'field' => 'job.component.id',
