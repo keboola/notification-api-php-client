@@ -73,7 +73,7 @@ class SubscriptionTest extends TestCase
             [
                 new Filter('job.component.id', 'my.component'),
                 new Filter('job.configuration.id', '12345'),
-                new Filter('phase.id', '123')
+                new Filter('phase.id', '123'),
             ]
         );
         self::assertSame(
