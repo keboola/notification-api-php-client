@@ -12,6 +12,7 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\MessageFormatter;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\RequestOptions;
 use JsonException;
 use Keboola\NotificationClient\Exception\ClientException as NotificationClientException;
 use Psr\Http\Message\RequestInterface;
@@ -106,7 +107,12 @@ abstract class Client
             ));
         }
         // finally create the instance
-        return new GuzzleClient(['base_uri' => $url, 'handler' => $handlerStack]);
+        return new GuzzleClient([
+            'base_uri' => $url,
+            'handler' => $handlerStack,
+            RequestOptions::CONNECT_TIMEOUT => 10,
+            RequestOptions::TIMEOUT => 120,
+        ]);
     }
 
     protected function sendRequest(Request $request): array
