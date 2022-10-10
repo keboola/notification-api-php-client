@@ -11,7 +11,7 @@ pool:
 variables:
   DOCKER_BUILDKIT: 1
   k8sNamespace: 'dev-notification-client'
-  ciClusterServiceConnection: 'CI AKS'
+  ciClusterServiceConnectionAKS: 'CI AKS 2022'
 
 stages:
   - stage: prepare
@@ -26,7 +26,7 @@ stages:
             displayName: kubectl login
             inputs:
               connectionType: 'Kubernetes Service Connection'
-              kubernetesServiceEndpoint: $(ciClusterServiceConnection)
+              kubernetesServiceEndpoint: $(ciClusterServiceConnectionAKS)
               command: login
           - script: |
               set -Eeuo pipefail
@@ -93,7 +93,7 @@ stages:
             displayName: kubectl login
             inputs:
               connectionType: 'Kubernetes Service Connection'
-              kubernetesServiceEndpoint: $(ciClusterServiceConnection)
+              kubernetesServiceEndpoint: $(ciClusterServiceConnectionAKS)
               command: login
 
           - script: |
