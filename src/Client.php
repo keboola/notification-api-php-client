@@ -6,7 +6,6 @@ namespace Keboola\NotificationClient;
 
 use Closure;
 use GuzzleHttp\Client as GuzzleClient;
-use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\MessageFormatter;
@@ -19,7 +18,6 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\Validation;
@@ -27,8 +25,6 @@ use Throwable;
 
 abstract class Client
 {
-    private const DEFAULT_USER_AGENT = 'Notification PHP Client';
-    private const DEFAULT_BACKOFF_RETRIES = 3;
     private const JSON_DEPTH = 512;
     protected array $defaultHeaders = ['Content-type' => 'application/json'];
     protected string $tokenHeaderName = '';
@@ -51,15 +47,6 @@ abstract class Client
     ) {
         $validator = Validation::createValidator();
         $errors = $validator->validate($baseUrl, [new Url()]);
-        if (!empty($options['backoffMaxTries'])) {
-            $errors->addAll($validator->validate($options['backoffMaxTries'], [new Range(['min' => 0, 'max' => 100])]));
-            $options['backoffMaxTries'] = intval($options['backoffMaxTries']);
-        } else {
-            $options['backoffMaxTries'] = self::DEFAULT_BACKOFF_RETRIES;
-        }
-        if (empty($options['userAgent'])) {
-            $options['userAgent'] = self::DEFAULT_USER_AGENT;
-        }
         if ($errors->count() !== 0) {
             $messages = '';
             /** @var ConstraintViolationInterface $error */

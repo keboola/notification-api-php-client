@@ -49,8 +49,8 @@ class StorageApiIndexClientTest extends TestCase
             'https://dummy',
             ['handler' => $stack, 'logger' => $logger, 'backoffMaxTries' => 3, 'userAgent' => 'Test']
         );
-        self::expectException(ClientException::class);
-        self::expectExceptionMessage($expectedError);
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessage($expectedError);
         $client->getServiceUrl('notification');
     }
 

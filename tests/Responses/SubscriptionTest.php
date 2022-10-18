@@ -42,9 +42,9 @@ class SubscriptionTest extends TestCase
             'id' => 123,
             'event' => 'some_event',
         ];
-        self::expectException(ClientException::class);
-        self::expectExceptionMessage('$id must be string, int used');
-        self::expectExceptionCode(0);
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessageMatches('#(\$id must be string, int used|\$id of type string)#');
+        $this->expectExceptionCode(0);
         new Subscription($data);
     }
 }

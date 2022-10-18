@@ -19,11 +19,9 @@ class FilterTest extends TestCase
 
     public function testInvalidData(): void
     {
-        self::expectException(ClientException::class);
-        self::expectExceptionMessage(
-            'Unrecognized response: Typed property Keboola\NotificationClient\Responses\Filter::$field must be string'
-        );
-        self::expectExceptionCode(0);
-        new Filter(['boo']);
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessageMatches('#(\$field must be string|\$field of type string)#');
+        $this->expectExceptionCode(0);
+        new Filter(['boo', 'field' => 1]);
     }
 }

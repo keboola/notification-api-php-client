@@ -38,16 +38,27 @@ class ClientTest extends TestCase
         );
     }
 
-    public function testCreateClientInvalidTokenAndUrl(): void
+    public function testCreateClientInvalidToken(): void
     {
-        self::expectException(ClientException::class);
-        self::expectExceptionMessage(
-            'Value "invalid url" is invalid: This value is not a valid URL.' . "\n" .
-            'Application token must be non-empty, "" provided.'
-        );
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessage('Application token must be non-empty, "" provided.');
         new EventsClient(
             'invalid url',
             '',
+            [
+                'backoffMaxTries' => 3,
+                'userAgent' => 'Test',
+            ]
+        );
+    }
+
+    public function testCreateClientInvalidUrl(): void
+    {
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessage('Value "invalid url" is invalid: This value is not a valid URL.');
+        new EventsClient(
+            'invalid url',
+            'token',
             [
                 'backoffMaxTries' => 3,
                 'userAgent' => 'Test',
@@ -94,11 +105,11 @@ class ClientTest extends TestCase
         $client->postEvent($this->getPostEventData());
         /** @var Request $request */
         $request = $requestHistory[0]['request'];
-        self::assertEquals('https://example.com/events/job-failed', $request->getUri()->__toString());
-        self::assertEquals('POST', $request->getMethod());
-        self::assertEquals('testToken', $request->getHeader('X-Kbc-ManageApiToken')[0]);
-        self::assertEquals('Notification PHP Client', $request->getHeader('User-Agent')[0]);
-        self::assertEquals('application/json', $request->getHeader('Content-type')[0]);
+        self::assertSame('https://example.com/events/job-failed', $request->getUri()->__toString());
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame('testToken', $request->getHeader('X-Kbc-ManageApiToken')[0]);
+        self::assertSame('Test', $request->getHeader('User-Agent')[0]);
+        self::assertSame('application/json', $request->getHeader('Content-type')[0]);
     }
 
     public function testLogger(): void
@@ -138,9 +149,9 @@ class ClientTest extends TestCase
         $client->postEvent($this->getPostEventData());
         /** @var Request $request */
         $request = $requestHistory[0]['request'];
-        self::assertEquals('test agent', $request->getHeader('User-Agent')[0]);
-        self::assertTrue($logger->hasInfoThatContains('"POST  /1.1" 200 '));
-        self::assertTrue($logger->hasInfoThatContains('test agent'));
+        self::assertSame('test agent', $request->getHeader('User-Agent')[0]);
+        self::assertTrue($logger->hasDebugThatContains('"POST  /1.1" 200 '));
+        self::assertTrue($logger->hasDebugThatContains('test agent'));
     }
 
     public function testRetrySuccess(): void
@@ -178,16 +189,25 @@ class ClientTest extends TestCase
         $history = Middleware::history($requestHistory);
         $stack = HandlerStack::create($mock);
         $stack->push($history);
-        $client = $this->getClient(['handler' => $stack, 'backoffMaxTries' => 3, 'userAgent' => 'Test']);
+        $logger = new TestLogger();
+        $client = $this->getClient(
+            [
+                'handler' => $stack,
+                'backoffMaxTries' => 3,
+                'userAgent' => 'Test',
+                'logger' => $logger,
+            ]
+        );
         $client->postEvent($this->getPostEventData());
         self::assertCount(3, $requestHistory);
         /** @var Request $request */
         $request = $requestHistory[0]['request'];
-        self::assertEquals('https://example.com/events/job-failed', $request->getUri()->__toString());
+        self::assertSame('https://example.com/events/job-failed', $request->getUri()->__toString());
         $request = $requestHistory[1]['request'];
-        self::assertEquals('https://example.com/events/job-failed', $request->getUri()->__toString());
+        self::assertSame('https://example.com/events/job-failed', $request->getUri()->__toString());
         $request = $requestHistory[2]['request'];
-        self::assertEquals('https://example.com/events/job-failed', $request->getUri()->__toString());
+        self::assertSame('https://example.com/events/job-failed', $request->getUri()->__toString());
+        self::assertTrue($logger->hasNoticeThatContains('retrying'));
     }
 
     public function testRetryFailure(): void
@@ -231,8 +251,8 @@ class ClientTest extends TestCase
         $stack = HandlerStack::create($mock);
         $stack->push($history);
         $client = $this->getClient(['handler' => $stack, 'backoffMaxTries' => 3, 'userAgent' => 'Test']);
-        self::expectException(ClientException::class);
-        self::expectExceptionMessage('{"message" => "Unauthorized"}');
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessage('{"message" => "Unauthorized"}');
         $client->postEvent($this->getPostEventData());
     }
 }

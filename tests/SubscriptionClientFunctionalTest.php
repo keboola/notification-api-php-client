@@ -47,8 +47,8 @@ class SubscriptionClientFunctionalTest extends TestCase
     public function testCreateInvalidSubscription(): void
     {
         $client = $this->getClient();
-        self::expectException(ClientException::class);
-        self::expectExceptionMessage(
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessage(
             'Invalid event type "dummy-event", valid types are: ' .
             '"job-failed, job-succeeded, job-succeeded-with-warning, job-processing-long, phase-job-failed, ' .
             'phase-job-succeeded, phase-job-succeeded-with-warning, phase-job-processing-long".'

@@ -71,9 +71,9 @@ class ClientFactoryTest extends TestCase
 
         /** @var Request $request */
         $request = $requestHistory[0]['request'];
-        self::assertEquals('test agent', $request->getHeader('User-Agent')[0]);
-        self::assertTrue($logger->hasInfoThatContains('"GET  /1.1" 200 '));
-        self::assertTrue($logger->hasInfoThatContains('test agent'));
+        self::assertSame('test agent', $request->getHeader('User-Agent')[0]);
+        self::assertTrue($logger->hasDebugThatContains('"GET  /1.1" 200 '));
+        self::assertTrue($logger->hasDebugThatContains('test agent'));
     }
 
     public function testGetClientLazy(): void

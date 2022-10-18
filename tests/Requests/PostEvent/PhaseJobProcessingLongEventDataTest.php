@@ -65,6 +65,6 @@ class PhaseJobProcessingLongEventDataTest extends TestCase
             ],
             $failedEventData->jsonSerialize()
         );
-        self::assertEquals('phase-job-processing-long', $failedEventData::getEventTypeName());
+        self::assertSame('phase-job-processing-long', $failedEventData::getEventTypeName());
     }
 }
