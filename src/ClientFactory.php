@@ -4,16 +4,33 @@ declare(strict_types=1);
 
 namespace Keboola\NotificationClient;
 
-use Keboola\NotificationClient\Requests\PostEvent\JobFailedEventData;
+use GuzzleHttp\HandlerStack;
+use Psr\Log\LoggerInterface;
 
 class ClientFactory
 {
     private const NOTIFICATION_SERVICE_NAME = 'notification';
     private ?string $notificationUrl;
     private string $connectionUrl;
+    /**
+     * @var array{
+     *     handler?: HandlerStack,
+     *     backoffMaxTries: int<0, 100>,
+     *     userAgent: string,
+     *     logger?: LoggerInterface
+     * }
+     */
     private array $connectionClientOptions;
 
-    public function __construct(string $connectionUrl, array $connectionClientOptions = [])
+    /**
+     * @param array{
+     *     handler?: HandlerStack,
+     *     backoffMaxTries: int<0, 100>,
+     *     userAgent: string,
+     *     logger?: LoggerInterface
+     * } $connectionClientOptions
+     */
+    public function __construct(string $connectionUrl, array $connectionClientOptions)
     {
         $this->connectionUrl = $connectionUrl;
         $this->connectionClientOptions = $connectionClientOptions;
@@ -29,12 +46,28 @@ class ClientFactory
         return (string) $this->notificationUrl;
     }
 
-    public function getEventsClient(string $applicationToken, array $options = []): EventsClient
+    /**
+     * @param array{
+     *     handler?: HandlerStack,
+     *     backoffMaxTries: int<0, 100>,
+     *     userAgent: string,
+     *     logger?: LoggerInterface
+     * } $options
+     */
+    public function getEventsClient(string $applicationToken, array $options): EventsClient
     {
         return new EventsClient($this->getNotificationUrl(), $applicationToken, $options);
     }
 
-    public function getSubscriptionClient(string $storageApiToken, array $options = []): SubscriptionClient
+    /**
+     * @param array{
+     *     handler?: HandlerStack,
+     *     backoffMaxTries: int<0, 100>,
+     *     userAgent: string,
+     *     logger?: LoggerInterface
+     * } $options
+     */
+    public function getSubscriptionClient(string $storageApiToken, array $options): SubscriptionClient
     {
         return new SubscriptionClient($this->getNotificationUrl(), $storageApiToken, $options);
     }

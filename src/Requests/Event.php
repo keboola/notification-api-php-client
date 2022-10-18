@@ -17,12 +17,9 @@ class Event implements JsonSerializable
         $this->eventData = $eventData;
     }
 
-    /**
-     * @return mixed
-     */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
-        return $this->eventData->jsonSerialize();
+        return (array) $this->eventData->jsonSerialize();
     }
 
     public function getEventType(): string

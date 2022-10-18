@@ -58,10 +58,16 @@ class ClientFactoryTest extends TestCase
 
         $clientFactory = new ClientFactory(
             'https://dummy',
-            ['handler' => $stack, 'logger' => $logger, 'userAgent' => 'test agent']
+            ['handler' => $stack, 'logger' => $logger, 'backoffMaxTries' => 3, 'userAgent' => 'test agent']
         );
-        self::assertInstanceOf(SubscriptionClient::class, $clientFactory->getSubscriptionClient('dummy'));
-        self::assertInstanceOf(EventsClient::class, $clientFactory->getEventsClient('dummy'));
+        self::assertInstanceOf(
+            SubscriptionClient::class,
+            $clientFactory->getSubscriptionClient('dummy', ['backoffMaxTries' => 3, 'userAgent' => 'Test'])
+        );
+        self::assertInstanceOf(
+            EventsClient::class,
+            $clientFactory->getEventsClient('dummy', ['backoffMaxTries' => 3, 'userAgent' => 'Test'])
+        );
 
         /** @var Request $request */
         $request = $requestHistory[0]['request'];
@@ -87,12 +93,12 @@ class ClientFactoryTest extends TestCase
 
         $clientFactory = new ClientFactory(
             'https://dummy',
-            ['handler' => $stack, 'logger' => $logger, 'userAgent' => 'test agent']
+            ['handler' => $stack, 'logger' => $logger, 'backoffMaxTries' => 3, 'userAgent' => 'test agent']
         );
         self::assertCount(0, $requestHistory);
-        $clientFactory->getSubscriptionClient('dummy');
+        $clientFactory->getSubscriptionClient('dummy', ['backoffMaxTries' => 3, 'userAgent' => 'Test']);
         self::assertCount(1, $requestHistory);
-        $clientFactory->getEventsClient('dummy');
+        $clientFactory->getEventsClient('dummy', ['backoffMaxTries' => 3, 'userAgent' => 'Test']);
         self::assertCount(1, $requestHistory);
     }
 }

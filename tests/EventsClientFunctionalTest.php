@@ -18,7 +18,11 @@ class EventsClientFunctionalTest extends TestCase
     {
         return new EventsClient(
             (string) getenv('TEST_NOTIFICATION_API_URL'),
-            (string) getenv('TEST_MANAGE_API_APPLICATION_TOKEN')
+            (string) getenv('TEST_MANAGE_API_APPLICATION_TOKEN'),
+            [
+                'backoffMaxTries' => 3,
+                'userAgent' => 'Test',
+            ]
         );
     }
 

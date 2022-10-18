@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\NotificationClient\Requests;
 
+use JetBrains\PhpStorm\Internal\TentativeType;
 use JsonSerializable;
 use Keboola\NotificationClient\ClientFactory;
 use Keboola\NotificationClient\Exception\ClientException;
@@ -39,10 +40,7 @@ class Subscription implements JsonSerializable
         $this->filters = $filters;
     }
 
-    /**
-     * @return mixed
-     */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         $filters = array_values(array_map(
             fn (Filter $v) => $v->jsonSerialize(),

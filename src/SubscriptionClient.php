@@ -12,16 +12,11 @@ use Keboola\NotificationClient\Responses\Subscription as ResponseSubscription;
 
 class SubscriptionClient extends Client
 {
-    protected function getTokenHeaderName(): string
-    {
-        return 'X-StorageApi-Token';
-    }
+    protected string $tokenHeaderName = 'X-StorageApi-Token';
 
-    public function __construct(
-        string $notificationApiUrl,
-        string $storageApiToken,
-        array $options = []
-    ) {
+    /** @inheritDoc */
+    public function __construct(string $notificationApiUrl, string $storageApiToken, array $options)
+    {
         if (empty($storageApiToken)) {
             throw new ClientException(sprintf(
                 'Storage API token must be non-empty, %s provided.',

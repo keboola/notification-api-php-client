@@ -17,6 +17,7 @@ class Filter
         try {
             $this->field = $data['field'];
             $this->value = $data['value'];
+            // @phpstan-ignore-next-line PHPStan is confused
         } catch (Throwable $e) {
             throw new ClientException('Unrecognized response: ' . $e->getMessage(), 0, $e);
         }

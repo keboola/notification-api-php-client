@@ -20,6 +20,10 @@ class StorageApiIndexClientTest extends TestCase
     {
         $client = new StorageApiIndexClient(
             (string) getenv('STORAGE_API_URL'),
+            [
+                'backoffMaxTries' => 3,
+                'userAgent' => 'Test',
+            ]
         );
         self::assertStringStartsWith('https://notification.', $client->getServiceUrl('notification'));
     }
@@ -41,7 +45,10 @@ class StorageApiIndexClientTest extends TestCase
         $stack = HandlerStack::create($mock);
         $stack->push($history);
         $logger = new TestLogger();
-        $client = new StorageApiIndexClient('https://dummy', ['handler' => $stack, 'logger' => $logger]);
+        $client = new StorageApiIndexClient(
+            'https://dummy',
+            ['handler' => $stack, 'logger' => $logger, 'backoffMaxTries' => 3, 'userAgent' => 'Test']
+        );
         self::expectException(ClientException::class);
         self::expectExceptionMessage($expectedError);
         $client->getServiceUrl('notification');

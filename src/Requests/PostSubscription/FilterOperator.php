@@ -19,10 +19,15 @@ use MyCLabs\Enum\Enum;
 class FilterOperator extends Enum
 {
     // phpcs:disable SlevomatCodingStandard.Classes.UnusedPrivateElements
+    // @phpstan-ignore-next-line
     private const EQUAL = '=='; // can't be called EQUALS because there is a method called `equals` on base Enum class
+    // @phpstan-ignore-next-line
     private const LESS_THAN = '<';
+    // @phpstan-ignore-next-line
     private const GREATER_THAN = '>';
+    // @phpstan-ignore-next-line
     private const LESS_THAN_OR_EQUAL = '<=';
+    // @phpstan-ignore-next-line
     private const GREATER_THAN_OR_EQUAL = '>=';
     // phpcs:enable SlevomatCodingStandard.Classes.UnusedPrivateElements
 }

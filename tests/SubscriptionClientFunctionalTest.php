@@ -17,7 +17,11 @@ class SubscriptionClientFunctionalTest extends TestCase
     {
         return new SubscriptionClient(
             (string) getenv('TEST_NOTIFICATION_API_URL'),
-            (string) getenv('TEST_STORAGE_API_TOKEN')
+            (string) getenv('TEST_STORAGE_API_TOKEN'),
+            [
+                'backoffMaxTries' => 3,
+                'userAgent' => 'Test',
+            ]
         );
     }
 
