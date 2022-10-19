@@ -41,9 +41,7 @@ class ClientTest extends TestCase
     public function testCreateClientInvalidUrl(): void
     {
         $this->expectException(ClientException::class);
-        $this->expectExceptionMessageMatches(
-            '#Invalid parameters when creating client: invalid url:\s*This value is not a valid URL\.#'
-        );
+        $this->expectExceptionMessage('Value "invalid url" is invalid: This value is not a valid URL.');
         new EventsClient(
             'invalid url',
             'token',
