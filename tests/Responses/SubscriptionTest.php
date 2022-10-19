@@ -43,7 +43,9 @@ class SubscriptionTest extends TestCase
             'event' => 'some_event',
         ];
         $this->expectException(ClientException::class);
-        $this->expectExceptionMessageMatches('#(\$id must be string, int used|\$id of type string)#');
+        $this->expectExceptionMessageMatches(
+            '#Unrecognized response:.*?(\$id must be string, int used|\$id of type string)#'
+        );
         $this->expectExceptionCode(0);
         new Subscription($data);
     }

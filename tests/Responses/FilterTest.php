@@ -20,7 +20,9 @@ class FilterTest extends TestCase
     public function testInvalidData(): void
     {
         $this->expectException(ClientException::class);
-        $this->expectExceptionMessageMatches('#(\$field must be string|\$field of type string)#');
+        $this->expectExceptionMessageMatches(
+            '#Unrecognized response:.*?(\$field must be string|\$field of type string)#'
+        );
         $this->expectExceptionCode(0);
         new Filter(['boo', 'field' => 1]);
     }
