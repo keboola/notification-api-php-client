@@ -38,24 +38,12 @@ class ClientTest extends TestCase
         );
     }
 
-    public function testCreateClientInvalidToken(): void
-    {
-        $this->expectException(ClientException::class);
-        $this->expectExceptionMessage('Application token must be non-empty, "" provided.');
-        new EventsClient(
-            'invalid url',
-            '',
-            [
-                'backoffMaxTries' => 3,
-                'userAgent' => 'Test',
-            ]
-        );
-    }
-
     public function testCreateClientInvalidUrl(): void
     {
         $this->expectException(ClientException::class);
-        $this->expectExceptionMessage('Value "invalid url" is invalid: This value is not a valid URL.');
+        $this->expectExceptionMessageMatches(
+            '#Invalid parameters when creating client: invalid url:\s*This value is not a valid URL\.#'
+        );
         new EventsClient(
             'invalid url',
             'token',
@@ -226,7 +214,10 @@ class ClientTest extends TestCase
         $history = Middleware::history($requestHistory);
         $stack = HandlerStack::create($mock);
         $stack->push($history);
-        $client = $this->getClient(['handler' => $stack, 'backoffMaxTries' => 1, 'userAgent' => 'Test']);
+        $logger = new TestLogger();
+        $client = $this->getClient(
+            ['handler' => $stack, 'backoffMaxTries' => 1, 'userAgent' => 'Test', 'logger' => $logger]
+        );
         try {
             $client->postEvent($this->getPostEventData());
             self::fail('Must throw exception');
@@ -234,6 +225,7 @@ class ClientTest extends TestCase
             self::assertStringContainsString('500 Internal Server Error', $e->getMessage());
         }
         self::assertCount(2, $requestHistory);
+        self::assertTrue($logger->hasNoticeThatContains('We have tried this 1 times. Giving up.'));
     }
 
     public function testNoRetry(): void

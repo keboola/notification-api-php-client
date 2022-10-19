@@ -6,6 +6,7 @@ namespace Keboola\NotificationClient\Tests;
 
 use DateTimeImmutable;
 use Keboola\NotificationClient\EventsClient;
+use Keboola\NotificationClient\Exception\ClientException;
 use Keboola\NotificationClient\Requests\Event;
 use Keboola\NotificationClient\Requests\PostEvent\JobData;
 use Keboola\NotificationClient\Requests\PostEvent\JobFailedEventData;
@@ -47,6 +48,21 @@ class EventsClientFunctionalTest extends TestCase
             )
         ));
         self::assertTrue(true);
+    }
+
+
+    public function testCreateClientInvalidToken(): void
+    {
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessage('Application token must be non-empty, "" provided.');
+        new EventsClient(
+            'https://example.com',
+            '',
+            [
+                'backoffMaxTries' => 3,
+                'userAgent' => 'Test',
+            ]
+        );
     }
 
     public function testPostEventUniqueId(): void

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\NotificationClient\Tests;
 
+use Keboola\NotificationClient\EventsClient;
 use Keboola\NotificationClient\Exception\ClientException;
 use Keboola\NotificationClient\Requests\PostSubscription\EmailRecipient;
 use Keboola\NotificationClient\Requests\PostSubscription\Filter;
@@ -18,6 +19,21 @@ class SubscriptionClientFunctionalTest extends TestCase
         return new SubscriptionClient(
             (string) getenv('TEST_NOTIFICATION_API_URL'),
             (string) getenv('TEST_STORAGE_API_TOKEN'),
+            [
+                'backoffMaxTries' => 3,
+                'userAgent' => 'Test',
+            ]
+        );
+    }
+
+
+    public function testCreateClientInvalidToken(): void
+    {
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessage('Storage API token must be non-empty, "" provided.');
+        new SubscriptionClient(
+            'https://example.com',
+            '',
             [
                 'backoffMaxTries' => 3,
                 'userAgent' => 'Test',

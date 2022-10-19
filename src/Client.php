@@ -48,12 +48,7 @@ abstract class Client
         $validator = Validation::createValidator();
         $errors = $validator->validate($baseUrl, [new Url()]);
         if ($errors->count() !== 0) {
-            $messages = '';
-            /** @var ConstraintViolationInterface $error */
-            foreach ($errors as $error) {
-                $messages .= 'Value "' . $error->getInvalidValue() . '" is invalid: ' . $error->getMessage() . "\n";
-            }
-            throw new NotificationClientException('Invalid parameters when creating client: ' . $messages);
+            throw new NotificationClientException('Invalid parameters when creating client: ' . $errors->__toString());
         }
 
         $this->guzzle = $this->initClient($baseUrl, $token, $options);
