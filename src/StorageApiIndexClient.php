@@ -26,7 +26,7 @@ class StorageApiIndexClient extends Client
         parent::__construct($connectionUrl, null, $options);
     }
 
-    protected function getIndex(): array
+    private function getIndex(): array
     {
         $request = new Request('GET', 'v2/storage?exclude=components');
         return $this->sendRequest($request);

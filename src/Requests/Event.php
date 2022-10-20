@@ -8,7 +8,7 @@ use JsonSerializable;
 
 class Event implements JsonSerializable
 {
-    private JsonSerializable $eventData;
+    private EventDataInterface $eventData;
     private string $eventType;
 
     public function __construct(EventDataInterface $eventData)

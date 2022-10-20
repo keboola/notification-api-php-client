@@ -28,9 +28,7 @@ abstract class Client
     private const JSON_DEPTH = 512;
     protected array $defaultHeaders = ['Content-type' => 'application/json'];
     protected string $tokenHeaderName = '';
-
     protected GuzzleClient $guzzle;
-    private LoggerInterface $logger;
 
     /**
      * @param array{
@@ -59,26 +57,29 @@ abstract class Client
         $this->guzzle = $this->initClient($baseUrl, $token, $options);
     }
 
-    private function createDefaultDecider(int $maxRetries): Closure
+    private function createDefaultDecider(int $maxRetries, LoggerInterface $logger): Closure
     {
         return function (
             $retries,
             RequestInterface $request,
             ?ResponseInterface $response = null,
             ?Throwable $error = null
-        ) use ($maxRetries) {
+        ) use (
+            $maxRetries,
+            $logger
+        ) {
             if ($retries >= $maxRetries) {
-                $this->logger->notice(sprintf('We have tried this %d times. Giving up.', $maxRetries));
+                $logger->notice(sprintf('We have tried this %d times. Giving up.', $maxRetries));
                 return false;
             } elseif ($response && $response->getStatusCode() >= 500) {
-                $this->logger->notice(sprintf(
+                $logger->notice(sprintf(
                     'Got a %s response for this reason: %s, retrying.',
                     $response->getStatusCode(),
                     $response->getReasonPhrase()
                 ));
                 return true;
             } elseif ($error && $error->getCode() >= 500) {
-                $this->logger->notice(sprintf(
+                $logger->notice(sprintf(
                     'Got a %s error with this message: %s, retrying.',
                     $error->getCode(),
                     $error->getMessage()
@@ -102,14 +103,6 @@ abstract class Client
     {
         // Initialize handlers (start with those supplied in constructor)
         $handlerStack = HandlerStack::create($options['handler'] ?? null);
-        // Set exponential backoff
-        $handlerStack->push(Middleware::retry($this->createDefaultDecider($options['backoffMaxTries'])));
-        // Set handler to set default headers
-        $headers = $this->defaultHeaders;
-        $headers['User-Agent'] = $options['userAgent'];
-        if ($this->tokenHeaderName) {
-            $headers[$this->tokenHeaderName] = (string) $token;
-        }
 
         // Set client logger
         if (isset($options['logger'])) {
@@ -121,9 +114,18 @@ abstract class Client
                 ),
                 'debug'
             ));
-            $this->logger = $options['logger'];
+            $logger = $options['logger'];
         } else {
-            $this->logger = new NullLogger();
+            $logger = new NullLogger();
+        }
+
+        // Set exponential backoff
+        $handlerStack->push(Middleware::retry($this->createDefaultDecider($options['backoffMaxTries'], $logger)));
+        // Set handler to set default headers
+        $headers = $this->defaultHeaders;
+        $headers['User-Agent'] = $options['userAgent'];
+        if ($this->tokenHeaderName) {
+            $headers[$this->tokenHeaderName] = (string) $token;
         }
 
         // finally create the instance
@@ -142,7 +144,7 @@ abstract class Client
             $response = $this->guzzle->send($request);
             $body = $response->getBody()->getContents();
             if ($body === '') {
-                    return [];
+                return [];
             }
             return (array) json_decode($body, true, self::JSON_DEPTH, JSON_THROW_ON_ERROR);
         } catch (GuzzleException $e) {
