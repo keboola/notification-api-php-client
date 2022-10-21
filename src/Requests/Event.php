@@ -19,7 +19,7 @@ class Event implements JsonSerializable
 
     public function jsonSerialize(): array
     {
-        return (array) $this->eventData->jsonSerialize();
+        return $this->eventData->jsonSerialize();
     }
 
     public function getEventType(): string
