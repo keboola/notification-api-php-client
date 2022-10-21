@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace Keboola\NotificationClient\Tests;
 
-use Keboola\NotificationClient\EventsClient;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
 use Keboola\NotificationClient\Exception\ClientException;
 use Keboola\NotificationClient\Requests\PostSubscription\EmailRecipient;
 use Keboola\NotificationClient\Requests\PostSubscription\Filter;
 use Keboola\NotificationClient\Requests\Subscription;
+use Keboola\NotificationClient\StorageApiIndexClient;
 use Keboola\NotificationClient\SubscriptionClient;
 use PHPUnit\Framework\TestCase;
 
@@ -74,5 +79,42 @@ class SubscriptionClientFunctionalTest extends TestCase
             new EmailRecipient('johnDoe@example.com'),
             [new Filter('projectId', (string) getenv('TEST_STORAGE_API_PROJECT_ID'))]
         ));
+    }
+
+    public function testCreateSubscriptionHeaders(): void
+    {
+        $mock = new MockHandler([
+            new Response(
+                200,
+                ['Content-Type' => 'application/json'],
+                '{"id": "1", "event": "2", "filters": [], "recipient": {"channel": "foo", "address": "bar"}}'
+            ),
+        ]);
+        // Add the history middleware to the handler stack.
+        $requestHistory = [];
+        $history = Middleware::history($requestHistory);
+        $stack = HandlerStack::create($mock);
+        $stack->push($history);
+        $client = new SubscriptionClient(
+            'https://example.com/',
+            'testToken',
+            ['handler' => $stack, 'backoffMaxTries' => 3, 'userAgent' => 'Test']
+        );
+        $client->createSubscription(new Subscription(
+            'job-failed',
+            new EmailRecipient('john.doe@example.com'),
+            [
+                new Filter('key', 'value'),
+            ]
+        ));
+
+        /** @var Request $request */
+        $request = $requestHistory[0]['request'];
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame(
+            ['Content-Length', 'User-Agent', 'X-StorageApi-Token', 'Host', 'Content-type'],
+            array_keys($request->getHeaders())
+        );
+        self::assertSame(['application/json'], $request->getHeaders()['Content-type']);
     }
 }

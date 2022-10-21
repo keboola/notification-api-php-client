@@ -18,6 +18,8 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\Validation;
@@ -26,7 +28,6 @@ use Throwable;
 abstract class Client
 {
     private const JSON_DEPTH = 512;
-    protected array $defaultHeaders = ['Content-type' => 'application/json'];
     protected string $tokenHeaderName = '';
     protected GuzzleClient $guzzle;
 
@@ -45,6 +46,21 @@ abstract class Client
     ) {
         $validator = Validation::createValidator();
         $errors = $validator->validate($baseUrl, [new Url()]);
+        $errors->addAll($validator->validate(
+            // @phpstan-ignore-next-line
+            $options['backoffMaxTries'] ?? null,
+            [new NotBlank(null, '"backoffMaxTries" option must be provided')]
+        ));
+        $errors->addAll($validator->validate(
+            // @phpstan-ignore-next-line
+            $options['backoffMaxTries'] ?? null,
+            [new Range(['min' => 0, 'max' => 100])]
+        ));
+        $errors->addAll($validator->validate(
+            // @phpstan-ignore-next-line
+            $options['userAgent'] ?? null,
+            [new NotBlank(null, '"userAgent" option must be provided')]
+        ));
         if ($errors->count() !== 0) {
             $messages = '';
             /** @var ConstraintViolationInterface $error */
@@ -121,8 +137,6 @@ abstract class Client
 
         // Set exponential backoff
         $handlerStack->push(Middleware::retry($this->createDefaultDecider($options['backoffMaxTries'], $logger)));
-        // Set handler to set default headers
-        $headers = $this->defaultHeaders;
         $headers['User-Agent'] = $options['userAgent'];
         if ($this->tokenHeaderName) {
             $headers[$this->tokenHeaderName] = (string) $token;

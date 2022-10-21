@@ -30,7 +30,12 @@ class SubscriptionClient extends Client
     {
         try {
             $jobDataJson = json_encode($requestData->jsonSerialize(), JSON_THROW_ON_ERROR);
-            $request = new Request('POST', 'project-subscriptions', [], $jobDataJson);
+            $request = new Request(
+                'POST',
+                'project-subscriptions',
+                ['Content-type' => 'application/json'],
+                $jobDataJson
+            );
         } catch (JsonException $e) {
             throw new ClientException('Invalid job data: ' . $e->getMessage(), $e->getCode(), $e);
         }

@@ -38,6 +38,64 @@ class ClientTest extends TestCase
         );
     }
 
+    public function testCreateClientEmptyBackoffAndUserAgent(): void
+    {
+        self::expectException(ClientException::class);
+        self::expectExceptionMessageMatches(
+            // phpcs:ignore Generic.Files.LineLength
+            '#Value "" is invalid: "backoffMaxTries" option must be provided\s*Value "" is invalid: "userAgent" option must be provided#'
+        );
+        new EventsClient(
+            'http://example.com/',
+            'testToken',
+            // @phpstan-ignore-next-line
+            []
+        );
+    }
+
+    public function testCreateClientInvalidBackoff(): void
+    {
+        self::expectException(ClientException::class);
+        // phpcs:ignore Generic.Files.LineLength
+        self::expectExceptionMessage(
+            'Invalid parameters when creating client: Value "abc" is invalid: This value should be a valid number.'
+        );
+        new EventsClient(
+            'http://example.com/',
+            'testToken',
+            // @phpstan-ignore-next-line
+            ['backoffMaxTries' => 'abc', 'userAgent' => 'boo']
+        );
+    }
+
+    public function testCreateClientTooLowBackoff(): void
+    {
+        self::expectException(ClientException::class);
+        self::expectExceptionMessage(
+            'Invalid parameters when creating client: Value "-1" is invalid: This value should be between 0 and 100.'
+        );
+        new EventsClient(
+            'http://example.com/',
+            'testToken',
+            // @phpstan-ignore-next-line
+            ['backoffMaxTries' => -1]
+        );
+    }
+
+    public function testCreateClientTooHighBackoff(): void
+    {
+        self::expectException(ClientException::class);
+        self::expectExceptionMessage(
+            'Invalid parameters when creating client: Value "101" is invalid: This value should be between 0 and 100.'
+        );
+        new EventsClient(
+            'http://example.com/',
+            'testToken',
+            // @phpstan-ignore-next-line
+            ['backoffMaxTries' => 101]
+        );
+    }
+
     public function testCreateClientInvalidUrl(): void
     {
         $this->expectException(ClientException::class);
