@@ -8,9 +8,14 @@ use Generator;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
+use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Keboola\NotificationClient\Exception\ClientException;
+use Keboola\NotificationClient\Requests\PostSubscription\EmailRecipient;
+use Keboola\NotificationClient\Requests\PostSubscription\Filter;
+use Keboola\NotificationClient\Requests\Subscription;
 use Keboola\NotificationClient\StorageApiIndexClient;
+use Keboola\NotificationClient\SubscriptionClient;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\Test\TestLogger;
 
@@ -20,6 +25,10 @@ class StorageApiIndexClientTest extends TestCase
     {
         $client = new StorageApiIndexClient(
             (string) getenv('STORAGE_API_URL'),
+            [
+                'backoffMaxTries' => 3,
+                'userAgent' => 'Test',
+            ]
         );
         self::assertStringStartsWith('https://notification.', $client->getServiceUrl('notification'));
     }
@@ -41,9 +50,12 @@ class StorageApiIndexClientTest extends TestCase
         $stack = HandlerStack::create($mock);
         $stack->push($history);
         $logger = new TestLogger();
-        $client = new StorageApiIndexClient('https://dummy', ['handler' => $stack, 'logger' => $logger]);
-        self::expectException(ClientException::class);
-        self::expectExceptionMessage($expectedError);
+        $client = new StorageApiIndexClient(
+            'https://dummy',
+            ['handler' => $stack, 'logger' => $logger, 'backoffMaxTries' => 3, 'userAgent' => 'Test']
+        );
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessage($expectedError);
         $client->getServiceUrl('notification');
     }
 
@@ -98,5 +110,34 @@ class StorageApiIndexClientTest extends TestCase
             }',
             'Service "notification" was not found in index.',
         ];
+    }
+
+    public function testGetServiceUrlHeaders(): void
+    {
+        $mock = new MockHandler([
+            new Response(
+                200,
+                ['Content-Type' => 'application/json'],
+                '{"services": [{"id": "boo", "url": "foo"}]}'
+            ),
+        ]);
+        // Add the history middleware to the handler stack.
+        $requestHistory = [];
+        $history = Middleware::history($requestHistory);
+        $stack = HandlerStack::create($mock);
+        $stack->push($history);
+        $client = new StorageApiIndexClient(
+            'https://example.com/',
+            ['handler' => $stack, 'backoffMaxTries' => 3, 'userAgent' => 'Test']
+        );
+        $client->getServiceUrl('boo');
+
+        /** @var Request $request */
+        $request = $requestHistory[0]['request'];
+        self::assertSame('GET', $request->getMethod());
+        self::assertSame(
+            ['User-Agent', 'Host'],
+            array_keys($request->getHeaders())
+        );
     }
 }

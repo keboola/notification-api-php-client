@@ -16,29 +16,55 @@ use Keboola\NotificationClient\Requests\Event;
 use Keboola\NotificationClient\Requests\PostEvent\JobData;
 use Keboola\NotificationClient\Requests\PostEvent\JobFailedEventData;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Psr\Log\Test\TestLogger;
 
 class ClientTest extends TestCase
 {
+    /**
+     * @param array{
+     *     handler?: HandlerStack,
+     *     backoffMaxTries: int<0, 100>,
+     *     userAgent: string,
+     *     logger?: LoggerInterface
+     * } $options
+     */
     private function getClient(array $options): EventsClient
     {
         return new EventsClient(
-            'http://example.com/',
+            'https://example.com/',
             'testToken',
             $options
+        );
+    }
+
+    public function testCreateClientEmptyBackoffAndUserAgent(): void
+    {
+        self::expectException(ClientException::class);
+        self::expectExceptionMessageMatches(
+            // phpcs:ignore Generic.Files.LineLength
+            '#Value "" is invalid: "backoffMaxTries" option must be provided\s*Value "" is invalid: "userAgent" option must be provided#'
+        );
+        new EventsClient(
+            'http://example.com/',
+            'testToken',
+            // @phpstan-ignore-next-line
+            []
         );
     }
 
     public function testCreateClientInvalidBackoff(): void
     {
         self::expectException(ClientException::class);
+        // phpcs:ignore Generic.Files.LineLength
         self::expectExceptionMessage(
-            'Invalid parameters when creating client: Value "abc" is invalid: This value should be a valid number'
+            'Invalid parameters when creating client: Value "abc" is invalid: This value should be a valid number.'
         );
         new EventsClient(
             'http://example.com/',
             'testToken',
-            ['backoffMaxTries' => 'abc']
+            // @phpstan-ignore-next-line
+            ['backoffMaxTries' => 'abc', 'userAgent' => 'boo']
         );
     }
 
@@ -51,6 +77,7 @@ class ClientTest extends TestCase
         new EventsClient(
             'http://example.com/',
             'testToken',
+            // @phpstan-ignore-next-line
             ['backoffMaxTries' => -1]
         );
     }
@@ -64,36 +91,23 @@ class ClientTest extends TestCase
         new EventsClient(
             'http://example.com/',
             'testToken',
+            // @phpstan-ignore-next-line
             ['backoffMaxTries' => 101]
         );
     }
 
-    public function testCreateClientInvalidToken(): void
-    {
-        self::expectException(ClientException::class);
-        self::expectExceptionMessage(
-            'Application token must be non-empty, "" provided.'
-        );
-        new EventsClient('http://example.com/', '');
-    }
-
     public function testCreateClientInvalidUrl(): void
     {
-        self::expectException(ClientException::class);
-        self::expectExceptionMessage(
-            'Value "invalid url" is invalid: This value is not a valid URL'
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessage('Value "invalid url" is invalid: This value is not a valid URL.');
+        new EventsClient(
+            'invalid url',
+            'token',
+            [
+                'backoffMaxTries' => 3,
+                'userAgent' => 'Test',
+            ]
         );
-        new EventsClient('invalid url', 'testToken');
-    }
-
-    public function testCreateClientMultipleErrors(): void
-    {
-        self::expectException(ClientException::class);
-        self::expectExceptionMessage(
-            'Invalid parameters when creating client: Value "invalid url" is invalid: This value is not a valid URL.'
-            . "\n" . 'Value "abc" is invalid: This value should be a valid number.'
-        );
-        new EventsClient('invalid url', 'SomeToken', ['backoffMaxTries' => 'abc']);
     }
 
     private function getPostEventData(): Event
@@ -131,15 +145,15 @@ class ClientTest extends TestCase
         $history = Middleware::history($requestHistory);
         $stack = HandlerStack::create($mock);
         $stack->push($history);
-        $client = $this->getClient(['handler' => $stack]);
+        $client = $this->getClient(['handler' => $stack, 'backoffMaxTries' => 3, 'userAgent' => 'Test']);
         $client->postEvent($this->getPostEventData());
         /** @var Request $request */
         $request = $requestHistory[0]['request'];
-        self::assertEquals('http://example.com/events/job-failed', $request->getUri()->__toString());
-        self::assertEquals('POST', $request->getMethod());
-        self::assertEquals('testToken', $request->getHeader('X-Kbc-ManageApiToken')[0]);
-        self::assertEquals('Notification PHP Client', $request->getHeader('User-Agent')[0]);
-        self::assertEquals('application/json', $request->getHeader('Content-type')[0]);
+        self::assertSame('https://example.com/events/job-failed', $request->getUri()->__toString());
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame('testToken', $request->getHeader('X-Kbc-ManageApiToken')[0]);
+        self::assertSame('Test', $request->getHeader('User-Agent')[0]);
+        self::assertSame('application/json', $request->getHeader('Content-type')[0]);
     }
 
     public function testLogger(): void
@@ -168,13 +182,20 @@ class ClientTest extends TestCase
         $stack = HandlerStack::create($mock);
         $stack->push($history);
         $logger = new TestLogger();
-        $client = $this->getClient(['handler' => $stack, 'logger' => $logger, 'userAgent' => 'test agent']);
+        $client = $this->getClient(
+            [
+                'handler' => $stack,
+                'logger' => $logger,
+                'backoffMaxTries' => 3,
+                'userAgent' => 'test agent',
+            ]
+        );
         $client->postEvent($this->getPostEventData());
         /** @var Request $request */
         $request = $requestHistory[0]['request'];
-        self::assertEquals('test agent', $request->getHeader('User-Agent')[0]);
-        self::assertTrue($logger->hasInfoThatContains('"POST  /1.1" 200 '));
-        self::assertTrue($logger->hasInfoThatContains('test agent'));
+        self::assertSame('test agent', $request->getHeader('User-Agent')[0]);
+        self::assertTrue($logger->hasDebugThatContains('"POST  /1.1" 200 '));
+        self::assertTrue($logger->hasDebugThatContains('test agent'));
     }
 
     public function testRetrySuccess(): void
@@ -212,16 +233,25 @@ class ClientTest extends TestCase
         $history = Middleware::history($requestHistory);
         $stack = HandlerStack::create($mock);
         $stack->push($history);
-        $client = $this->getClient(['handler' => $stack]);
+        $logger = new TestLogger();
+        $client = $this->getClient(
+            [
+                'handler' => $stack,
+                'backoffMaxTries' => 3,
+                'userAgent' => 'Test',
+                'logger' => $logger,
+            ]
+        );
         $client->postEvent($this->getPostEventData());
         self::assertCount(3, $requestHistory);
         /** @var Request $request */
         $request = $requestHistory[0]['request'];
-        self::assertEquals('http://example.com/events/job-failed', $request->getUri()->__toString());
+        self::assertSame('https://example.com/events/job-failed', $request->getUri()->__toString());
         $request = $requestHistory[1]['request'];
-        self::assertEquals('http://example.com/events/job-failed', $request->getUri()->__toString());
+        self::assertSame('https://example.com/events/job-failed', $request->getUri()->__toString());
         $request = $requestHistory[2]['request'];
-        self::assertEquals('http://example.com/events/job-failed', $request->getUri()->__toString());
+        self::assertSame('https://example.com/events/job-failed', $request->getUri()->__toString());
+        self::assertTrue($logger->hasNoticeThatContains('retrying'));
     }
 
     public function testRetryFailure(): void
@@ -240,7 +270,10 @@ class ClientTest extends TestCase
         $history = Middleware::history($requestHistory);
         $stack = HandlerStack::create($mock);
         $stack->push($history);
-        $client = $this->getClient(['handler' => $stack, 'backoffMaxTries' => 1]);
+        $logger = new TestLogger();
+        $client = $this->getClient(
+            ['handler' => $stack, 'backoffMaxTries' => 1, 'userAgent' => 'Test', 'logger' => $logger]
+        );
         try {
             $client->postEvent($this->getPostEventData());
             self::fail('Must throw exception');
@@ -248,6 +281,7 @@ class ClientTest extends TestCase
             self::assertStringContainsString('500 Internal Server Error', $e->getMessage());
         }
         self::assertCount(2, $requestHistory);
+        self::assertTrue($logger->hasNoticeThatContains('We have tried this 1 times. Giving up.'));
     }
 
     public function testNoRetry(): void
@@ -264,9 +298,9 @@ class ClientTest extends TestCase
         $history = Middleware::history($requestHistory);
         $stack = HandlerStack::create($mock);
         $stack->push($history);
-        $client = $this->getClient(['handler' => $stack]);
-        self::expectException(ClientException::class);
-        self::expectExceptionMessage('{"message" => "Unauthorized"}');
+        $client = $this->getClient(['handler' => $stack, 'backoffMaxTries' => 3, 'userAgent' => 'Test']);
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessage('{"message" => "Unauthorized"}');
         $client->postEvent($this->getPostEventData());
     }
 }

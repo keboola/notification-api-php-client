@@ -4,4 +4,9 @@ parameters:
     paths:
         - src
         - tests
+    stubFiles:
+        - tests/stubs/Guzzle.stub
     ignoreErrors:
+
+includes:
+    - vendor/phpstan/phpstan-phpunit/extension.neon

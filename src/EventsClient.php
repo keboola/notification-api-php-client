@@ -11,16 +11,11 @@ use Keboola\NotificationClient\Requests\Event;
 
 class EventsClient extends Client
 {
-    protected function getTokenHeaderName(): string
-    {
-        return 'X-Kbc-ManageApiToken';
-    }
+    protected string $tokenHeaderName = 'X-Kbc-ManageApiToken';
 
-    public function __construct(
-        string $notificationApiUrl,
-        string $applicationToken,
-        array $options = []
-    ) {
+    /** @inheritDoc */
+    public function __construct(string $notificationApiUrl, string $applicationToken, array $options)
+    {
         if (empty($applicationToken)) {
             throw new ClientException(sprintf(
                 'Application token must be non-empty, %s provided.',
@@ -34,7 +29,12 @@ class EventsClient extends Client
     {
         try {
             $jobDataJson = json_encode($requestData->jsonSerialize(), JSON_THROW_ON_ERROR);
-            $request = new Request('POST', sprintf('events/%s', $requestData->getEventType()), [], $jobDataJson);
+            $request = new Request(
+                'POST',
+                sprintf('events/%s', $requestData->getEventType()),
+                ['Content-type' => 'application/json'],
+                $jobDataJson
+            );
         } catch (JsonException $e) {
             throw new ClientException('Invalid job data: ' . $e->getMessage(), $e->getCode(), $e);
         }

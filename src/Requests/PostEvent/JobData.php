@@ -38,10 +38,7 @@ class JobData implements JsonSerializable
         $this->configurationName = $configurationName;
     }
 
-    /**
-     * @return mixed
-     */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         $result = [
             'id' => $this->jobId,

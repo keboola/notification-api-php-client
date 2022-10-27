@@ -9,4 +9,5 @@ use JsonSerializable;
 interface EventDataInterface extends JsonSerializable
 {
     public static function getEventTypeName(): string;
+    public function jsonSerialize(): array;
 }

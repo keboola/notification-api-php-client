@@ -8,7 +8,7 @@ use JsonSerializable;
 
 class Event implements JsonSerializable
 {
-    private JsonSerializable $eventData;
+    private EventDataInterface $eventData;
     private string $eventType;
 
     public function __construct(EventDataInterface $eventData)
@@ -17,10 +17,7 @@ class Event implements JsonSerializable
         $this->eventData = $eventData;
     }
 
-    /**
-     * @return mixed
-     */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return $this->eventData->jsonSerialize();
     }
