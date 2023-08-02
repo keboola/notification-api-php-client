@@ -39,6 +39,7 @@ class EventsClientFunctionalTest extends TestCase
             new JobFailedEventData(
                 '1234',
                 'My project',
+                'branch-id',
                 'job failed',
                 new JobData(
                     '23456',
@@ -77,6 +78,7 @@ class EventsClientFunctionalTest extends TestCase
             new JobProcessingLongEventData(
                 '1234',
                 'My project',
+                'branch-id',
                 12.5,
                 102.2,
                 120,
@@ -118,6 +120,7 @@ class EventsClientFunctionalTest extends TestCase
             new JobFailedEventData(
                 '1234',
                 'My project',
+                'branch-id',
                 'Some Error',
                 new JobData(
                     '23456',

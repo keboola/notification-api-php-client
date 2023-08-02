@@ -116,6 +116,7 @@ class ClientTest extends TestCase
             new JobFailedEventData(
                 '1234',
                 'My project',
+                'branch-id',
                 'Some Error',
                 new JobData(
                     '23456',

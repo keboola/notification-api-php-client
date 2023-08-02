@@ -10,6 +10,7 @@ class PhaseJobProcessingLongEventData implements EventDataInterface
 {
     private string $projectId;
     private string $projectName;
+    private string $branchId;
     private float $durationOvertimePercentage;
     private float $averageDuration;
     private float $currentDuration;
@@ -20,6 +21,7 @@ class PhaseJobProcessingLongEventData implements EventDataInterface
     public function __construct(
         string $projectId,
         string $projectName,
+        string $branchId,
         string $phaseName,
         string $phaseId,
         float $durationOvertimePercentage,
@@ -29,6 +31,7 @@ class PhaseJobProcessingLongEventData implements EventDataInterface
     ) {
         $this->projectId = $projectId;
         $this->projectName = $projectName;
+        $this->branchId = $branchId;
         $this->durationOvertimePercentage = $durationOvertimePercentage;
         $this->jobData = $jobData;
         $this->averageDuration = $averageDuration;
@@ -51,6 +54,9 @@ class PhaseJobProcessingLongEventData implements EventDataInterface
             'project' => [
                 'id' => $this->projectId,
                 'name' => $this->projectName,
+            ],
+            'branch' => [
+                'id' => $this->branchId,
             ],
             'uniqueId' => $this->jobData->getJobId(),
         ];

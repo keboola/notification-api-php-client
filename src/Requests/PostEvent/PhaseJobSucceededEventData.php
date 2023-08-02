@@ -10,6 +10,7 @@ class PhaseJobSucceededEventData implements EventDataInterface
 {
     private string $projectId;
     private string $projectName;
+    private string $branchId;
     private JobData $jobData;
     private string $phaseName;
     private string $phaseId;
@@ -17,12 +18,14 @@ class PhaseJobSucceededEventData implements EventDataInterface
     public function __construct(
         string $projectId,
         string $projectName,
+        string $branchId,
         string $phaseName,
         string $phaseId,
         JobData $jobData
     ) {
         $this->projectId = $projectId;
         $this->projectName = $projectName;
+        $this->branchId = $branchId;
         $this->jobData = $jobData;
         $this->phaseName = $phaseName;
         $this->phaseId = $phaseId;
@@ -39,6 +42,9 @@ class PhaseJobSucceededEventData implements EventDataInterface
             'project' => [
                 'id' => $this->projectId,
                 'name' => $this->projectName,
+            ],
+            'branch' => [
+                'id' => $this->branchId,
             ],
         ];
     }

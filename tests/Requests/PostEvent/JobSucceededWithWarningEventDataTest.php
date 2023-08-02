@@ -27,6 +27,7 @@ class JobSucceededWithWarningEventDataTest extends TestCase
         $failedEventData = new JobSucceededWithWarningEventData(
             '1234',
             'My project',
+            'branch-id',
             'someMessage',
             $jobData
         );
@@ -52,6 +53,9 @@ class JobSucceededWithWarningEventDataTest extends TestCase
                 'project' => [
                     'id' => '1234',
                     'name' => 'My project',
+                ],
+                'branch' => [
+                    'id' => 'branch-id',
                 ],
             ],
             $failedEventData->jsonSerialize()

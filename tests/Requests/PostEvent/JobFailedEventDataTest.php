@@ -23,7 +23,13 @@ class JobFailedEventDataTest extends TestCase
             'my-configuration',
             'My configuration'
         );
-        $failedEventData = new JobFailedEventData('1234', 'My project', 'someMessage', $jobData);
+        $failedEventData = new JobFailedEventData(
+            '1234',
+            'My project',
+            'branch-id',
+            'someMessage',
+            $jobData
+        );
         self::assertSame(
             [
                 'errorMessage' => 'someMessage',
@@ -45,6 +51,9 @@ class JobFailedEventDataTest extends TestCase
                 'project' => [
                     'id' => '1234',
                     'name' => 'My project',
+                ],
+                'branch' => [
+                    'id' => 'branch-id',
                 ],
             ],
             $failedEventData->jsonSerialize()
