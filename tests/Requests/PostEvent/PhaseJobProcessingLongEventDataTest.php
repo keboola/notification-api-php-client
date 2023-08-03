@@ -26,6 +26,7 @@ class PhaseJobProcessingLongEventDataTest extends TestCase
         $failedEventData = new PhaseJobProcessingLongEventData(
             '1234',
             'My project',
+            'branch-id',
             'Lithium Extractors',
             '123',
             12.534,
@@ -60,6 +61,9 @@ class PhaseJobProcessingLongEventDataTest extends TestCase
                 'project' => [
                     'id' => '1234',
                     'name' => 'My project',
+                ],
+                'branch' => [
+                    'id' => 'branch-id',
                 ],
                 'uniqueId' => '23456',
             ],

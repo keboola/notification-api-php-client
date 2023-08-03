@@ -18,6 +18,7 @@ class EventTest extends TestCase
             new JobFailedEventData(
                 '1234',
                 'My Project',
+                'branch-id',
                 'My failed job',
                 new JobData(
                     '23456',
@@ -52,6 +53,9 @@ class EventTest extends TestCase
                 'project' => [
                     'id' => '1234',
                     'name' => 'My Project',
+                ],
+                'branch' => [
+                    'id' => 'branch-id',
                 ],
             ],
             $postEventRequest->jsonSerialize()

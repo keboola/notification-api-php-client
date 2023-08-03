@@ -26,6 +26,7 @@ class PhaseJobSucceededEventDataTest extends TestCase
         $failedEventData = new PhaseJobSucceededEventData(
             '1234',
             'My project',
+            'branch-id',
             'Lithium Extractors',
             '123',
             $jobData
@@ -55,6 +56,9 @@ class PhaseJobSucceededEventDataTest extends TestCase
                 'project' => [
                     'id' => '1234',
                     'name' => 'My project',
+                ],
+                'branch' => [
+                    'id' => 'branch-id',
                 ],
             ],
             $failedEventData->jsonSerialize()

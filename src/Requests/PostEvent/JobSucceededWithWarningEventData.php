@@ -10,13 +10,20 @@ class JobSucceededWithWarningEventData implements EventDataInterface
 {
     private string $projectId;
     private string $projectName;
+    private string $branchId;
     private string $errorMessage;
     private JobData $jobData;
 
-    public function __construct(string $projectId, string $projectName, string $errorMessage, JobData $jobData)
-    {
+    public function __construct(
+        string $projectId,
+        string $projectName,
+        string $branchId,
+        string $errorMessage,
+        JobData $jobData
+    ) {
         $this->projectId = $projectId;
         $this->projectName = $projectName;
+        $this->branchId = $branchId;
         $this->errorMessage = $errorMessage;
         $this->jobData = $jobData;
     }
@@ -29,6 +36,9 @@ class JobSucceededWithWarningEventData implements EventDataInterface
             'project' => [
                 'id' => $this->projectId,
                 'name' => $this->projectName,
+            ],
+            'branch' => [
+                'id' => $this->branchId,
             ],
         ];
     }
