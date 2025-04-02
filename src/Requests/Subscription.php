@@ -18,21 +18,22 @@ use Keboola\NotificationClient\Requests\PostEvent\PhaseJobSucceededEventData;
 use Keboola\NotificationClient\Requests\PostEvent\PhaseJobSucceededWithWarningEventData;
 use Keboola\NotificationClient\Requests\PostSubscription\EmailRecipient;
 use Keboola\NotificationClient\Requests\PostSubscription\Filter;
+use Keboola\NotificationClient\Requests\PostSubscription\RecipientInterface;
 
 class Subscription implements JsonSerializable
 {
     private string $eventType;
-    private EmailRecipient $recipient;
+    private RecipientInterface $recipient;
     /** @var array<Filter> */
     private array $filters;
 
     /**
      * PostSubscriptionRequest constructor.
      * @param string $eventType
-     * @param EmailRecipient $recipient
+     * @param RecipientInterface $recipient
      * @param array<Filter> $filters
      */
-    public function __construct(string $eventType, EmailRecipient $recipient, array $filters)
+    public function __construct(string $eventType, RecipientInterface $recipient, array $filters)
     {
         $this->checkEventType($eventType);
         $this->eventType = $eventType;

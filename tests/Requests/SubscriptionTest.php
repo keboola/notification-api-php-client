@@ -6,16 +6,39 @@ namespace Keboola\NotificationClient\Tests\Requests;
 
 use Keboola\NotificationClient\Requests\PostSubscription\EmailRecipient;
 use Keboola\NotificationClient\Requests\PostSubscription\Filter;
+use Keboola\NotificationClient\Requests\PostSubscription\RecipientInterface;
+use Keboola\NotificationClient\Requests\PostSubscription\WebhookRecipient;
 use Keboola\NotificationClient\Requests\Subscription;
 use PHPUnit\Framework\TestCase;
 
 class SubscriptionTest extends TestCase
 {
-    public function testJsonSerialize(): void
+    public function recipientProvider(): iterable
+    {
+        yield 'email' => [
+            new EmailRecipient('john.doe@example.com'),
+            [
+                'channel' => 'email',
+                'address' => 'john.doe@example.com',
+            ],
+        ];
+
+        yield 'webhook' => [
+            new WebhookRecipient('https://example.com/webhook'),
+            [
+                'channel' => 'webhook',
+                'url' => 'https://example.com/webhook',
+            ],
+        ];
+    }
+
+
+    /** @dataProvider recipientProvider */
+    public function testJsonSerialize(RecipientInterface $recipient, array $expectedRecipient): void
     {
         $subscriptionRequest = new Subscription(
             'job-failed',
-            new EmailRecipient('john.doe@example.com'),
+            $recipient,
             [new Filter('foo', 'bar')],
         );
         self::assertSame(
@@ -27,20 +50,18 @@ class SubscriptionTest extends TestCase
                         'value' => 'bar',
                     ],
                 ],
-                'recipient' => [
-                    'channel' => 'email',
-                    'address' => 'john.doe@example.com',
-                ],
+                'recipient' => $expectedRecipient,
             ],
             $subscriptionRequest->jsonSerialize(),
         );
     }
 
-    public function testJsonSerializeStrangeFilters(): void
+    /** @dataProvider recipientProvider */
+    public function testJsonSerializeStrangeFilters(RecipientInterface $recipient, array $expectedRecipient): void
     {
         $subscriptionRequest = new Subscription(
             'job-failed',
-            new EmailRecipient('john.doe@example.com'),
+            $recipient,
             ['a' => new Filter('foo', 'bar'), '4filter' => new Filter('bar', 'Kochba')],
         );
         self::assertSame(
@@ -56,20 +77,18 @@ class SubscriptionTest extends TestCase
                         'value' => 'Kochba',
                     ],
                 ],
-                'recipient' => [
-                    'channel' => 'email',
-                    'address' => 'john.doe@example.com',
-                ],
+                'recipient' => $expectedRecipient,
             ],
             $subscriptionRequest->jsonSerialize(),
         );
     }
 
-    public function testPhaseJobFailedSubscription(): void
+    /** @dataProvider recipientProvider */
+    public function testPhaseJobFailedSubscription(RecipientInterface $recipient, array $expectedRecipient): void
     {
         $subscriptionRequest = new Subscription(
             'phase-job-failed',
-            new EmailRecipient('john.doe@example.com'),
+            $recipient,
             [
                 new Filter('job.component.id', 'my.component'),
                 new Filter('job.configuration.id', '12345'),
@@ -93,20 +112,20 @@ class SubscriptionTest extends TestCase
                         'value' => '123',
                     ],
                 ],
-                'recipient' => [
-                    'channel' => 'email',
-                    'address' => 'john.doe@example.com',
-                ],
+                'recipient' => $expectedRecipient,
             ],
             $subscriptionRequest->jsonSerialize(),
         );
     }
 
-    public function testPhaseJobSucceededWithWarningSubscription(): void
-    {
+    /** @dataProvider recipientProvider */
+    public function testPhaseJobSucceededWithWarningSubscription(
+        RecipientInterface $recipient,
+        array $expectedRecipient
+    ): void {
         $subscriptionRequest = new Subscription(
             'phase-job-succeeded-with-warning',
-            new EmailRecipient('john.doe@example.com'),
+            $recipient,
             [
                 new Filter('job.component.id', 'my.component'),
                 new Filter('job.configuration.id', '12345'),
@@ -130,20 +149,18 @@ class SubscriptionTest extends TestCase
                         'value' => '123',
                     ],
                 ],
-                'recipient' => [
-                    'channel' => 'email',
-                    'address' => 'john.doe@example.com',
-                ],
+                'recipient' => $expectedRecipient,
             ],
             $subscriptionRequest->jsonSerialize(),
         );
     }
 
-    public function testJobSucceededSubscription(): void
+    /** @dataProvider recipientProvider */
+    public function testJobSucceededSubscription(RecipientInterface $recipient, array $expectedRecipient): void
     {
         $subscriptionRequest = new Subscription(
             'job-succeeded',
-            new EmailRecipient('john.doe@example.com'),
+            $recipient,
             [
                 new Filter('job.component.id', 'my.component'),
                 new Filter('job.configuration.id', '12345'),
@@ -163,20 +180,18 @@ class SubscriptionTest extends TestCase
                         'value' => '12345',
                     ],
                 ],
-                'recipient' => [
-                    'channel' => 'email',
-                    'address' => 'john.doe@example.com',
-                ],
+                'recipient' => $expectedRecipient,
             ],
             $subscriptionRequest->jsonSerialize(),
         );
     }
 
-    public function testPhaseJobSucceededSubscription(): void
+    /** @dataProvider recipientProvider */
+    public function testPhaseJobSucceededSubscription(RecipientInterface $recipient, array $expectedRecipient): void
     {
         $subscriptionRequest = new Subscription(
             'phase-job-succeeded',
-            new EmailRecipient('john.doe@example.com'),
+            $recipient,
             [
                 new Filter('job.component.id', 'my.component'),
                 new Filter('job.configuration.id', '12345'),
@@ -201,20 +216,20 @@ class SubscriptionTest extends TestCase
                         'value' => '123',
                     ],
                 ],
-                'recipient' => [
-                    'channel' => 'email',
-                    'address' => 'john.doe@example.com',
-                ],
+                'recipient' => $expectedRecipient,
             ],
             $subscriptionRequest->jsonSerialize(),
         );
     }
 
-    public function testPhaseJobProcessingLongSubscription(): void
-    {
+    /** @dataProvider recipientProvider */
+    public function testPhaseJobProcessingLongSubscription(
+        RecipientInterface $recipient,
+        array $expectedRecipient
+    ): void {
         $subscriptionRequest = new Subscription(
             'phase-job-processing-long',
-            new EmailRecipient('john.doe@example.com'),
+            $recipient,
             [
                 new Filter('job.component.id', 'my.component'),
                 new Filter('job.configuration.id', '12345'),
@@ -238,10 +253,7 @@ class SubscriptionTest extends TestCase
                         'value' => '123',
                     ],
                 ],
-                'recipient' => [
-                    'channel' => 'email',
-                    'address' => 'john.doe@example.com',
-                ],
+                'recipient' => $expectedRecipient,
             ],
             $subscriptionRequest->jsonSerialize(),
         );
