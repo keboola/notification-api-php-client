@@ -5,23 +5,22 @@ declare(strict_types=1);
 namespace Keboola\NotificationClient\Responses;
 
 use Keboola\NotificationClient\Exception\ClientException;
-use Throwable;
 
 class Notification
 {
-    private string $eventId;
+    private string $id;
 
     public function __construct(array $data)
     {
-        try {
-            $this->eventId = $data['eventId'];
-        } catch (Throwable $e) {
-            throw new ClientException('Unrecognized response: ' . $e->getMessage(), 0, $e);
+        if (!array_key_exists('id', $data)) {
+            throw new ClientException('Unrecognized response');
         }
+
+        $this->id = $data['id'];
     }
 
-    public function getEventId(): string
+    public function getId(): string
     {
-        return $this->eventId;
+        return $this->id;
     }
 }

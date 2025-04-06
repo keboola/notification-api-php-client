@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Keboola\NotificationClient\Requests;
+namespace Keboola\NotificationClient\Requests\PostNotification;
 
-use JsonSerializable;
 use Keboola\NotificationClient\Requests\PostSubscription\EmailRecipient;
 
-class DirectProjectNotification implements JsonSerializable
+class ProjectEmail implements NotificationInterface
 {
     private const TYPE = 'direct-project-email';
 

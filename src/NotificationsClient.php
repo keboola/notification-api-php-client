@@ -7,7 +7,7 @@ namespace Keboola\NotificationClient;
 use GuzzleHttp\Psr7\Request;
 use JsonException;
 use Keboola\NotificationClient\Exception\ClientException;
-use Keboola\NotificationClient\Requests\DirectNotification;
+use Keboola\NotificationClient\Requests\PostNotification\NotificationInterface;
 use Keboola\NotificationClient\Responses\Notification as ResponseNotification;
 
 class NotificationsClient extends Client
@@ -19,13 +19,13 @@ class NotificationsClient extends Client
         if (empty($applicationToken)) {
             throw new ClientException(sprintf(
                 'Application token must be non-empty, %s provided.',
-                json_encode($applicationToken)
+                json_encode($applicationToken),
             ));
         }
         parent::__construct($notificationApiUrl, $applicationToken, $options);
     }
 
-    public function postNotification(DirectNotification $notification): ResponseNotification
+    public function postNotification(NotificationInterface $notification): ResponseNotification
     {
         try {
             $notificationJson = json_encode($notification->jsonSerialize(), JSON_THROW_ON_ERROR);
@@ -33,7 +33,7 @@ class NotificationsClient extends Client
                 'POST',
                 'notifications',
                 ['Content-type' => 'application/json'],
-                $notificationJson
+                $notificationJson,
             );
         } catch (JsonException $e) {
             throw new ClientException('Invalid notification data: ' . $e->getMessage(), $e->getCode(), $e);
