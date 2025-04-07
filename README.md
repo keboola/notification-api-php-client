@@ -152,15 +152,15 @@ Store the result `TEST_NOTIFICATION_API_URL` in `set-env.sh`.
 - With the above setup, you can run tests:
 
     ```bash
-    docker-compose build
-    source ./set-env.sh && docker-compose run tests
+    docker compose build
+    source ./set-env.sh && docker compose run tests
     ```
 
 - To run tests with local code use:
 
     ```bash
-    docker-compose run tests-local composer install
-    source ./set-env.sh && docker-compose run tests-local
+    docker compose run tests-local composer install
+    source ./set-env.sh && docker compose run tests-local
     ```
 
 ## License
