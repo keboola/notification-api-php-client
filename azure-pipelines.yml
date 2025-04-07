@@ -47,6 +47,7 @@ stages:
               TEST_AWS_ACCESS_KEY_ID: $(TEST_AWS_ACCESS_KEY_ID)
               TEST_AWS_SECRET_ACCESS_KEY: $(TEST_AWS_SECRET_ACCESS_KEY)
               HOSTNAME_SUFFIX: $(HOSTNAME_SUFFIX)
+              AWS_SQS_QUEUE_URL: $(AWS_SQS_QUEUE_URL)
 
   - stage: tests
     dependsOn: prepare

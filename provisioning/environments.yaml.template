@@ -29,6 +29,6 @@ data:
   azureClientId: '$TEST_AZURE_CLIENT_ID'
   azureTenantId: '$TEST_AZURE_TENANT_ID'
   databaseSslVerifyEnabled: '0'
-  messengerTransportDsn: 'doctrine://default'
+  messengerTransportDsn: '$MESSENGER_TRANSPORT_DSN'
   mailerDsn: 'null://null'
   hostnameSufix: '$HOSTNAME_SUFFIX'

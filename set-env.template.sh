@@ -4,6 +4,7 @@ export DATABASE_URL=mysql://root:root@dev-mysql-service:3310/notifications?serve
 export DATABASE_PASSWORD=root
 
 export AWS_REGION=us-east-1
+export MESSENGER_TRANSPORT_DSN="${AWS_SQS_QUEUE_URL}?auto_setup=false"
 
 export TEST_AWS_ACCESS_KEY_ID=
 export TEST_AWS_SECRET_ACCESS_KEY=

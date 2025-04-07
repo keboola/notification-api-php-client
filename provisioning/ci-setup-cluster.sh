@@ -28,6 +28,8 @@ export DATABASE_URL_BASE64
 export DATABASE_PASSWORD_BASE64
 export TEST_AWS_SECRET_ACCESS_KEY_BASE64
 
+export MESSENGER_TRANSPORT_DSN="${AWS_SQS_QUEUE_URL}?auto_setup=false"
+
 envsubst < ./provisioning/environments.yaml.template > ./provisioning/environments.yaml
 kubectl apply -f ./provisioning/environments.yaml
 kubectl apply -f ./provisioning/notification.yaml
