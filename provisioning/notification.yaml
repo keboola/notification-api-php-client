@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: dev-mysql
-          image: mysql:8
+          image: mysql:8.0
           resources:
             requests:
               cpu: "100m"
