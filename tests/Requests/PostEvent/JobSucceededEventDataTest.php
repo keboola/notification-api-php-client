@@ -21,13 +21,13 @@ class JobSucceededEventDataTest extends TestCase
             'keboola.orchestrator',
             'Orchestrator',
             'my-configuration',
-            'My configuration'
+            'My configuration',
         );
         $failedEventData = new JobSucceededEventData(
             '1234',
             'My project',
             'branch-id',
-            $jobData
+            $jobData,
         );
 
         self::assertSame(
@@ -55,7 +55,7 @@ class JobSucceededEventDataTest extends TestCase
                     'id' => 'branch-id',
                 ],
             ],
-            $failedEventData->jsonSerialize()
+            $failedEventData->jsonSerialize(),
         );
     }
 }

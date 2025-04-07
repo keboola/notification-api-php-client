@@ -28,7 +28,7 @@ class StorageApiIndexClientTest extends TestCase
             [
                 'backoffMaxTries' => 3,
                 'userAgent' => 'Test',
-            ]
+            ],
         );
         self::assertStringStartsWith('https://notification.', $client->getServiceUrl('notification'));
     }
@@ -42,7 +42,7 @@ class StorageApiIndexClientTest extends TestCase
             new Response(
                 200,
                 ['Content-Type' => 'application/json'],
-                $responseData
+                $responseData,
             ),
         ]);
         $requestHistory = [];
@@ -52,7 +52,7 @@ class StorageApiIndexClientTest extends TestCase
         $logger = new TestLogger();
         $client = new StorageApiIndexClient(
             'https://dummy',
-            ['handler' => $stack, 'logger' => $logger, 'backoffMaxTries' => 3, 'userAgent' => 'Test']
+            ['handler' => $stack, 'logger' => $logger, 'backoffMaxTries' => 3, 'userAgent' => 'Test'],
         );
         $this->expectException(ClientException::class);
         $this->expectExceptionMessage($expectedError);
@@ -118,7 +118,7 @@ class StorageApiIndexClientTest extends TestCase
             new Response(
                 200,
                 ['Content-Type' => 'application/json'],
-                '{"services": [{"id": "boo", "url": "foo"}]}'
+                '{"services": [{"id": "boo", "url": "foo"}]}',
             ),
         ]);
         // Add the history middleware to the handler stack.
@@ -128,7 +128,7 @@ class StorageApiIndexClientTest extends TestCase
         $stack->push($history);
         $client = new StorageApiIndexClient(
             'https://example.com/',
-            ['handler' => $stack, 'backoffMaxTries' => 3, 'userAgent' => 'Test']
+            ['handler' => $stack, 'backoffMaxTries' => 3, 'userAgent' => 'Test'],
         );
         $client->getServiceUrl('boo');
 
@@ -137,7 +137,7 @@ class StorageApiIndexClientTest extends TestCase
         self::assertSame('GET', $request->getMethod());
         self::assertSame(
             ['User-Agent', 'Host'],
-            array_keys($request->getHeaders())
+            array_keys($request->getHeaders()),
         );
     }
 }

@@ -34,7 +34,7 @@ class ClientTest extends TestCase
         return new EventsClient(
             'https://example.com/',
             'testToken',
-            $options
+            $options,
         );
     }
 
@@ -43,13 +43,13 @@ class ClientTest extends TestCase
         self::expectException(ClientException::class);
         self::expectExceptionMessageMatches(
             // phpcs:ignore Generic.Files.LineLength
-            '#Value "" is invalid: "backoffMaxTries" option must be provided\s*Value "" is invalid: "userAgent" option must be provided#'
+            '#Value "" is invalid: "backoffMaxTries" option must be provided\s*Value "" is invalid: "userAgent" option must be provided#',
         );
         new EventsClient(
             'http://example.com/',
             'testToken',
             // @phpstan-ignore-next-line
-            []
+            [],
         );
     }
 
@@ -58,13 +58,13 @@ class ClientTest extends TestCase
         self::expectException(ClientException::class);
         // phpcs:ignore Generic.Files.LineLength
         self::expectExceptionMessage(
-            'Invalid parameters when creating client: Value "abc" is invalid: This value should be a valid number.'
+            'Invalid parameters when creating client: Value "abc" is invalid: This value should be a valid number.',
         );
         new EventsClient(
             'http://example.com/',
             'testToken',
             // @phpstan-ignore-next-line
-            ['backoffMaxTries' => 'abc', 'userAgent' => 'boo']
+            ['backoffMaxTries' => 'abc', 'userAgent' => 'boo'],
         );
     }
 
@@ -72,13 +72,13 @@ class ClientTest extends TestCase
     {
         self::expectException(ClientException::class);
         self::expectExceptionMessage(
-            'Invalid parameters when creating client: Value "-1" is invalid: This value should be between 0 and 100.'
+            'Invalid parameters when creating client: Value "-1" is invalid: This value should be between 0 and 100.',
         );
         new EventsClient(
             'http://example.com/',
             'testToken',
             // @phpstan-ignore-next-line
-            ['backoffMaxTries' => -1]
+            ['backoffMaxTries' => -1],
         );
     }
 
@@ -86,13 +86,13 @@ class ClientTest extends TestCase
     {
         self::expectException(ClientException::class);
         self::expectExceptionMessage(
-            'Invalid parameters when creating client: Value "101" is invalid: This value should be between 0 and 100.'
+            'Invalid parameters when creating client: Value "101" is invalid: This value should be between 0 and 100.',
         );
         new EventsClient(
             'http://example.com/',
             'testToken',
             // @phpstan-ignore-next-line
-            ['backoffMaxTries' => 101]
+            ['backoffMaxTries' => 101],
         );
     }
 
@@ -106,7 +106,7 @@ class ClientTest extends TestCase
             [
                 'backoffMaxTries' => 3,
                 'userAgent' => 'Test',
-            ]
+            ],
         );
     }
 
@@ -126,9 +126,9 @@ class ClientTest extends TestCase
                     'keboola.orchestrator',
                     'Orchestrator',
                     'my-configuration',
-                    'My configuration'
-                )
-            )
+                    'My configuration',
+                ),
+            ),
         );
     }
 
@@ -138,7 +138,7 @@ class ClientTest extends TestCase
             new Response(
                 202,
                 ['Content-Type' => 'application/json'],
-                null
+                null,
             ),
         ]);
         // Add the history middleware to the handler stack.
@@ -174,7 +174,7 @@ class ClientTest extends TestCase
                     "configRow": null,
                     "tag": null,
                     "createdTime": "2021-03-04T21:59:49+00:00"
-                }'
+                }',
             ),
         ]);
         // Add the history middleware to the handler stack.
@@ -189,7 +189,7 @@ class ClientTest extends TestCase
                 'logger' => $logger,
                 'backoffMaxTries' => 3,
                 'userAgent' => 'test agent',
-            ]
+            ],
         );
         $client->postEvent($this->getPostEventData());
         /** @var Request $request */
@@ -205,12 +205,12 @@ class ClientTest extends TestCase
             new Response(
                 500,
                 ['Content-Type' => 'application/json'],
-                '{"message" => "Out of order"}'
+                '{"message" => "Out of order"}',
             ),
             new Response(
                 501,
                 ['Content-Type' => 'application/json'],
-                'Out of order'
+                'Out of order',
             ),
             new Response(
                 200,
@@ -226,7 +226,7 @@ class ClientTest extends TestCase
                     "configRow": null,
                     "tag": null,
                     "createdTime": "2021-03-04T21:59:49+00:00"
-                }'
+                }',
             ),
         ]);
         // Add the history middleware to the handler stack.
@@ -241,7 +241,7 @@ class ClientTest extends TestCase
                 'backoffMaxTries' => 3,
                 'userAgent' => 'Test',
                 'logger' => $logger,
-            ]
+            ],
         );
         $client->postEvent($this->getPostEventData());
         self::assertCount(3, $requestHistory);
@@ -262,7 +262,7 @@ class ClientTest extends TestCase
             $responses[] = new Response(
                 500,
                 ['Content-Type' => 'application/json'],
-                '{"message" => "Out of order"}'
+                '{"message" => "Out of order"}',
             );
         }
         $mock = new MockHandler($responses);
@@ -273,7 +273,7 @@ class ClientTest extends TestCase
         $stack->push($history);
         $logger = new TestLogger();
         $client = $this->getClient(
-            ['handler' => $stack, 'backoffMaxTries' => 1, 'userAgent' => 'Test', 'logger' => $logger]
+            ['handler' => $stack, 'backoffMaxTries' => 1, 'userAgent' => 'Test', 'logger' => $logger],
         );
         try {
             $client->postEvent($this->getPostEventData());
@@ -291,7 +291,7 @@ class ClientTest extends TestCase
             new Response(
                 401,
                 ['Content-Type' => 'application/json'],
-                '{"message" => "Unauthorized"}'
+                '{"message" => "Unauthorized"}',
             ),
         ]);
         // Add the history middleware to the handler stack.

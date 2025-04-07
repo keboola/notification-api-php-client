@@ -27,7 +27,7 @@ class SubscriptionClientFunctionalTest extends TestCase
             [
                 'backoffMaxTries' => 3,
                 'userAgent' => 'Test',
-            ]
+            ],
         );
     }
 
@@ -42,7 +42,7 @@ class SubscriptionClientFunctionalTest extends TestCase
             [
                 'backoffMaxTries' => 3,
                 'userAgent' => 'Test',
-            ]
+            ],
         );
     }
 
@@ -54,7 +54,7 @@ class SubscriptionClientFunctionalTest extends TestCase
             new EmailRecipient('johnDoe@example.com'),
             [
                 new Filter('project.id', (string) getenv('TEST_STORAGE_API_PROJECT_ID')),
-            ]
+            ],
         ));
 
         self::assertNotEmpty($response->getId());
@@ -72,12 +72,12 @@ class SubscriptionClientFunctionalTest extends TestCase
         $this->expectExceptionMessage(
             'Invalid event type "dummy-event", valid types are: ' .
             '"job-failed, job-succeeded, job-succeeded-with-warning, job-processing-long, phase-job-failed, ' .
-            'phase-job-succeeded, phase-job-succeeded-with-warning, phase-job-processing-long".'
+            'phase-job-succeeded, phase-job-succeeded-with-warning, phase-job-processing-long".',
         );
         $client->createSubscription(new Subscription(
             'dummy-event',
             new EmailRecipient('johnDoe@example.com'),
-            [new Filter('projectId', (string) getenv('TEST_STORAGE_API_PROJECT_ID'))]
+            [new Filter('projectId', (string) getenv('TEST_STORAGE_API_PROJECT_ID'))],
         ));
     }
 
@@ -87,7 +87,7 @@ class SubscriptionClientFunctionalTest extends TestCase
             new Response(
                 200,
                 ['Content-Type' => 'application/json'],
-                '{"id": "1", "event": "2", "filters": [], "recipient": {"channel": "foo", "address": "bar"}}'
+                '{"id": "1", "event": "2", "filters": [], "recipient": {"channel": "foo", "address": "bar"}}',
             ),
         ]);
         // Add the history middleware to the handler stack.
@@ -98,14 +98,14 @@ class SubscriptionClientFunctionalTest extends TestCase
         $client = new SubscriptionClient(
             'https://example.com/',
             'testToken',
-            ['handler' => $stack, 'backoffMaxTries' => 3, 'userAgent' => 'Test']
+            ['handler' => $stack, 'backoffMaxTries' => 3, 'userAgent' => 'Test'],
         );
         $client->createSubscription(new Subscription(
             'job-failed',
             new EmailRecipient('john.doe@example.com'),
             [
                 new Filter('key', 'value'),
-            ]
+            ],
         ));
 
         /** @var Request $request */
@@ -113,7 +113,7 @@ class SubscriptionClientFunctionalTest extends TestCase
         self::assertSame('POST', $request->getMethod());
         self::assertSame(
             ['Content-Length', 'User-Agent', 'X-StorageApi-Token', 'Host', 'Content-type'],
-            array_keys($request->getHeaders())
+            array_keys($request->getHeaders()),
         );
         self::assertSame(['application/json'], $request->getHeaders()['Content-type']);
     }

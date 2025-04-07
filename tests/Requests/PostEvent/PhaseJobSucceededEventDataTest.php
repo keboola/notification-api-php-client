@@ -21,7 +21,7 @@ class PhaseJobSucceededEventDataTest extends TestCase
             'keboola.orchestrator',
             'Orchestrator',
             'my-configuration',
-            'My configuration'
+            'My configuration',
         );
         $failedEventData = new PhaseJobSucceededEventData(
             '1234',
@@ -29,7 +29,7 @@ class PhaseJobSucceededEventDataTest extends TestCase
             'branch-id',
             'Lithium Extractors',
             '123',
-            $jobData
+            $jobData,
         );
 
         self::assertSame(
@@ -61,7 +61,7 @@ class PhaseJobSucceededEventDataTest extends TestCase
                     'id' => 'branch-id',
                 ],
             ],
-            $failedEventData->jsonSerialize()
+            $failedEventData->jsonSerialize(),
         );
     }
 }

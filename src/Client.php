@@ -49,17 +49,17 @@ abstract class Client
         $errors->addAll($validator->validate(
             // @phpstan-ignore-next-line
             $options['backoffMaxTries'] ?? null,
-            [new NotBlank(null, '"backoffMaxTries" option must be provided')]
+            [new NotBlank(null, '"backoffMaxTries" option must be provided')],
         ));
         $errors->addAll($validator->validate(
             // @phpstan-ignore-next-line
             $options['backoffMaxTries'] ?? null,
-            [new Range(['min' => 0, 'max' => 100])]
+            [new Range(['min' => 0, 'max' => 100])],
         ));
         $errors->addAll($validator->validate(
             // @phpstan-ignore-next-line
             $options['userAgent'] ?? null,
-            [new NotBlank(null, '"userAgent" option must be provided')]
+            [new NotBlank(null, '"userAgent" option must be provided')],
         ));
         if ($errors->count() !== 0) {
             $messages = '';
@@ -91,14 +91,14 @@ abstract class Client
                 $logger->notice(sprintf(
                     'Got a %s response for this reason: %s, retrying.',
                     $response->getStatusCode(),
-                    $response->getReasonPhrase()
+                    $response->getReasonPhrase(),
                 ));
                 return true;
             } elseif ($error && $error->getCode() >= 500) {
                 $logger->notice(sprintf(
                     'Got a %s error with this message: %s, retrying.',
                     $error->getCode(),
-                    $error->getMessage()
+                    $error->getMessage(),
                 ));
                 return true;
             } else {
@@ -126,9 +126,9 @@ abstract class Client
                 $options['logger'],
                 new MessageFormatter(
                     '{hostname} {req_header_User-Agent} - [{ts}] "{method} {resource} {protocol}/{version}"' .
-                    ' {code} {res_header_Content-Length}'
+                    ' {code} {res_header_Content-Length}',
                 ),
-                'debug'
+                'debug',
             ));
             $logger = $options['logger'];
         } else {

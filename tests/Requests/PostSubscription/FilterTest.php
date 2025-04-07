@@ -18,7 +18,7 @@ class FilterTest extends TestCase
                 'field' => 'someName',
                 'value' => 'someValue',
             ],
-            $filter->jsonSerialize()
+            $filter->jsonSerialize(),
         );
     }
 
@@ -31,7 +31,7 @@ class FilterTest extends TestCase
                 'value' => 'someValue',
                 'operator' => '>=',
             ],
-            $filter->jsonSerialize()
+            $filter->jsonSerialize(),
         );
     }
 }

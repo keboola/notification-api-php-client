@@ -22,14 +22,14 @@ class JobSucceededWithWarningEventDataTest extends TestCase
             'keboola.orchestrator',
             'Orchestrator',
             'my-configuration',
-            'My configuration'
+            'My configuration',
         );
         $failedEventData = new JobSucceededWithWarningEventData(
             '1234',
             'My project',
             'branch-id',
             'someMessage',
-            $jobData
+            $jobData,
         );
 
         self::assertSame(
@@ -58,7 +58,7 @@ class JobSucceededWithWarningEventDataTest extends TestCase
                     'id' => 'branch-id',
                 ],
             ],
-            $failedEventData->jsonSerialize()
+            $failedEventData->jsonSerialize(),
         );
     }
 }
