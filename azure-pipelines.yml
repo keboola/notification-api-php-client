@@ -63,8 +63,8 @@ stages:
 
               echo "Notification API URL: $NOTIFICATION_API_IP"
 
-              docker-compose build --pull
-              docker-compose run --rm tests
+              docker compose build --pull
+              docker compose run --rm tests
             displayName: 'Build & Run Tests'
             env:
               TEST_STORAGE_API_TOKEN: $(TEST_STORAGE_API_TOKEN)
