@@ -82,7 +82,6 @@ $clientFactory->getEventsClient('xxx-xxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         - `TEST_AWS_ACCESS_KEY` - The created security credentials for the `JobQueueApiPhpClient` user.
         - `TEST_AWS_SECRET_ACCESS_KEY` - The created security credentials for the `JobQueueApiPhpClient` user.
         - `AWS_REGION` - `Region` output of the above stack.
-        - `AWS_LOGS_S3_BUCKET` - `S3LogsBucket` output of the above stackk.
 
 ### Azure Setup
 
@@ -123,10 +122,6 @@ $clientFactory->getEventsClient('xxx-xxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     az storage account show-connection-string -g testing-notification-api-php-client -n mirontfcnacc2 --query "connectionString" --output tsv
     ```
 
-Set the connection string and container name you provided as parameter to the create command to following environment variables in the `set-env.sh` file:
- - AZURE_LOGS_ABS_CONTAINER 
- - AZURE_LOGS_ABS_CONNECTION_STRING
-
 ## Generate environment configuration
 
 ```bash
@@ -134,7 +129,6 @@ export DATABASE_URL_BASE64=$(printf "mysql://root:root@dev-mysql-service:3310/no
 export DATABASE_PASSWORD_BASE64=$(printf "root" | base64 --wrap=0)
 export TEST_AZURE_CLIENT_SECRET_BASE64=$(printf "%s" "$TEST_AZURE_CLIENT_SECRET"| base64 --wrap=0)
 export TEST_AWS_SECRET_ACCESS_KEY_BASE64=$(printf "%s" "$TEST_AWS_SECRET_ACCESS_KEY"| base64 --wrap=0)
-export AZURE_LOGS_ABS_CONNECTION_STRING_BASE64=$(printf "%s" "$AZURE_LOGS_ABS_CONNECTION_STRING"| base64 --wrap=0)
 
 ./set-env.sh
 envsubst < provisioning/environments.yaml.template > provisioning/environments.yaml

@@ -90,11 +90,6 @@ spec:
                   name: dev-notification-environments
                   key: keboolaStack
 
-            - name: AWS_LOGS_S3_BUCKET
-              valueFrom:
-                configMapKeyRef:
-                  name: dev-notification-environments
-                  key: awsLogsS3Bucket
             - name: AWS_REGION
               valueFrom:
                 configMapKeyRef:
@@ -111,16 +106,6 @@ spec:
                   name: dev-notification-environments
                   key: awsSecretAccessKey
 
-            - name: AZURE_LOGS_ABS_CONTAINER
-              valueFrom:
-                configMapKeyRef:
-                  name: dev-notification-environments
-                  key: azureLogsAbsContainer
-            - name: AZURE_LOGS_ABS_CONNECTION_STRING
-              valueFrom:
-                secretKeyRef:
-                  name: dev-notification-environments
-                  key: azureLogsAbsConnectionString
             - name: AZURE_CLIENT_ID
               valueFrom:
                 configMapKeyRef:

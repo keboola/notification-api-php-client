@@ -43,7 +43,6 @@ stages:
             name: prepare_cluster
             env:
               KUBERNETES_NAMESPACE: $(k8sNamespace)
-              AWS_LOGS_S3_BUCKET: $(AWS_LOGS_S3_BUCKET)
               AWS_REGION: $(AWS_REGION)
               TEST_AWS_ACCESS_KEY_ID: $(TEST_AWS_ACCESS_KEY_ID)
               TEST_AWS_SECRET_ACCESS_KEY: $(TEST_AWS_SECRET_ACCESS_KEY)

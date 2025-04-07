@@ -12,7 +12,6 @@ metadata:
 type: Opaque
 data:
   awsSecretAccessKey: '$TEST_AWS_SECRET_ACCESS_KEY_BASE64'
-  azureLogsAbsConnectionString: '$AZURE_LOGS_ABS_CONNECTION_STRING_BASE64'
   azureClientSecret: '$TEST_AZURE_CLIENT_SECRET_BASE64'
   databaseUrl: '$DATABASE_URL_BASE64'
   databasePassword: '$DATABASE_PASSWORD_BASE64'
@@ -26,9 +25,7 @@ data:
   appEnv: 'dev'
   keboolaStack: 'local'
   awsAccessKeyId: '$TEST_AWS_ACCESS_KEY_ID'
-  awsLogsS3Bucket: '$AWS_LOGS_S3_BUCKET'
   awsRegion: '$AWS_REGION'
-  azureLogsAbsContainer: '$AZURE_LOGS_ABS_CONTAINER'
   azureClientId: '$TEST_AZURE_CLIENT_ID'
   azureTenantId: '$TEST_AZURE_TENANT_ID'
   databaseSslVerifyEnabled: '0'
