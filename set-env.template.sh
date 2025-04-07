@@ -1,6 +1,5 @@
 #!/bin/bash
 
-export STORAGE_API_URL=https://connection.keboola.com/
 export DATABASE_URL=mysql://root:root@dev-mysql-service:3310/notifications?serverVersion=8.0
 export DATABASE_PASSWORD=root
 
@@ -20,3 +19,4 @@ export TEST_NOTIFICATION_API_URL=https://localhost:8181/
 export TEST_STORAGE_API_TOKEN=
 export TEST_MANAGE_API_APPLICATION_TOKEN=
 export TEST_STORAGE_API_PROJECT_ID=
+export HOSTNAME_SUFFIX=keboola.com

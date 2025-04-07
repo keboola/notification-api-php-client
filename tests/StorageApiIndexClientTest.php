@@ -24,7 +24,7 @@ class StorageApiIndexClientTest extends TestCase
     public function testFunctional(): void
     {
         $client = new StorageApiIndexClient(
-            (string) getenv('STORAGE_API_URL'),
+            sprintf('https://connection.%s', (string) getenv('HOSTNAME_SUFFIX')),
             [
                 'backoffMaxTries' => 3,
                 'userAgent' => 'Test',

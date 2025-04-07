@@ -138,11 +138,11 @@ spec:
                   key: azureTenantId
 
 
-            - name: STORAGE_API_URL
+            - name: HOSTNAME_SUFFIX
               valueFrom:
                 configMapKeyRef:
                   name: dev-notification-environments
-                  key: storageApiUrl
+                  key: hostnameSufix
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:

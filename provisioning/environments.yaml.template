@@ -31,7 +31,7 @@ data:
   azureLogsAbsContainer: '$AZURE_LOGS_ABS_CONTAINER'
   azureClientId: '$TEST_AZURE_CLIENT_ID'
   azureTenantId: '$TEST_AZURE_TENANT_ID'
-  storageApiUrl: '$STORAGE_API_URL'
   databaseSslVerifyEnabled: '0'
   messengerTransportDsn: 'doctrine://default'
   mailerDsn: 'null://null'
+  hostnameSufix: '$HOSTNAME_SUFFIX'
