@@ -11,6 +11,7 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Keboola\NotificationClient\ClientFactory;
 use Keboola\NotificationClient\EventsClient;
+use Keboola\NotificationClient\NotificationsClient;
 use Keboola\NotificationClient\SubscriptionClient;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\Test\TestLogger;
@@ -68,6 +69,10 @@ class ClientFactoryTest extends TestCase
             EventsClient::class,
             $clientFactory->getEventsClient('dummy', ['backoffMaxTries' => 3, 'userAgent' => 'Test']),
         );
+        self::assertInstanceOf(
+            NotificationsClient::class,
+            $clientFactory->getNotificationsClient('dummy', ['backoffMaxTries' => 3, 'userAgent' => 'Test']),
+        );
 
         /** @var Request $request */
         $request = $requestHistory[0]['request'];
@@ -99,6 +104,8 @@ class ClientFactoryTest extends TestCase
         $clientFactory->getSubscriptionClient('dummy', ['backoffMaxTries' => 3, 'userAgent' => 'Test']);
         self::assertCount(1, $requestHistory);
         $clientFactory->getEventsClient('dummy', ['backoffMaxTries' => 3, 'userAgent' => 'Test']);
+        self::assertCount(1, $requestHistory);
+        $clientFactory->getNotificationsClient('dummy', ['backoffMaxTries' => 3, 'userAgent' => 'Test']);
         self::assertCount(1, $requestHistory);
     }
 }

@@ -71,4 +71,17 @@ class ClientFactory
     {
         return new SubscriptionClient($this->getNotificationUrl(), $storageApiToken, $options);
     }
+
+    /**
+     * @param array{
+     *     handler?: HandlerStack,
+     *     backoffMaxTries: int<0, 100>,
+     *     userAgent: string,
+     *     logger?: LoggerInterface
+     * } $options
+     */
+    public function getNotificationsClient(string $applicationToken, array $options): NotificationsClient
+    {
+        return new NotificationsClient($this->getNotificationUrl(), $applicationToken, $options);
+    }
 }
