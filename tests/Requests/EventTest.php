@@ -28,9 +28,9 @@ class EventTest extends TestCase
                     'keboola.orchestrator',
                     'Orchestrator',
                     'my-configuration',
-                    'My configuration'
-                )
-            )
+                    'My configuration',
+                ),
+            ),
         );
         self::assertSame(
             [
@@ -58,7 +58,7 @@ class EventTest extends TestCase
                     'id' => 'branch-id',
                 ],
             ],
-            $postEventRequest->jsonSerialize()
+            $postEventRequest->jsonSerialize(),
         );
         self::assertSame('job-failed', $postEventRequest->getEventType());
     }

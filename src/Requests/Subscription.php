@@ -44,7 +44,7 @@ class Subscription implements JsonSerializable
     {
         $filters = array_values(array_map(
             fn (Filter $v) => $v->jsonSerialize(),
-            $this->filters
+            $this->filters,
         ));
         return [
             'event' => $this->eventType,
@@ -70,7 +70,7 @@ class Subscription implements JsonSerializable
             throw new ClientException(sprintf(
                 'Invalid event type "%s", valid types are: "%s".',
                 $eventType,
-                implode(', ', $validEventTypes)
+                implode(', ', $validEventTypes),
             ));
         }
     }

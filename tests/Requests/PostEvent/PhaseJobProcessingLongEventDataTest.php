@@ -21,7 +21,7 @@ class PhaseJobProcessingLongEventDataTest extends TestCase
             'keboola.orchestrator',
             'Orchestrator',
             'my-configuration',
-            'My configuration'
+            'My configuration',
         );
         $failedEventData = new PhaseJobProcessingLongEventData(
             '1234',
@@ -32,7 +32,7 @@ class PhaseJobProcessingLongEventDataTest extends TestCase
             12.534,
             23.854,
             12.0,
-            $jobData
+            $jobData,
         );
         self::assertSame(
             [
@@ -67,7 +67,7 @@ class PhaseJobProcessingLongEventDataTest extends TestCase
                 ],
                 'uniqueId' => '23456',
             ],
-            $failedEventData->jsonSerialize()
+            $failedEventData->jsonSerialize(),
         );
         self::assertSame('phase-job-processing-long', $failedEventData::getEventTypeName());
     }

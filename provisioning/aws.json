@@ -3,19 +3,10 @@
     "Description": "Resources for Notification Tests",
     "Parameters": {},
     "Resources": {
-        "NotificationS3LogsBucket": {
-            "Type": "AWS::S3::Bucket",
+        "NotificationQueue": {
+            "Type": "AWS::SQS::Queue",
             "Properties": {
-                "LifecycleConfiguration": {
-                    "Rules": [
-                        {
-                            "Id": "Delete debug files",
-                            "Prefix": "debug-files/",
-                            "ExpirationInDays": 7,
-                            "Status": "Enabled"
-                        }
-                    ]
-                },
+                "VisibilityTimeout": 30,
                 "Tags": [
                     {
                         "Key": "KeboolaStack",
@@ -33,37 +24,23 @@
                 "Path": "/",
                 "Policies": [
                     {
-                        "PolicyName": "UseS3BucketPolicy",
+                        "PolicyName": "UseSQSQueuePolicy",
                         "PolicyDocument": {
                             "Statement": [
                                 {
-                                    "Sid": "UseS3Bucket",
+                                    "Sid": "UseSQSQueue",
                                     "Effect": "Allow",
                                     "Action": [
-                                        "s3:PutObject",
-                                        "s3:GetObject",
-                                        "s3:ListBucket",
-                                        "s3:DeleteObject"
+                                        "sqs:GetQueueAttributes",
+                                        "sqs:SendMessage",
+                                        "sqs:ReceiveMessage",
+                                        "sqs:DeleteMessage",
+                                        "sqs:ChangeMessageVisibility"
                                     ],
                                     "Resource": [
                                         {
-                                            "Fn::Join": [
-                                                "",
-                                                [
-                                                    "",
-                                                    {
-                                                        "Fn::GetAtt": [
-                                                            "NotificationS3LogsBucket",
-                                                            "Arn"
-                                                        ]
-                                                    },
-                                                    "/*"
-                                                ]
-                                            ]
-                                        },
-                                        {
                                             "Fn::GetAtt": [
-                                                "NotificationS3LogsBucket",
+                                                "NotificationQueue",
                                                 "Arn"
                                             ]
                                         }
@@ -75,7 +52,7 @@
                 ]
             },
             "DependsOn": [
-                "NotificationS3LogsBucket"
+                "NotificationQueue"
             ]
         }
     },
@@ -90,9 +67,17 @@
                 "Ref": "AWS::Region"
             }
         },
-        "S3LogsBucket": {
+        "SQSQueueUrl": {
             "Value": {
-                "Ref": "NotificationS3LogsBucket"
+                "Ref": "NotificationQueue"
+            }
+        },
+        "SQSQueueArn": {
+            "Value": {
+                "Fn::GetAtt": [
+                    "NotificationQueue",
+                    "Arn"
+                ]
             }
         }
     }

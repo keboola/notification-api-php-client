@@ -17,7 +17,7 @@ class EmailRecipientTest extends TestCase
                 'channel' => 'email',
                 'address' => 'John.Doe@example.com',
             ],
-            $emailRecipient->jsonSerialize()
+            $emailRecipient->jsonSerialize(),
         );
     }
 }

@@ -30,7 +30,7 @@ class JobDataTest extends TestCase
                 'keboola.orchestrator',
                 'Orchestrator',
                 'my-configuration',
-                'My configuration'
+                'My configuration',
             ),
             [
                 'id' => '23456',
@@ -57,7 +57,7 @@ class JobDataTest extends TestCase
                 'keboola.orchestrator',
                 'Orchestrator',
                 null,
-                'My configuration'
+                'My configuration',
             ),
             [
                 'id' => '23456',
@@ -80,7 +80,7 @@ class JobDataTest extends TestCase
                 'keboola.orchestrator',
                 'Orchestrator',
                 '1234',
-                null
+                null,
             ),
             [
                 'id' => '23456',
@@ -103,7 +103,7 @@ class JobDataTest extends TestCase
                 'keboola.orchestrator',
                 'Orchestrator',
                 '1234',
-                null
+                null,
             ),
             [
                 'id' => '23456',

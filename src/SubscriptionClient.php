@@ -20,7 +20,7 @@ class SubscriptionClient extends Client
         if (empty($storageApiToken)) {
             throw new ClientException(sprintf(
                 'Storage API token must be non-empty, %s provided.',
-                json_encode($storageApiToken)
+                json_encode($storageApiToken),
             ));
         }
         parent::__construct($notificationApiUrl, $storageApiToken, $options);
@@ -34,7 +34,7 @@ class SubscriptionClient extends Client
                 'POST',
                 'project-subscriptions',
                 ['Content-type' => 'application/json'],
-                $jobDataJson
+                $jobDataJson,
             );
         } catch (JsonException $e) {
             throw new ClientException('Invalid job data: ' . $e->getMessage(), $e->getCode(), $e);

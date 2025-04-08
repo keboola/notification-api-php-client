@@ -19,7 +19,7 @@ class EventsClient extends Client
         if (empty($applicationToken)) {
             throw new ClientException(sprintf(
                 'Application token must be non-empty, %s provided.',
-                json_encode($applicationToken)
+                json_encode($applicationToken),
             ));
         }
         parent::__construct($notificationApiUrl, $applicationToken, $options);
@@ -33,7 +33,7 @@ class EventsClient extends Client
                 'POST',
                 sprintf('events/%s', $requestData->getEventType()),
                 ['Content-type' => 'application/json'],
-                $jobDataJson
+                $jobDataJson,
             );
         } catch (JsonException $e) {
             throw new ClientException('Invalid job data: ' . $e->getMessage(), $e->getCode(), $e);

@@ -16,7 +16,7 @@ class SubscriptionTest extends TestCase
         $subscriptionRequest = new Subscription(
             'job-failed',
             new EmailRecipient('john.doe@example.com'),
-            [new Filter('foo', 'bar')]
+            [new Filter('foo', 'bar')],
         );
         self::assertSame(
             [
@@ -32,7 +32,7 @@ class SubscriptionTest extends TestCase
                     'address' => 'john.doe@example.com',
                 ],
             ],
-            $subscriptionRequest->jsonSerialize()
+            $subscriptionRequest->jsonSerialize(),
         );
     }
 
@@ -41,7 +41,7 @@ class SubscriptionTest extends TestCase
         $subscriptionRequest = new Subscription(
             'job-failed',
             new EmailRecipient('john.doe@example.com'),
-            ['a' => new Filter('foo', 'bar'), '4filter' => new Filter('bar', 'Kochba')]
+            ['a' => new Filter('foo', 'bar'), '4filter' => new Filter('bar', 'Kochba')],
         );
         self::assertSame(
             [
@@ -61,7 +61,7 @@ class SubscriptionTest extends TestCase
                     'address' => 'john.doe@example.com',
                 ],
             ],
-            $subscriptionRequest->jsonSerialize()
+            $subscriptionRequest->jsonSerialize(),
         );
     }
 
@@ -74,7 +74,7 @@ class SubscriptionTest extends TestCase
                 new Filter('job.component.id', 'my.component'),
                 new Filter('job.configuration.id', '12345'),
                 new Filter('phase.id', '123'),
-            ]
+            ],
         );
         self::assertSame(
             [
@@ -98,7 +98,7 @@ class SubscriptionTest extends TestCase
                     'address' => 'john.doe@example.com',
                 ],
             ],
-            $subscriptionRequest->jsonSerialize()
+            $subscriptionRequest->jsonSerialize(),
         );
     }
 
@@ -111,7 +111,7 @@ class SubscriptionTest extends TestCase
                 new Filter('job.component.id', 'my.component'),
                 new Filter('job.configuration.id', '12345'),
                 new Filter('phase.id', '123'),
-            ]
+            ],
         );
         self::assertSame(
             [
@@ -135,7 +135,7 @@ class SubscriptionTest extends TestCase
                     'address' => 'john.doe@example.com',
                 ],
             ],
-            $subscriptionRequest->jsonSerialize()
+            $subscriptionRequest->jsonSerialize(),
         );
     }
 
@@ -147,7 +147,7 @@ class SubscriptionTest extends TestCase
             [
                 new Filter('job.component.id', 'my.component'),
                 new Filter('job.configuration.id', '12345'),
-            ]
+            ],
         );
 
         self::assertSame(
@@ -168,7 +168,7 @@ class SubscriptionTest extends TestCase
                     'address' => 'john.doe@example.com',
                 ],
             ],
-            $subscriptionRequest->jsonSerialize()
+            $subscriptionRequest->jsonSerialize(),
         );
     }
 
@@ -181,7 +181,7 @@ class SubscriptionTest extends TestCase
                 new Filter('job.component.id', 'my.component'),
                 new Filter('job.configuration.id', '12345'),
                 new Filter('phase.id', '123'),
-            ]
+            ],
         );
 
         self::assertSame(
@@ -206,7 +206,7 @@ class SubscriptionTest extends TestCase
                     'address' => 'john.doe@example.com',
                 ],
             ],
-            $subscriptionRequest->jsonSerialize()
+            $subscriptionRequest->jsonSerialize(),
         );
     }
 
@@ -219,7 +219,7 @@ class SubscriptionTest extends TestCase
                 new Filter('job.component.id', 'my.component'),
                 new Filter('job.configuration.id', '12345'),
                 new Filter('phase.id', '123'),
-            ]
+            ],
         );
         self::assertSame(
             [
@@ -243,7 +243,7 @@ class SubscriptionTest extends TestCase
                     'address' => 'john.doe@example.com',
                 ],
             ],
-            $subscriptionRequest->jsonSerialize()
+            $subscriptionRequest->jsonSerialize(),
         );
     }
 }

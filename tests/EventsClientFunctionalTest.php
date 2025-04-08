@@ -28,7 +28,7 @@ class EventsClientFunctionalTest extends TestCase
             [
                 'backoffMaxTries' => 3,
                 'userAgent' => 'Test',
-            ]
+            ],
         );
     }
 
@@ -49,9 +49,9 @@ class EventsClientFunctionalTest extends TestCase
                     'keboola.orchestrator',
                     'Orchestrator',
                     'my-configuration',
-                    'My configuration'
-                )
-            )
+                    'My configuration',
+                ),
+            ),
         ));
         self::assertTrue(true);
     }
@@ -67,7 +67,7 @@ class EventsClientFunctionalTest extends TestCase
             [
                 'backoffMaxTries' => 3,
                 'userAgent' => 'Test',
-            ]
+            ],
         );
     }
 
@@ -90,9 +90,9 @@ class EventsClientFunctionalTest extends TestCase
                     'keboola.orchestrator',
                     'Orchestrator',
                     'my-configuration',
-                    'My configuration'
-                )
-            )
+                    'My configuration',
+                ),
+            ),
         ));
         self::assertTrue(true);
     }
@@ -103,7 +103,7 @@ class EventsClientFunctionalTest extends TestCase
             new Response(
                 200,
                 ['Content-Type' => 'application/json'],
-                '{"ok": "1"}'
+                '{"ok": "1"}',
             ),
         ]);
         // Add the history middleware to the handler stack.
@@ -114,7 +114,7 @@ class EventsClientFunctionalTest extends TestCase
         $client = new EventsClient(
             'https://example.com/',
             'testToken',
-            ['handler' => $stack, 'backoffMaxTries' => 3, 'userAgent' => 'Test']
+            ['handler' => $stack, 'backoffMaxTries' => 3, 'userAgent' => 'Test'],
         );
         $client->postEvent(new Event(
             new JobFailedEventData(
@@ -130,9 +130,9 @@ class EventsClientFunctionalTest extends TestCase
                     'keboola.orchestrator',
                     'Orchestrator',
                     'my-configuration',
-                    'My configuration'
-                )
-            )
+                    'My configuration',
+                ),
+            ),
         ));
 
         /** @var Request $request */
@@ -140,7 +140,7 @@ class EventsClientFunctionalTest extends TestCase
         self::assertSame('POST', $request->getMethod());
         self::assertSame(
             ['Content-Length', 'User-Agent', 'X-Kbc-ManageApiToken', 'Host', 'Content-type'],
-            array_keys($request->getHeaders())
+            array_keys($request->getHeaders()),
         );
         self::assertSame(['application/json'], $request->getHeaders()['Content-type']);
     }

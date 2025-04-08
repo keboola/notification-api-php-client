@@ -11,7 +11,7 @@ $dotEnv->usePutenv();
 $dotEnv->bootEnv(dirname(__DIR__).'/.env', 'dev', []);
 
 $requiredEnvs = ['TEST_NOTIFICATION_API_URL', 'TEST_STORAGE_API_TOKEN', 'TEST_MANAGE_API_APPLICATION_TOKEN',
-    'STORAGE_API_URL', 'TEST_STORAGE_API_PROJECT_ID'];
+    'TEST_STORAGE_API_PROJECT_ID', 'HOSTNAME_SUFFIX'];
 foreach ($requiredEnvs as $env) {
     if (empty(getenv($env))) {
         throw new Exception(sprintf('Environment variable "%s" is empty', $env));

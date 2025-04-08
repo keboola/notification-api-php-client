@@ -25,7 +25,7 @@ class Subscription
             $this->event = $data['event'];
             $this->filters = array_values(array_map(
                 fn(array $item) => new Filter($item),
-                $data['filters']
+                $data['filters'],
             ));
             $this->recipientChannel = $data['recipient']['channel'];
             $this->recipientAddress = $data['recipient']['address'];

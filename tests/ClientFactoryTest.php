@@ -47,7 +47,7 @@ class ClientFactoryTest extends TestCase
             new Response(
                 200,
                 ['Content-Type' => 'application/json'],
-                self::SAMPLE_RESPONSE_DATA
+                self::SAMPLE_RESPONSE_DATA,
             ),
         ]);
         $requestHistory = [];
@@ -58,15 +58,15 @@ class ClientFactoryTest extends TestCase
 
         $clientFactory = new ClientFactory(
             'https://dummy',
-            ['handler' => $stack, 'logger' => $logger, 'backoffMaxTries' => 3, 'userAgent' => 'test agent']
+            ['handler' => $stack, 'logger' => $logger, 'backoffMaxTries' => 3, 'userAgent' => 'test agent'],
         );
         self::assertInstanceOf(
             SubscriptionClient::class,
-            $clientFactory->getSubscriptionClient('dummy', ['backoffMaxTries' => 3, 'userAgent' => 'Test'])
+            $clientFactory->getSubscriptionClient('dummy', ['backoffMaxTries' => 3, 'userAgent' => 'Test']),
         );
         self::assertInstanceOf(
             EventsClient::class,
-            $clientFactory->getEventsClient('dummy', ['backoffMaxTries' => 3, 'userAgent' => 'Test'])
+            $clientFactory->getEventsClient('dummy', ['backoffMaxTries' => 3, 'userAgent' => 'Test']),
         );
 
         /** @var Request $request */
@@ -82,7 +82,7 @@ class ClientFactoryTest extends TestCase
             new Response(
                 200,
                 ['Content-Type' => 'application/json'],
-                self::SAMPLE_RESPONSE_DATA
+                self::SAMPLE_RESPONSE_DATA,
             ),
         ]);
         $requestHistory = [];
@@ -93,7 +93,7 @@ class ClientFactoryTest extends TestCase
 
         $clientFactory = new ClientFactory(
             'https://dummy',
-            ['handler' => $stack, 'logger' => $logger, 'backoffMaxTries' => 3, 'userAgent' => 'test agent']
+            ['handler' => $stack, 'logger' => $logger, 'backoffMaxTries' => 3, 'userAgent' => 'test agent'],
         );
         self::assertCount(0, $requestHistory);
         $clientFactory->getSubscriptionClient('dummy', ['backoffMaxTries' => 3, 'userAgent' => 'Test']);
