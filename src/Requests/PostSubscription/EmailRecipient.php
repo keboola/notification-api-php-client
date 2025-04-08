@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\NotificationClient\Requests\PostSubscription;
 
-use JsonSerializable;
-
-class EmailRecipient implements JsonSerializable
+class EmailRecipient implements RecipientInterface
 {
     private string $address;
 
