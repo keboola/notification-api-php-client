@@ -4,7 +4,9 @@ PHP client for the Notification API ([API docs](https://app.swaggerhub.com/apis/
 
 ## Usage
 The client uses two kinds of authorizations - Storage API token for Subscription API (`SubscriptionClient` class) and 
-Manage API Application token with scope `notifications:push-event` for the Events API (`EventsClient` class).
+Manage API Application token with scopes:
+- `notifications:push-event` for the Events API (`EventsClient` class)
+- `notifications:send-notification` for the Notifications API (`NotificationsClient` class)
 
 ```bash
 composer require keboola/notification-api-php-client
