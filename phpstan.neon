@@ -1,12 +1,11 @@
 parameters:
     level: max
-    checkMissingIterableValueType: false
     paths:
         - src
         - tests
     stubFiles:
         - tests/stubs/Guzzle.stub
     ignoreErrors:
-
+        - identifier: missingType.iterableValue
 includes:
     - vendor/phpstan/phpstan-phpunit/extension.neon

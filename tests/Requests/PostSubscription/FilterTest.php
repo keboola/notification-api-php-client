@@ -24,7 +24,7 @@ class FilterTest extends TestCase
 
     public function testJsonSerializeWithOperator(): void
     {
-        $filter = new Filter('someName', 'someValue', FilterOperator::GREATER_THAN_OR_EQUAL());
+        $filter = new Filter('someName', 'someValue', FilterOperator::GreaterThanOrEqual);
         self::assertSame(
             [
                 'field' => 'someName',

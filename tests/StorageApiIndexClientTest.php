@@ -11,13 +11,10 @@ use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Keboola\NotificationClient\Exception\ClientException;
-use Keboola\NotificationClient\Requests\PostSubscription\EmailRecipient;
-use Keboola\NotificationClient\Requests\PostSubscription\Filter;
-use Keboola\NotificationClient\Requests\Subscription;
 use Keboola\NotificationClient\StorageApiIndexClient;
-use Keboola\NotificationClient\SubscriptionClient;
+use Monolog\Handler\TestHandler;
+use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\Test\TestLogger;
 
 class StorageApiIndexClientTest extends TestCase
 {
@@ -49,7 +46,10 @@ class StorageApiIndexClientTest extends TestCase
         $history = Middleware::history($requestHistory);
         $stack = HandlerStack::create($mock);
         $stack->push($history);
-        $logger = new TestLogger();
+
+        $logsHandler = new TestHandler();
+        $logger = new Logger('test', [$logsHandler]);
+
         $client = new StorageApiIndexClient(
             'https://dummy',
             ['handler' => $stack, 'logger' => $logger, 'backoffMaxTries' => 3, 'userAgent' => 'Test'],

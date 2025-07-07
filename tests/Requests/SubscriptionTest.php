@@ -121,7 +121,7 @@ class SubscriptionTest extends TestCase
     /** @dataProvider recipientProvider */
     public function testPhaseJobSucceededWithWarningSubscription(
         RecipientInterface $recipient,
-        array $expectedRecipient
+        array $expectedRecipient,
     ): void {
         $subscriptionRequest = new Subscription(
             'phase-job-succeeded-with-warning',
@@ -225,7 +225,7 @@ class SubscriptionTest extends TestCase
     /** @dataProvider recipientProvider */
     public function testPhaseJobProcessingLongSubscription(
         RecipientInterface $recipient,
-        array $expectedRecipient
+        array $expectedRecipient,
     ): void {
         $subscriptionRequest = new Subscription(
             'phase-job-processing-long',

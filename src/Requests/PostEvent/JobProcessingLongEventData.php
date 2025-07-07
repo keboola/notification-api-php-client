@@ -23,7 +23,7 @@ class JobProcessingLongEventData implements EventDataInterface
         float $durationOvertimePercentage,
         float $averageDuration,
         float $currentDuration,
-        JobData $jobData
+        JobData $jobData,
     ) {
         $this->projectId = $projectId;
         $this->projectName = $projectName;

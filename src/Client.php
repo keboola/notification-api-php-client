@@ -42,7 +42,7 @@ abstract class Client
     public function __construct(
         string $baseUrl,
         ?string $token,
-        array $options
+        array $options,
     ) {
         $validator = Validation::createValidator();
         $errors = $validator->validate($baseUrl, [new Url()]);
@@ -79,10 +79,10 @@ abstract class Client
             $retries,
             RequestInterface $request,
             ?ResponseInterface $response = null,
-            ?Throwable $error = null
+            ?Throwable $error = null,
         ) use (
             $maxRetries,
-            $logger
+            $logger,
         ) {
             if ($retries >= $maxRetries) {
                 $logger->notice(sprintf('We have tried this %d times. Giving up.', $maxRetries));

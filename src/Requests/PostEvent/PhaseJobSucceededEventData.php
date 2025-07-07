@@ -21,7 +21,7 @@ class PhaseJobSucceededEventData implements EventDataInterface
         string $branchId,
         string $phaseName,
         string $phaseId,
-        JobData $jobData
+        JobData $jobData,
     ) {
         $this->projectId = $projectId;
         $this->projectName = $projectName;

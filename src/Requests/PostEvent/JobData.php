@@ -26,7 +26,7 @@ class JobData implements JsonSerializable
         string $componentId,
         string $componentName,
         ?string $configurationId,
-        ?string $configurationName
+        ?string $configurationName,
     ) {
         $this->jobId = $jobId;
         $this->jobUrl = $jobUrl;

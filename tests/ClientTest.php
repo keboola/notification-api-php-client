@@ -15,9 +15,10 @@ use Keboola\NotificationClient\Exception\ClientException;
 use Keboola\NotificationClient\Requests\Event;
 use Keboola\NotificationClient\Requests\PostEvent\JobData;
 use Keboola\NotificationClient\Requests\PostEvent\JobFailedEventData;
+use Monolog\Handler\TestHandler;
+use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Psr\Log\Test\TestLogger;
 
 class ClientTest extends TestCase
 {
@@ -182,7 +183,10 @@ class ClientTest extends TestCase
         $history = Middleware::history($requestHistory);
         $stack = HandlerStack::create($mock);
         $stack->push($history);
-        $logger = new TestLogger();
+
+        $logsHandler = new TestHandler();
+        $logger = new Logger('test', [$logsHandler]);
+
         $client = $this->getClient(
             [
                 'handler' => $stack,
@@ -195,8 +199,8 @@ class ClientTest extends TestCase
         /** @var Request $request */
         $request = $requestHistory[0]['request'];
         self::assertSame('test agent', $request->getHeader('User-Agent')[0]);
-        self::assertTrue($logger->hasDebugThatContains('"POST  /1.1" 200 '));
-        self::assertTrue($logger->hasDebugThatContains('test agent'));
+        self::assertTrue($logsHandler->hasDebugThatContains('"POST  /1.1" 200 '));
+        self::assertTrue($logsHandler->hasDebugThatContains('test agent'));
     }
 
     public function testRetrySuccess(): void
@@ -234,7 +238,10 @@ class ClientTest extends TestCase
         $history = Middleware::history($requestHistory);
         $stack = HandlerStack::create($mock);
         $stack->push($history);
-        $logger = new TestLogger();
+
+        $logsHandler = new TestHandler();
+        $logger = new Logger('test', [$logsHandler]);
+
         $client = $this->getClient(
             [
                 'handler' => $stack,
@@ -252,7 +259,7 @@ class ClientTest extends TestCase
         self::assertSame('https://example.com/events/job-failed', $request->getUri()->__toString());
         $request = $requestHistory[2]['request'];
         self::assertSame('https://example.com/events/job-failed', $request->getUri()->__toString());
-        self::assertTrue($logger->hasNoticeThatContains('retrying'));
+        self::assertTrue($logsHandler->hasNoticeThatContains('retrying'));
     }
 
     public function testRetryFailure(): void
@@ -271,7 +278,10 @@ class ClientTest extends TestCase
         $history = Middleware::history($requestHistory);
         $stack = HandlerStack::create($mock);
         $stack->push($history);
-        $logger = new TestLogger();
+
+        $logsHandler = new TestHandler();
+        $logger = new Logger('test', [$logsHandler]);
+
         $client = $this->getClient(
             ['handler' => $stack, 'backoffMaxTries' => 1, 'userAgent' => 'Test', 'logger' => $logger],
         );
@@ -282,7 +292,7 @@ class ClientTest extends TestCase
             self::assertStringContainsString('500 Internal Server Error', $e->getMessage());
         }
         self::assertCount(2, $requestHistory);
-        self::assertTrue($logger->hasNoticeThatContains('We have tried this 1 times. Giving up.'));
+        self::assertTrue($logsHandler->hasNoticeThatContains('We have tried this 1 times. Giving up.'));
     }
 
     public function testNoRetry(): void

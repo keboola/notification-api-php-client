@@ -21,7 +21,7 @@ class ProjectWebhook implements NotificationInterface
         string $projectId,
         string $projectName,
         string $title,
-        ?string $message
+        ?string $message,
     ) {
         $this->recipient = $recipient;
         $this->projectId = $projectId;
