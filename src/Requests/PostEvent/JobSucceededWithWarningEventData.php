@@ -19,7 +19,7 @@ class JobSucceededWithWarningEventData implements EventDataInterface
         string $projectName,
         string $branchId,
         string $errorMessage,
-        JobData $jobData
+        JobData $jobData,
     ) {
         $this->projectId = $projectId;
         $this->projectName = $projectName;

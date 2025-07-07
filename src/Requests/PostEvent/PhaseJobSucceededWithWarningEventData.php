@@ -23,7 +23,7 @@ class PhaseJobSucceededWithWarningEventData implements EventDataInterface
         string $phaseName,
         string $phaseId,
         string $errorMessage,
-        JobData $jobData
+        JobData $jobData,
     ) {
         $this->projectId = $projectId;
         $this->projectName = $projectName;
