@@ -28,7 +28,6 @@
         "php": "^8.2",
         "ext-json": "*",
         "guzzlehttp/guzzle": "^6.3|^7.2",
-        "myclabs/php-enum": "^1.8",
         "psr/log": "^2|^3",
         "symfony/validator": "^6.4|^7.0"
     },

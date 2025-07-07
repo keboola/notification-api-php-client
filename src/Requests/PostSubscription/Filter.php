@@ -27,7 +27,7 @@ class Filter implements JsonSerializable
         ];
 
         if ($this->operator !== null) {
-            $data['operator'] = $this->operator->getValue();
+            $data['operator'] = $this->operator->value;
         }
 
         return $data;

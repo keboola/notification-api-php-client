@@ -14,15 +14,15 @@ class FilterOperatorTest extends TestCase
      */
     public function testOperatorValues(FilterOperator $operator, string $expectedValue): void
     {
-        self::assertSame($expectedValue, $operator->getValue());
+        self::assertSame($expectedValue, $operator->value);
     }
 
     public function provideOperatorValues(): iterable
     {
-        yield 'equals' => [FilterOperator::EQUAL(), '=='];
-        yield 'less than' => [FilterOperator::LESS_THAN(), '<'];
-        yield 'greater than' => [FilterOperator::GREATER_THAN(), '>'];
-        yield 'less than or equals' => [FilterOperator::LESS_THAN_OR_EQUAL(), '<='];
-        yield 'greater than or equals' => [FilterOperator::GREATER_THAN_OR_EQUAL(), '>='];
+        yield 'equals' => [FilterOperator::Equal, '=='];
+        yield 'less than' => [FilterOperator::LessThan, '<'];
+        yield 'greater than' => [FilterOperator::GreaterThan, '>'];
+        yield 'less than or equals' => [FilterOperator::LessThanOrEqual, '<='];
+        yield 'greater than or equals' => [FilterOperator::GreaterThanOrEqual, '>='];
     }
 }
