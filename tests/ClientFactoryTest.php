@@ -13,8 +13,9 @@ use Keboola\NotificationClient\ClientFactory;
 use Keboola\NotificationClient\EventsClient;
 use Keboola\NotificationClient\NotificationsClient;
 use Keboola\NotificationClient\SubscriptionClient;
+use Monolog\Handler\TestHandler;
+use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\Test\TestLogger;
 
 class ClientFactoryTest extends TestCase
 {
@@ -55,7 +56,9 @@ class ClientFactoryTest extends TestCase
         $history = Middleware::history($requestHistory);
         $stack = HandlerStack::create($mock);
         $stack->push($history);
-        $logger = new TestLogger();
+
+        $logsHandler = new TestHandler();
+        $logger = new Logger('test', [$logsHandler]);
 
         $clientFactory = new ClientFactory(
             'https://dummy',
@@ -77,8 +80,8 @@ class ClientFactoryTest extends TestCase
         /** @var Request $request */
         $request = $requestHistory[0]['request'];
         self::assertSame('test agent', $request->getHeader('User-Agent')[0]);
-        self::assertTrue($logger->hasDebugThatContains('"GET  /1.1" 200 '));
-        self::assertTrue($logger->hasDebugThatContains('test agent'));
+        self::assertTrue($logsHandler->hasDebugThatContains('"GET  /1.1" 200 '));
+        self::assertTrue($logsHandler->hasDebugThatContains('test agent'));
     }
 
     public function testGetClientLazy(): void
@@ -94,7 +97,9 @@ class ClientFactoryTest extends TestCase
         $history = Middleware::history($requestHistory);
         $stack = HandlerStack::create($mock);
         $stack->push($history);
-        $logger = new TestLogger();
+
+        $logsHandler = new TestHandler();
+        $logger = new Logger('test', [$logsHandler]);
 
         $clientFactory = new ClientFactory(
             'https://dummy',
