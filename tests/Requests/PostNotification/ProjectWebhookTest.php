@@ -139,4 +139,97 @@ class ProjectWebhookTest extends TestCase
             $projectWebhook->jsonSerialize(),
         );
     }
+
+    public function testJsonSerializeWithFlow(): void
+    {
+        $recipient = new WebhookRecipient('https://example.com/webhook');
+        $projectId = '12345';
+        $projectName = 'Test Project';
+        $title = 'Test Notification';
+        $message = 'This is a test notification message';
+        $flow = new FlowInfo(
+            'flow-123',
+            'My Test Flow',
+            'https://connection.keboola.com/flows/123',
+        );
+
+        $projectWebhook = new ProjectWebhook(
+            $recipient,
+            $projectId,
+            $projectName,
+            $title,
+            $message,
+            $flow,
+        );
+
+        self::assertSame(
+            [
+                'type' => 'direct-project-webhook',
+                'recipient' => [
+                    'channel' => 'webhook',
+                    'url' => 'https://example.com/webhook',
+                ],
+                'data' => [
+                    'project' => [
+                        'id' => $projectId,
+                        'name' => $projectName,
+                    ],
+                    'title' => $title,
+                    'message' => $message,
+                    'flow' => [
+                        'id' => 'flow-123',
+                        'name' => 'My Test Flow',
+                        'url' => 'https://connection.keboola.com/flows/123',
+                    ],
+                ],
+            ],
+            $projectWebhook->jsonSerialize(),
+        );
+    }
+
+    public function testJsonSerializeWithJob(): void
+    {
+        $recipient = new WebhookRecipient('https://example.com/webhook');
+        $projectId = '12345';
+        $projectName = 'Test Project';
+        $title = 'Test Notification';
+        $message = 'This is a test notification message';
+        $job = new JobInfo(
+            'job-123',
+            'https://connection.keboola.com/jobs/123',
+        );
+
+        $projectWebhook = new ProjectWebhook(
+            $recipient,
+            $projectId,
+            $projectName,
+            $title,
+            $message,
+            null,
+            $job,
+        );
+
+        self::assertSame(
+            [
+                'type' => 'direct-project-webhook',
+                'recipient' => [
+                    'channel' => 'webhook',
+                    'url' => 'https://example.com/webhook',
+                ],
+                'data' => [
+                    'project' => [
+                        'id' => $projectId,
+                        'name' => $projectName,
+                    ],
+                    'title' => $title,
+                    'message' => $message,
+                    'job' => [
+                        'id' => 'job-123',
+                        'url' => 'https://connection.keboola.com/jobs/123',
+                    ],
+                ],
+            ],
+            $projectWebhook->jsonSerialize(),
+        );
+    }
 }
