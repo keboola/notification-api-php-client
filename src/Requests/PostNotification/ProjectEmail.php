@@ -15,6 +15,8 @@ class ProjectEmail implements NotificationInterface
     private string $title;
     private string $message;
     private EmailRecipient $recipient;
+    private ?FlowInfo $flow;
+    private ?JobInfo $job;
 
     public function __construct(
         EmailRecipient $recipient,
@@ -22,17 +24,21 @@ class ProjectEmail implements NotificationInterface
         string $projectName,
         string $title,
         string $message,
+        ?FlowInfo $flow = null,
+        ?JobInfo $job = null,
     ) {
         $this->recipient = $recipient;
         $this->projectId = $projectId;
         $this->projectName = $projectName;
         $this->title = $title;
         $this->message = $message;
+        $this->flow = $flow;
+        $this->job = $job;
     }
 
     public function jsonSerialize(): array
     {
-        return [
+        $notification = [
             'type' => self::TYPE,
             'recipient' => $this->recipient->jsonSerialize(),
             'data' => [
@@ -44,5 +50,15 @@ class ProjectEmail implements NotificationInterface
                 'message' => $this->message,
             ],
         ];
+
+        if ($this->flow !== null) {
+            $notification['data']['flow'] = $this->flow->jsonSerialize();
+        }
+
+        if ($this->job !== null) {
+            $notification['data']['job'] = $this->job->jsonSerialize();
+        }
+
+        return $notification;
     }
 }
