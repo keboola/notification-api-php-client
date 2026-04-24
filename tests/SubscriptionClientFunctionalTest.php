@@ -139,7 +139,7 @@ class SubscriptionClientFunctionalTest extends TestCase
         /** @var Request $request */
         $request = $requestHistory[0]['request'];
         self::assertSame('DELETE', $request->getMethod());
-        self::assertSame('project-subscriptions/subscription-123', (string) $request->getUri());
+        self::assertSame('https://example.com/project-subscriptions/subscription-123', (string) $request->getUri());
         self::assertSame(
             ['User-Agent', 'X-StorageApi-Token', 'Host'],
             array_keys($request->getHeaders()),
@@ -183,7 +183,7 @@ class SubscriptionClientFunctionalTest extends TestCase
         /** @var Request $request */
         $request = $requestHistory[0]['request'];
         self::assertSame('GET', $request->getMethod());
-        self::assertSame('project-subscriptions', (string) $request->getUri());
+        self::assertSame('https://example.com/project-subscriptions', (string) $request->getUri());
         self::assertSame(
             ['User-Agent', 'X-StorageApi-Token', 'Host'],
             array_keys($request->getHeaders()),
