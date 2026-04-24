@@ -70,7 +70,7 @@ foreach ($subscriptions as $subscription) {
 }
 
 // fetch a single subscription by ID
-$detail = $subscriptionClient->detailSubscription($created->getId());
+$subscription = $subscriptionClient->getSubscription($created->getId());
 
 // delete a subscription
 $subscriptionClient->deleteSubscription($created->getId());

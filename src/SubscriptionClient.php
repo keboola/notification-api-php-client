@@ -51,7 +51,7 @@ class SubscriptionClient extends Client
         $this->sendRequest($request);
     }
 
-    public function detailSubscription(string $id): ResponseSubscription
+    public function getSubscription(string $id): ResponseSubscription
     {
         $request = new Request(
             'GET',

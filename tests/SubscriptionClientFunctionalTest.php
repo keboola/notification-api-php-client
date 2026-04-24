@@ -146,7 +146,7 @@ class SubscriptionClientFunctionalTest extends TestCase
         );
     }
 
-    public function testDetailSubscriptionHeaders(): void
+    public function testGetSubscriptionHeaders(): void
     {
         $mock = new MockHandler([
             new Response(
@@ -172,7 +172,7 @@ class SubscriptionClientFunctionalTest extends TestCase
             ['handler' => $stack, 'backoffMaxTries' => 3, 'userAgent' => 'Test'],
         );
 
-        $result = $client->detailSubscription('subscription-123');
+        $result = $client->getSubscription('subscription-123');
 
         /** @var Request $request */
         $request = $requestHistory[0]['request'];
@@ -262,10 +262,10 @@ class SubscriptionClientFunctionalTest extends TestCase
         ));
         self::assertNotEmpty($created->getId());
 
-        // detail — must return the same subscription
-        $detail = $client->detailSubscription($created->getId());
-        self::assertSame($created->getId(), $detail->getId());
-        self::assertSame('job-failed', $detail->getEvent());
+        // get — must return the same subscription
+        $fetched = $client->getSubscription($created->getId());
+        self::assertSame($created->getId(), $fetched->getId());
+        self::assertSame('job-failed', $fetched->getEvent());
 
         // list — must contain the new subscription
         $beforeDelete = $client->listSubscriptions();
