@@ -41,4 +41,39 @@ class SubscriptionClient extends Client
         }
         return new ResponseSubscription($this->sendRequest($request));
     }
+
+    public function deleteSubscription(string $id): void
+    {
+        $request = new Request(
+            'DELETE',
+            'project-subscriptions/' . rawurlencode($id),
+        );
+        $this->sendRequest($request);
+    }
+
+    public function getSubscription(string $id): ResponseSubscription
+    {
+        $request = new Request(
+            'GET',
+            'project-subscriptions/' . rawurlencode($id),
+        );
+        return new ResponseSubscription($this->sendRequest($request));
+    }
+
+    /**
+     * @return array<ResponseSubscription>
+     */
+    public function listSubscriptions(): array
+    {
+        $request = new Request(
+            'GET',
+            'project-subscriptions',
+        );
+        $response = $this->sendRequest($request);
+
+        return array_values(array_map(
+            fn(array $item): ResponseSubscription => new ResponseSubscription($item),
+            $response,
+        ));
+    }
 }

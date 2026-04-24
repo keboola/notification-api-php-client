@@ -45,6 +45,37 @@ $clientFactory = new ClientFactory('https://connection.keboola.com');
 $clientFactory->getEventsClient('xxx-xxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
 ```
 
+### Subscription client
+
+```php
+use Keboola\NotificationClient\ClientFactory;
+use Keboola\NotificationClient\Requests\PostSubscription\EmailRecipient;
+use Keboola\NotificationClient\Requests\PostSubscription\Filter;
+use Keboola\NotificationClient\Requests\Subscription;
+
+$clientFactory = new ClientFactory('https://connection.keboola.com');
+$subscriptionClient = $clientFactory->getSubscriptionClient('xxx-storage-api-token');
+
+// create a subscription
+$created = $subscriptionClient->createSubscription(new Subscription(
+    'job-failed',
+    new EmailRecipient('you@example.com'),
+    [new Filter('project.id', '123')],
+));
+
+// list all subscriptions for the project (returned by token)
+$subscriptions = $subscriptionClient->listSubscriptions();
+foreach ($subscriptions as $subscription) {
+    echo $subscription->getId() . ': ' . $subscription->getEvent() . "\n";
+}
+
+// fetch a single subscription by ID
+$subscription = $subscriptionClient->getSubscription($created->getId());
+
+// delete a subscription
+$subscriptionClient->deleteSubscription($created->getId());
+```
+
 ## Development
 - Create an Azure service principal to download the required images and login:
 
