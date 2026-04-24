@@ -13,6 +13,7 @@ use Keboola\NotificationClient\Exception\ClientException;
 use Keboola\NotificationClient\Requests\PostSubscription\EmailRecipient;
 use Keboola\NotificationClient\Requests\PostSubscription\Filter;
 use Keboola\NotificationClient\Requests\Subscription;
+use Keboola\NotificationClient\Responses\Subscription as ResponseSubscription;
 use Keboola\NotificationClient\StorageApiIndexClient;
 use Keboola\NotificationClient\SubscriptionClient;
 use PHPUnit\Framework\TestCase;
@@ -190,7 +191,7 @@ class SubscriptionClientFunctionalTest extends TestCase
 
         self::assertCount(2, $result);
         self::assertContainsOnlyInstancesOf(
-            \Keboola\NotificationClient\Responses\Subscription::class,
+            ResponseSubscription::class,
             $result,
         );
         self::assertSame('sub-1', $result[0]->getId());
@@ -219,11 +220,11 @@ class SubscriptionClientFunctionalTest extends TestCase
         // list — must contain the new subscription
         $beforeDelete = $client->listSubscriptions();
         self::assertContainsOnlyInstancesOf(
-            \Keboola\NotificationClient\Responses\Subscription::class,
+            ResponseSubscription::class,
             $beforeDelete,
         );
         $ids = array_map(
-            fn(\Keboola\NotificationClient\Responses\Subscription $s): string => $s->getId(),
+            fn(ResponseSubscription $s): string => $s->getId(),
             $beforeDelete,
         );
         self::assertContains($created->getId(), $ids);
@@ -234,7 +235,7 @@ class SubscriptionClientFunctionalTest extends TestCase
         // list — must no longer contain it
         $afterDelete = $client->listSubscriptions();
         $idsAfter = array_map(
-            fn(\Keboola\NotificationClient\Responses\Subscription $s): string => $s->getId(),
+            fn(ResponseSubscription $s): string => $s->getId(),
             $afterDelete,
         );
         self::assertNotContains($created->getId(), $idsAfter);
