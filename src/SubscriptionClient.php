@@ -51,6 +51,15 @@ class SubscriptionClient extends Client
         $this->sendRequest($request);
     }
 
+    public function detailSubscription(string $id): ResponseSubscription
+    {
+        $request = new Request(
+            'GET',
+            'project-subscriptions/' . rawurlencode($id),
+        );
+        return new ResponseSubscription($this->sendRequest($request));
+    }
+
     /**
      * @return array<ResponseSubscription>
      */

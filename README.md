@@ -69,6 +69,9 @@ foreach ($subscriptions as $subscription) {
     echo $subscription->getId() . ': ' . $subscription->getEvent() . "\n";
 }
 
+// fetch a single subscription by ID
+$detail = $subscriptionClient->detailSubscription($created->getId());
+
 // delete a subscription
 $subscriptionClient->deleteSubscription($created->getId());
 ```

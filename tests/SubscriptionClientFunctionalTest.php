@@ -146,6 +146,51 @@ class SubscriptionClientFunctionalTest extends TestCase
         );
     }
 
+    public function testDetailSubscriptionHeaders(): void
+    {
+        $mock = new MockHandler([
+            new Response(
+                200,
+                ['Content-Type' => 'application/json'],
+                (string) json_encode([
+                    'id' => 'subscription-123',
+                    'event' => 'job-failed',
+                    'filters' => [
+                        ['field' => 'project.id', 'value' => '123'],
+                    ],
+                    'recipient' => ['channel' => 'email', 'address' => 'a@example.com'],
+                ]),
+            ),
+        ]);
+        $requestHistory = [];
+        $history = Middleware::history($requestHistory);
+        $stack = HandlerStack::create($mock);
+        $stack->push($history);
+        $client = new SubscriptionClient(
+            'https://example.com/',
+            'testToken',
+            ['handler' => $stack, 'backoffMaxTries' => 3, 'userAgent' => 'Test'],
+        );
+
+        $result = $client->detailSubscription('subscription-123');
+
+        /** @var Request $request */
+        $request = $requestHistory[0]['request'];
+        self::assertSame('GET', $request->getMethod());
+        self::assertSame('https://example.com/project-subscriptions/subscription-123', (string) $request->getUri());
+        self::assertSame(
+            ['User-Agent', 'X-StorageApi-Token', 'Host'],
+            array_keys($request->getHeaders()),
+        );
+
+        self::assertSame('subscription-123', $result->getId());
+        self::assertSame('job-failed', $result->getEvent());
+        self::assertSame('project.id', $result->getFilters()[0]->getField());
+        self::assertSame('123', $result->getFilters()[0]->getValue());
+        self::assertSame('email', $result->getRecipientChannel());
+        self::assertSame('a@example.com', $result->getRecipientAddress());
+    }
+
     public function testListSubscriptionsHeaders(): void
     {
         $responseBody = json_encode([
@@ -216,6 +261,11 @@ class SubscriptionClientFunctionalTest extends TestCase
             ],
         ));
         self::assertNotEmpty($created->getId());
+
+        // detail — must return the same subscription
+        $detail = $client->detailSubscription($created->getId());
+        self::assertSame($created->getId(), $detail->getId());
+        self::assertSame('job-failed', $detail->getEvent());
 
         // list — must contain the new subscription
         $beforeDelete = $client->listSubscriptions();
