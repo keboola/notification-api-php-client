@@ -117,4 +117,126 @@ class SubscriptionClientFunctionalTest extends TestCase
         );
         self::assertSame(['application/json'], $request->getHeaders()['Content-type']);
     }
+
+    public function testDeleteSubscriptionHeaders(): void
+    {
+        $mock = new MockHandler([
+            new Response(204, [], ''),
+        ]);
+        $requestHistory = [];
+        $history = Middleware::history($requestHistory);
+        $stack = HandlerStack::create($mock);
+        $stack->push($history);
+        $client = new SubscriptionClient(
+            'https://example.com/',
+            'testToken',
+            ['handler' => $stack, 'backoffMaxTries' => 3, 'userAgent' => 'Test'],
+        );
+
+        $client->deleteSubscription('subscription-123');
+
+        /** @var Request $request */
+        $request = $requestHistory[0]['request'];
+        self::assertSame('DELETE', $request->getMethod());
+        self::assertSame('project-subscriptions/subscription-123', (string) $request->getUri());
+        self::assertSame(
+            ['User-Agent', 'X-StorageApi-Token', 'Host'],
+            array_keys($request->getHeaders()),
+        );
+    }
+
+    public function testListSubscriptionsHeaders(): void
+    {
+        $responseBody = json_encode([
+            [
+                'id' => 'sub-1',
+                'event' => 'job-failed',
+                'filters' => [
+                    ['field' => 'project.id', 'value' => '123'],
+                ],
+                'recipient' => ['channel' => 'email', 'address' => 'a@example.com'],
+            ],
+            [
+                'id' => 'sub-2',
+                'event' => 'job-succeeded',
+                'filters' => [],
+                'recipient' => ['channel' => 'email', 'address' => 'b@example.com'],
+            ],
+        ]);
+
+        $mock = new MockHandler([
+            new Response(200, ['Content-Type' => 'application/json'], (string) $responseBody),
+        ]);
+        $requestHistory = [];
+        $history = Middleware::history($requestHistory);
+        $stack = HandlerStack::create($mock);
+        $stack->push($history);
+        $client = new SubscriptionClient(
+            'https://example.com/',
+            'testToken',
+            ['handler' => $stack, 'backoffMaxTries' => 3, 'userAgent' => 'Test'],
+        );
+
+        $result = $client->listSubscriptions();
+
+        /** @var Request $request */
+        $request = $requestHistory[0]['request'];
+        self::assertSame('GET', $request->getMethod());
+        self::assertSame('project-subscriptions', (string) $request->getUri());
+        self::assertSame(
+            ['User-Agent', 'X-StorageApi-Token', 'Host'],
+            array_keys($request->getHeaders()),
+        );
+
+        self::assertCount(2, $result);
+        self::assertContainsOnlyInstancesOf(
+            \Keboola\NotificationClient\Responses\Subscription::class,
+            $result,
+        );
+        self::assertSame('sub-1', $result[0]->getId());
+        self::assertSame('job-failed', $result[0]->getEvent());
+        self::assertSame('project.id', $result[0]->getFilters()[0]->getField());
+        self::assertSame('123', $result[0]->getFilters()[0]->getValue());
+        self::assertSame('email', $result[0]->getRecipientChannel());
+        self::assertSame('a@example.com', $result[0]->getRecipientAddress());
+        self::assertSame('sub-2', $result[1]->getId());
+    }
+
+    public function testListAndDeleteSubscriptionLifecycle(): void
+    {
+        $client = $this->getClient();
+
+        // create
+        $created = $client->createSubscription(new Subscription(
+            'job-failed',
+            new EmailRecipient('ajda-2680@example.com'),
+            [
+                new Filter('project.id', (string) getenv('TEST_STORAGE_API_PROJECT_ID')),
+            ],
+        ));
+        self::assertNotEmpty($created->getId());
+
+        // list — must contain the new subscription
+        $beforeDelete = $client->listSubscriptions();
+        self::assertContainsOnlyInstancesOf(
+            \Keboola\NotificationClient\Responses\Subscription::class,
+            $beforeDelete,
+        );
+        $ids = array_map(
+            fn(\Keboola\NotificationClient\Responses\Subscription $s): string => $s->getId(),
+            $beforeDelete,
+        );
+        self::assertContains($created->getId(), $ids);
+
+        // delete
+        $client->deleteSubscription($created->getId());
+
+        // list — must no longer contain it
+        $afterDelete = $client->listSubscriptions();
+        $idsAfter = array_map(
+            fn(\Keboola\NotificationClient\Responses\Subscription $s): string => $s->getId(),
+            $afterDelete,
+        );
+        self::assertNotContains($created->getId(), $idsAfter);
+    }
 }
