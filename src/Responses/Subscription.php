@@ -38,20 +38,26 @@ class Subscription
      */
     private static function createRecipient(array $data): RecipientInterface
     {
-        $channel = $data['channel'];
-        assert(is_string($channel));
+        $channel = self::extractString($data, 'channel');
         switch ($channel) {
             case EmailRecipient::CHANNEL:
-                $address = $data['address'];
-                assert(is_string($address));
-                return new EmailRecipient($address);
+                return new EmailRecipient(self::extractString($data, 'address'));
             case WebhookRecipient::CHANNEL:
-                $url = $data['url'];
-                assert(is_string($url));
-                return new WebhookRecipient($url);
+                return new WebhookRecipient(self::extractString($data, 'url'));
             default:
                 throw new ClientException(sprintf('Unknown recipient channel "%s"', $channel));
         }
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private static function extractString(array $data, string $key): string
+    {
+        if (!array_key_exists($key, $data) || !is_string($data[$key])) {
+            throw new ClientException(sprintf('Recipient field "%s" must be a string', $key));
+        }
+        return $data[$key];
     }
 
     public function getId(): string
