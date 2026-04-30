@@ -17,6 +17,25 @@ class FilterTest extends TestCase
         self::assertSame('bar', $filter->getValue());
     }
 
+    /**
+     * @dataProvider provideScalarValues
+     */
+    public function testScalarValues(int|float|bool|string|null $value): void
+    {
+        $filter = new Filter(['field' => 'foo', 'value' => $value]);
+        self::assertSame('foo', $filter->getField());
+        self::assertSame($value, $filter->getValue());
+    }
+
+    public function provideScalarValues(): iterable
+    {
+        yield 'int' => [12345];
+        yield 'float' => [0.2];
+        yield 'bool true' => [true];
+        yield 'bool false' => [false];
+        yield 'null' => [null];
+    }
+
     public function testInvalidData(): void
     {
         $this->expectException(ClientException::class);

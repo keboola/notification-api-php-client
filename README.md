@@ -76,6 +76,10 @@ $subscription = $subscriptionClient->getSubscription($created->getId());
 $subscriptionClient->deleteSubscription($created->getId());
 ```
 
+`Responses\Filter::getValue()` returns `int|float|bool|string|null` — the
+value type matches whatever the API returns (for example
+`durationOvertimePercentage` returns `float`).
+
 ## Development
 - Create an Azure service principal to download the required images and login:
 
