@@ -88,7 +88,7 @@ class SubscriptionClientFunctionalTest extends TestCase
             new Response(
                 200,
                 ['Content-Type' => 'application/json'],
-                '{"id": "1", "event": "2", "filters": [], "recipient": {"channel": "foo", "address": "bar"}}',
+                '{"id": "1", "event": "2", "filters": [], "recipient": {"channel": "email", "address": "bar"}}',
             ),
         ]);
         // Add the history middleware to the handler stack.
