@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Keboola\NotificationClient\Responses;
 
 use Keboola\NotificationClient\Exception\ClientException;
+use Keboola\NotificationClient\Responses\Recipient\EmailRecipient;
+use Keboola\NotificationClient\Responses\Recipient\RecipientInterface;
+use Keboola\NotificationClient\Responses\Recipient\WebhookRecipient;
 use Throwable;
 
 class Subscription
@@ -13,10 +16,7 @@ class Subscription
     private string $event;
     /** @var array<Filter> */
     private array $filters;
-    /** @var string */
-    private $recipientAddress;
-    /** @var string */
-    private $recipientChannel;
+    private RecipientInterface $recipient;
 
     public function __construct(array $data)
     {
@@ -27,10 +27,30 @@ class Subscription
                 fn(array $item) => new Filter($item),
                 $data['filters'],
             ));
-            $this->recipientChannel = $data['recipient']['channel'];
-            $this->recipientAddress = $data['recipient']['address'];
+            $this->recipient = self::createRecipient($data['recipient']);
         } catch (Throwable $e) {
             throw new ClientException('Unrecognized response: ' . $e->getMessage(), 0, $e);
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private static function createRecipient(array $data): RecipientInterface
+    {
+        $channel = $data['channel'];
+        assert(is_string($channel));
+        switch ($channel) {
+            case EmailRecipient::CHANNEL:
+                $address = $data['address'];
+                assert(is_string($address));
+                return new EmailRecipient($address);
+            case WebhookRecipient::CHANNEL:
+                $url = $data['url'];
+                assert(is_string($url));
+                return new WebhookRecipient($url);
+            default:
+                throw new ClientException(sprintf('Unknown recipient channel "%s"', $channel));
         }
     }
 
@@ -52,13 +72,24 @@ class Subscription
         return $this->filters;
     }
 
-    public function getRecipientAddress(): string
+    public function getRecipient(): RecipientInterface
     {
-        return $this->recipientAddress;
+        return $this->recipient;
     }
 
     public function getRecipientChannel(): string
     {
-        return $this->recipientChannel;
+        return $this->recipient->getChannel();
+    }
+
+    /**
+     * BC: previously `: string`. Now `: ?string`. Returns null for non-email channels (e.g. webhook).
+     */
+    public function getRecipientAddress(): ?string
+    {
+        if ($this->recipient instanceof EmailRecipient) {
+            return $this->recipient->getAddress();
+        }
+        return null;
     }
 }
