@@ -10,7 +10,7 @@ use Throwable;
 class Filter
 {
     private string $field;
-    private string $value;
+    private int|float|bool|string|null $value;
 
     public function __construct(array $data)
     {
@@ -28,7 +28,7 @@ class Filter
         return $this->field;
     }
 
-    public function getValue(): string
+    public function getValue(): int|float|bool|string|null
     {
         return $this->value;
     }
