@@ -80,6 +80,29 @@ $subscriptionClient->deleteSubscription($created->getId());
 value type matches whatever the API returns (for example
 `durationOvertimePercentage` returns `float`).
 
+### Subscription response recipients
+
+`Responses\Subscription` exposes the recipient as a polymorphic Value Object via `getRecipient(): RecipientInterface`. Two concrete types live under `Keboola\NotificationClient\Responses\Recipient`:
+
+- `EmailRecipient` — `getChannel()` returns `'email'`, `getAddress(): string`
+- `WebhookRecipient` — `getChannel()` returns `'webhook'`, `getUrl(): string`
+
+Use `instanceof` to narrow:
+
+```php
+use Keboola\NotificationClient\Responses\Recipient\EmailRecipient;
+use Keboola\NotificationClient\Responses\Recipient\WebhookRecipient;
+
+$recipient = $subscription->getRecipient();
+if ($recipient instanceof EmailRecipient) {
+    $email = $recipient->getAddress();
+} elseif ($recipient instanceof WebhookRecipient) {
+    $url = $recipient->getUrl();
+}
+```
+
+**BC change:** `Subscription::getRecipientAddress()` return type changed from `string` to `?string` and returns `null` for non-email channels. `getRecipientChannel(): string` is unchanged.
+
 ## Development
 - Create an Azure service principal to download the required images and login:
 
