@@ -101,8 +101,6 @@ if ($recipient instanceof EmailRecipient) {
 }
 ```
 
-**BC change:** `Subscription::getRecipientAddress()` return type changed from `string` to `?string` and returns `null` for non-email channels. `getRecipientChannel(): string` is unchanged.
-
 ## Development
 - Create an Azure service principal to download the required images and login:
 

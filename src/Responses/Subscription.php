@@ -82,20 +82,4 @@ class Subscription
     {
         return $this->recipient;
     }
-
-    public function getRecipientChannel(): string
-    {
-        return $this->recipient->getChannel();
-    }
-
-    /**
-     * BC: previously `: string`. Now `: ?string`. Returns null for non-email channels (e.g. webhook).
-     */
-    public function getRecipientAddress(): ?string
-    {
-        if ($this->recipient instanceof EmailRecipient) {
-            return $this->recipient->getAddress();
-        }
-        return null;
-    }
 }

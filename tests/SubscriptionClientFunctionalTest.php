@@ -13,6 +13,7 @@ use Keboola\NotificationClient\Exception\ClientException;
 use Keboola\NotificationClient\Requests\PostSubscription\EmailRecipient;
 use Keboola\NotificationClient\Requests\PostSubscription\Filter;
 use Keboola\NotificationClient\Requests\Subscription;
+use Keboola\NotificationClient\Responses\Recipient\EmailRecipient as ResponseEmailRecipient;
 use Keboola\NotificationClient\Responses\Subscription as ResponseSubscription;
 use Keboola\NotificationClient\StorageApiIndexClient;
 use Keboola\NotificationClient\SubscriptionClient;
@@ -62,8 +63,10 @@ class SubscriptionClientFunctionalTest extends TestCase
         self::assertSame('job-failed', $response->getEvent());
         self::assertSame('project.id', $response->getFilters()[0]->getField());
         self::assertSame((string) getenv('TEST_STORAGE_API_PROJECT_ID'), $response->getFilters()[0]->getValue());
-        self::assertSame('johnDoe@example.com', $response->getRecipientAddress());
-        self::assertSame('email', $response->getRecipientChannel());
+        $recipient = $response->getRecipient();
+        self::assertInstanceOf(ResponseEmailRecipient::class, $recipient);
+        self::assertSame('email', $recipient->getChannel());
+        self::assertSame('johnDoe@example.com', $recipient->getAddress());
     }
 
     public function testCreateInvalidSubscription(): void
@@ -187,8 +190,10 @@ class SubscriptionClientFunctionalTest extends TestCase
         self::assertSame('job-failed', $result->getEvent());
         self::assertSame('project.id', $result->getFilters()[0]->getField());
         self::assertSame('123', $result->getFilters()[0]->getValue());
-        self::assertSame('email', $result->getRecipientChannel());
-        self::assertSame('a@example.com', $result->getRecipientAddress());
+        $recipient = $result->getRecipient();
+        self::assertInstanceOf(ResponseEmailRecipient::class, $recipient);
+        self::assertSame('email', $recipient->getChannel());
+        self::assertSame('a@example.com', $recipient->getAddress());
     }
 
     public function testListSubscriptionsHeaders(): void
@@ -243,8 +248,10 @@ class SubscriptionClientFunctionalTest extends TestCase
         self::assertSame('job-failed', $result[0]->getEvent());
         self::assertSame('project.id', $result[0]->getFilters()[0]->getField());
         self::assertSame('123', $result[0]->getFilters()[0]->getValue());
-        self::assertSame('email', $result[0]->getRecipientChannel());
-        self::assertSame('a@example.com', $result[0]->getRecipientAddress());
+        $recipient = $result[0]->getRecipient();
+        self::assertInstanceOf(ResponseEmailRecipient::class, $recipient);
+        self::assertSame('email', $recipient->getChannel());
+        self::assertSame('a@example.com', $recipient->getAddress());
         self::assertSame('sub-2', $result[1]->getId());
     }
 

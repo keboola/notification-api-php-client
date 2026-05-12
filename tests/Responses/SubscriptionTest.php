@@ -31,8 +31,6 @@ class SubscriptionTest extends TestCase
         $subscription = new Subscription($data);
         self::assertSame('123', $subscription->getId());
         self::assertSame('some_event', $subscription->getEvent());
-        self::assertSame('email', $subscription->getRecipientChannel());
-        self::assertSame('john.doe@example.com', $subscription->getRecipientAddress());
         self::assertCount(1, $subscription->getFilters());
         self::assertSame('bar', $subscription->getFilters()[0]->getField());
         self::assertSame('Kochba', $subscription->getFilters()[0]->getValue());
@@ -57,8 +55,6 @@ class SubscriptionTest extends TestCase
         $subscription = new Subscription($data);
         self::assertSame('29746', $subscription->getId());
         self::assertSame('job-succeeded', $subscription->getEvent());
-        self::assertSame('webhook', $subscription->getRecipientChannel());
-        self::assertNull($subscription->getRecipientAddress());
         self::assertSame([], $subscription->getFilters());
 
         $recipient = $subscription->getRecipient();
