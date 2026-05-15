@@ -25,6 +25,7 @@ class SubscriptionTest extends TestCase
                 2 => [
                     'field' => 'bar',
                     'value' => 'Kochba',
+                    'operator' => '==',
                 ],
             ],
         ];
@@ -34,6 +35,7 @@ class SubscriptionTest extends TestCase
         self::assertCount(1, $subscription->getFilters());
         self::assertSame('bar', $subscription->getFilters()[0]->getField());
         self::assertSame('Kochba', $subscription->getFilters()[0]->getValue());
+        self::assertSame('==', $subscription->getFilters()[0]->getOperator());
 
         $recipient = $subscription->getRecipient();
         self::assertInstanceOf(EmailRecipient::class, $recipient);

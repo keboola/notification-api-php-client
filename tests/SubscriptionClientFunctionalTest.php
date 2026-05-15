@@ -159,7 +159,7 @@ class SubscriptionClientFunctionalTest extends TestCase
                     'id' => 'subscription-123',
                     'event' => 'job-failed',
                     'filters' => [
-                        ['field' => 'project.id', 'value' => '123'],
+                        ['field' => 'project.id', 'value' => '123', 'operator' => '=='],
                     ],
                     'recipient' => ['channel' => 'email', 'address' => 'a@example.com'],
                 ]),
@@ -190,6 +190,7 @@ class SubscriptionClientFunctionalTest extends TestCase
         self::assertSame('job-failed', $result->getEvent());
         self::assertSame('project.id', $result->getFilters()[0]->getField());
         self::assertSame('123', $result->getFilters()[0]->getValue());
+        self::assertSame('==', $result->getFilters()[0]->getOperator());
         $recipient = $result->getRecipient();
         self::assertInstanceOf(ResponseEmailRecipient::class, $recipient);
         self::assertSame('email', $recipient->getChannel());
@@ -203,7 +204,7 @@ class SubscriptionClientFunctionalTest extends TestCase
                 'id' => 'sub-1',
                 'event' => 'job-failed',
                 'filters' => [
-                    ['field' => 'project.id', 'value' => '123'],
+                    ['field' => 'project.id', 'value' => '123', 'operator' => '=='],
                 ],
                 'recipient' => ['channel' => 'email', 'address' => 'a@example.com'],
             ],
@@ -248,6 +249,7 @@ class SubscriptionClientFunctionalTest extends TestCase
         self::assertSame('job-failed', $result[0]->getEvent());
         self::assertSame('project.id', $result[0]->getFilters()[0]->getField());
         self::assertSame('123', $result[0]->getFilters()[0]->getValue());
+        self::assertSame('==', $result[0]->getFilters()[0]->getOperator());
         $recipient = $result[0]->getRecipient();
         self::assertInstanceOf(ResponseEmailRecipient::class, $recipient);
         self::assertSame('email', $recipient->getChannel());
