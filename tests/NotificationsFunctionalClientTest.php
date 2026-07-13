@@ -6,92 +6,91 @@ namespace Keboola\NotificationClient\Tests;
 
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Middleware;
-use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Keboola\ApiClientBase\Auth\KeboolaServiceAccountAuthenticator;
 use Keboola\NotificationClient\Exception\ClientException;
 use Keboola\NotificationClient\NotificationsClient;
 use Keboola\NotificationClient\Requests\PostNotification\ProjectEmail;
 use Keboola\NotificationClient\Requests\PostSubscription\EmailRecipient;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class NotificationsFunctionalClientTest extends TestCase
 {
     private function getClient(): NotificationsClient
     {
+        $baseUrl = (string) getenv('TEST_NOTIFICATION_API_URL');
+        $applicationToken = (string) getenv('TEST_MANAGE_API_APPLICATION_TOKEN');
+        if ($baseUrl === '' || $applicationToken === '') {
+            throw new RuntimeException('Test environment variables are not configured.');
+        }
+
         return new NotificationsClient(
-            (string) getenv('TEST_NOTIFICATION_API_URL'),
-            (string) getenv('TEST_MANAGE_API_APPLICATION_TOKEN'),
-            [
-                'backoffMaxTries' => 3,
-                'userAgent' => 'Test',
-            ],
+            $baseUrl,
+            $applicationToken,
+            backoffMaxTries: 3,
+            userAgent: 'Test',
         );
     }
 
-
-    public function testCreateClientInvalidToken(): void
+    private function getNotification(): ProjectEmail
     {
-        $this->expectException(ClientException::class);
-        $this->expectExceptionMessage('Application token must be non-empty, "" provided.');
-        new NotificationsClient(
-            'https://example.com',
-            '',
-            [
-                'backoffMaxTries' => 3,
-                'userAgent' => 'Test',
-            ],
+        return new ProjectEmail(
+            new EmailRecipient('devel+test-notification-api-client@keboola.com'),
+            (string) getenv('TEST_STORAGE_API_PROJECT_ID'),
+            'Test Project',
+            'Notification API client test',
+            'Test Notification Body',
         );
     }
 
     public function testPostNotification(): void
     {
         $client = $this->getClient();
-        $response = $client->postNotification(new ProjectEmail(
-            new EmailRecipient('devel+test-notification-api-client@keboola.com'),
-            (string) getenv('TEST_STORAGE_API_PROJECT_ID'),
-            'Test Project',
-            'Notification API client test',
-            'Test Notification Body',
-        ));
+        $response = $client->postNotification($this->getNotification());
 
         self::assertIsNumeric($response->getId());
     }
 
-    public function testPostNotificationHeaders(): void
+    public function testPostNotificationMapsResponseAndSendsManageTokenHeader(): void
     {
-        $mock = new MockHandler([
-            new Response(
-                200,
-                ['Content-Type' => 'application/json'],
-                '{"id": "1", "event": "2", "filters": [], "recipient": {"channel": "foo", "address": "bar"}}',
-            ),
-        ]);
-        // Add the history middleware to the handler stack.
-        $requestHistory = [];
-        $history = Middleware::history($requestHistory);
-        $stack = HandlerStack::create($mock);
-        $stack->push($history);
+        $mock = new MockHandler([new Response(200, [], '{"id": "12345"}')]);
         $client = new NotificationsClient(
             'https://example.com/',
             'testToken',
-            ['handler' => $stack, 'backoffMaxTries' => 3, 'userAgent' => 'Test'],
+            requestHandler: HandlerStack::create($mock),
         );
-        $client->postNotification(new ProjectEmail(
-            new EmailRecipient('devel+test-notification-api-client@keboola.com'),
-            (string) getenv('TEST_STORAGE_API_PROJECT_ID'),
-            'Test Project',
-            'Notification API client test',
-            'Test Notification Body',
-        ));
 
-        /** @var Request $request */
-        $request = $requestHistory[0]['request'];
+        $response = $client->postNotification($this->getNotification());
+
+        self::assertSame('12345', $response->getId());
+        $request = $mock->getLastRequest();
+        self::assertNotNull($request);
         self::assertSame('POST', $request->getMethod());
-        self::assertSame(
-            ['Content-Length', 'User-Agent', 'X-Kbc-ManageApiToken', 'Host', 'Content-type'],
-            array_keys($request->getHeaders()),
+        self::assertSame('https://example.com/notifications', (string) $request->getUri());
+        self::assertSame('testToken', $request->getHeaderLine('X-KBC-ManageApiToken'));
+        self::assertSame('application/json', $request->getHeaderLine('Content-type'));
+    }
+
+    public function testNullTokenSelectsServiceAccountAuth(): void
+    {
+        $defaultPath = KeboolaServiceAccountAuthenticator::DEFAULT_TOKEN_PATH;
+        if (is_readable($defaultPath)) {
+            self::markTestSkipped(sprintf(
+                'SA token at "%s" is mounted; cannot exercise the default-auth failure path.',
+                $defaultPath,
+            ));
+        }
+
+        $client = new NotificationsClient(
+            'https://example.com/',
+            null,
+            backoffMaxTries: 0,
+            requestHandler: HandlerStack::create(new MockHandler([new Response(200, [], '{"id":"1"}')])),
         );
-        self::assertSame(['application/json'], $request->getHeaders()['Content-type']);
+
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessage($defaultPath);
+        $client->postNotification($this->getNotification());
     }
 }
