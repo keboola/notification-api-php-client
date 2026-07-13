@@ -3,58 +3,69 @@
 PHP client for the Notification API ([API docs](https://app.swaggerhub.com/apis/odinuv/notifications-service/1.0.0)).
 
 ## Usage
-The client uses two kinds of authorizations - Storage API token for Subscription API (`SubscriptionClient` class) and 
-Manage API Application token with scopes:
-- `notifications:push-event` for the Events API (`EventsClient` class)
-- `notifications:send-notification` for the Notifications API (`NotificationsClient` class)
+
+The client is built on [`keboola/php-api-client-base`](https://github.com/keboola/php-api-client-base).
+Each client takes the **already-resolved** Notification API base URL (resolve it yourself, e.g. with
+[`keboola/service-client`](https://github.com/keboola/service-client)'s `getNotificationServiceUrl()`).
+
+Authorization:
+- `SubscriptionClient` — Storage API token (required).
+- `EventsClient` (scope `notifications:push-event`) and `NotificationsClient`
+  (scope `notifications:send-notification`) — Manage API Application token.
+  Pass `null` instead of a token to authenticate via the projected Kubernetes
+  ServiceAccount token (see `KeboolaServiceAccountAuthenticator` in the base package).
 
 ```bash
 composer require keboola/notification-api-php-client
 ```
 
 ```php
+use DateTimeImmutable;
 use Keboola\NotificationClient\EventsClient;
-use Keboola\NotificationClient\Requests\PostEvent\JobFailedEventData;
-use Keboola\NotificationClient\Requests\PostEvent\JobData;
 use Keboola\NotificationClient\Requests\Event;
-use Psr\Log\NullLogger;
+use Keboola\NotificationClient\Requests\PostEvent\JobData;
+use Keboola\NotificationClient\Requests\PostEvent\JobFailedEventData;
 
 $client = new EventsClient(
-    new NullLogger(),
-    'http://notifications.connection.keboola.com/',
-    'xxx-xxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+    'https://notification.connection.keboola.com/',
+    'xxx-xxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', // or null to use the ServiceAccount token
+    backoffMaxTries: 3,
+    userAgent: 'my-service',
 );
 $client->postEvent(
-    new Event(        
+    new Event(
         new JobFailedEventData(
             '123',
             'My Project',
+            'branch-id',
             'Job finished with error',
-            new JobData('my-project', '123', 'http://someUrl', '2020-01-02', '2020-01-01', 'my-orchestration')
+            new JobData(
+                '456',
+                'http://someUrl',
+                new DateTimeImmutable('2020-01-01T11:11:00+00:00'),
+                new DateTimeImmutable('2020-01-01T11:12:00+00:00'),
+                'keboola.orchestrator',
+                'Orchestrator',
+                'my-configuration',
+                'My configuration',
+            ),
         )
     )
 );
 ```
 
-or use a factory to create the client
-
-```php
-use Keboola\NotificationClient\ClientFactory;
-
-$clientFactory = new ClientFactory('https://connection.keboola.com');
-$clientFactory->getEventsClient('xxx-xxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
-```
-
 ### Subscription client
 
 ```php
-use Keboola\NotificationClient\ClientFactory;
 use Keboola\NotificationClient\Requests\PostSubscription\EmailRecipient;
 use Keboola\NotificationClient\Requests\PostSubscription\Filter;
 use Keboola\NotificationClient\Requests\Subscription;
+use Keboola\NotificationClient\SubscriptionClient;
 
-$clientFactory = new ClientFactory('https://connection.keboola.com');
-$subscriptionClient = $clientFactory->getSubscriptionClient('xxx-storage-api-token');
+$subscriptionClient = new SubscriptionClient(
+    'https://notification.connection.keboola.com/',
+    'xxx-storage-api-token',
+);
 
 // create a subscription
 $created = $subscriptionClient->createSubscription(new Subscription(
