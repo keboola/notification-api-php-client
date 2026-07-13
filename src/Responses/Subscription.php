@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Keboola\NotificationClient\Responses;
 
+use Keboola\ApiClientBase\ResponseModelInterface;
 use Keboola\NotificationClient\Exception\ClientException;
 use Keboola\NotificationClient\Responses\Recipient\EmailRecipient;
 use Keboola\NotificationClient\Responses\Recipient\RecipientInterface;
 use Keboola\NotificationClient\Responses\Recipient\WebhookRecipient;
 use Throwable;
 
-class Subscription
+final class Subscription implements ResponseModelInterface
 {
     private string $id;
     private string $event;
@@ -31,6 +32,11 @@ class Subscription
         } catch (Throwable $e) {
             throw new ClientException('Unrecognized response: ' . $e->getMessage(), 0, $e);
         }
+    }
+
+    public static function fromResponseData(array $data): static
+    {
+        return new self($data);
     }
 
     /**
