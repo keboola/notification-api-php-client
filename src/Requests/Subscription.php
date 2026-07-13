@@ -6,7 +6,6 @@ namespace Keboola\NotificationClient\Requests;
 
 use JetBrains\PhpStorm\Internal\TentativeType;
 use JsonSerializable;
-use Keboola\NotificationClient\ClientFactory;
 use Keboola\NotificationClient\Exception\ClientException;
 use Keboola\NotificationClient\Requests\PostEvent\JobFailedEventData;
 use Keboola\NotificationClient\Requests\PostEvent\JobProcessingLongEventData;

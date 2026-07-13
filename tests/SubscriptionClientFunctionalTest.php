@@ -15,7 +15,6 @@ use Keboola\NotificationClient\Requests\PostSubscription\Filter;
 use Keboola\NotificationClient\Requests\Subscription;
 use Keboola\NotificationClient\Responses\Recipient\EmailRecipient as ResponseEmailRecipient;
 use Keboola\NotificationClient\Responses\Subscription as ResponseSubscription;
-use Keboola\NotificationClient\StorageApiIndexClient;
 use Keboola\NotificationClient\SubscriptionClient;
 use PHPUnit\Framework\TestCase;
 
