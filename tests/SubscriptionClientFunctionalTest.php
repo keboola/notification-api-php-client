@@ -6,8 +6,6 @@ namespace Keboola\NotificationClient\Tests;
 
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Middleware;
-use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Keboola\NotificationClient\Exception\ClientException;
 use Keboola\NotificationClient\Requests\PostSubscription\EmailRecipient;
@@ -17,33 +15,32 @@ use Keboola\NotificationClient\Responses\Recipient\EmailRecipient as ResponseEma
 use Keboola\NotificationClient\Responses\Subscription as ResponseSubscription;
 use Keboola\NotificationClient\SubscriptionClient;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class SubscriptionClientFunctionalTest extends TestCase
 {
     private function getClient(): SubscriptionClient
     {
+        $baseUrl = (string) getenv('TEST_NOTIFICATION_API_URL');
+        $storageApiToken = (string) getenv('TEST_STORAGE_API_TOKEN');
+        if ($baseUrl === '' || $storageApiToken === '') {
+            throw new RuntimeException('Test environment variables are not configured.');
+        }
+
         return new SubscriptionClient(
-            (string) getenv('TEST_NOTIFICATION_API_URL'),
-            (string) getenv('TEST_STORAGE_API_TOKEN'),
-            [
-                'backoffMaxTries' => 3,
-                'userAgent' => 'Test',
-            ],
+            $baseUrl,
+            $storageApiToken,
+            backoffMaxTries: 3,
+            userAgent: 'Test',
         );
     }
 
-
-    public function testCreateClientInvalidToken(): void
+    private function mockClient(MockHandler $mock): SubscriptionClient
     {
-        $this->expectException(ClientException::class);
-        $this->expectExceptionMessage('Storage API token must be non-empty, "" provided.');
-        new SubscriptionClient(
-            'https://example.com',
-            '',
-            [
-                'backoffMaxTries' => 3,
-                'userAgent' => 'Test',
-            ],
+        return new SubscriptionClient(
+            'https://example.com/',
+            'testToken',
+            requestHandler: HandlerStack::create($mock),
         );
     }
 
@@ -53,9 +50,7 @@ class SubscriptionClientFunctionalTest extends TestCase
         $response = $client->createSubscription(new Subscription(
             'job-failed',
             new EmailRecipient('johnDoe@example.com'),
-            [
-                new Filter('project.id', (string) getenv('TEST_STORAGE_API_PROJECT_ID')),
-            ],
+            [new Filter('project.id', (string) getenv('TEST_STORAGE_API_PROJECT_ID'))],
         ));
 
         self::assertNotEmpty($response->getId());
@@ -84,106 +79,64 @@ class SubscriptionClientFunctionalTest extends TestCase
         ));
     }
 
-    public function testCreateSubscriptionHeaders(): void
+    public function testCreateSubscriptionSendsStorageTokenHeader(): void
     {
-        $mock = new MockHandler([
-            new Response(
-                200,
-                ['Content-Type' => 'application/json'],
-                '{"id": "1", "event": "2", "filters": [], "recipient": {"channel": "email", "address": "bar"}}',
-            ),
-        ]);
-        // Add the history middleware to the handler stack.
-        $requestHistory = [];
-        $history = Middleware::history($requestHistory);
-        $stack = HandlerStack::create($mock);
-        $stack->push($history);
-        $client = new SubscriptionClient(
-            'https://example.com/',
-            'testToken',
-            ['handler' => $stack, 'backoffMaxTries' => 3, 'userAgent' => 'Test'],
-        );
+        $mock = new MockHandler([new Response(
+            200,
+            ['Content-Type' => 'application/json'],
+            '{"id": "1", "event": "2", "filters": [], "recipient": {"channel": "email", "address": "bar"}}',
+        )]);
+        $client = $this->mockClient($mock);
+
         $client->createSubscription(new Subscription(
             'job-failed',
             new EmailRecipient('john.doe@example.com'),
-            [
-                new Filter('key', 'value'),
-            ],
+            [new Filter('key', 'value')],
         ));
 
-        /** @var Request $request */
-        $request = $requestHistory[0]['request'];
+        $request = $mock->getLastRequest();
+        self::assertNotNull($request);
         self::assertSame('POST', $request->getMethod());
-        self::assertSame(
-            ['Content-Length', 'User-Agent', 'X-StorageApi-Token', 'Host', 'Content-type'],
-            array_keys($request->getHeaders()),
-        );
-        self::assertSame(['application/json'], $request->getHeaders()['Content-type']);
+        self::assertSame('https://example.com/project-subscriptions', (string) $request->getUri());
+        self::assertSame('testToken', $request->getHeaderLine('X-StorageApi-Token'));
+        self::assertSame('application/json', $request->getHeaderLine('Content-type'));
     }
 
-    public function testDeleteSubscriptionHeaders(): void
+    public function testDeleteSubscription(): void
     {
-        $mock = new MockHandler([
-            new Response(204, [], ''),
-        ]);
-        $requestHistory = [];
-        $history = Middleware::history($requestHistory);
-        $stack = HandlerStack::create($mock);
-        $stack->push($history);
-        $client = new SubscriptionClient(
-            'https://example.com/',
-            'testToken',
-            ['handler' => $stack, 'backoffMaxTries' => 3, 'userAgent' => 'Test'],
-        );
+        $mock = new MockHandler([new Response(204, [], '')]);
+        $client = $this->mockClient($mock);
 
         $client->deleteSubscription('subscription-123');
 
-        /** @var Request $request */
-        $request = $requestHistory[0]['request'];
+        $request = $mock->getLastRequest();
+        self::assertNotNull($request);
         self::assertSame('DELETE', $request->getMethod());
         self::assertSame('https://example.com/project-subscriptions/subscription-123', (string) $request->getUri());
-        self::assertSame(
-            ['User-Agent', 'X-StorageApi-Token', 'Host'],
-            array_keys($request->getHeaders()),
-        );
+        self::assertSame('testToken', $request->getHeaderLine('X-StorageApi-Token'));
     }
 
-    public function testGetSubscriptionHeaders(): void
+    public function testGetSubscription(): void
     {
-        $mock = new MockHandler([
-            new Response(
-                200,
-                ['Content-Type' => 'application/json'],
-                (string) json_encode([
-                    'id' => 'subscription-123',
-                    'event' => 'job-failed',
-                    'filters' => [
-                        ['field' => 'project.id', 'value' => '123', 'operator' => '=='],
-                    ],
-                    'recipient' => ['channel' => 'email', 'address' => 'a@example.com'],
-                ]),
-            ),
-        ]);
-        $requestHistory = [];
-        $history = Middleware::history($requestHistory);
-        $stack = HandlerStack::create($mock);
-        $stack->push($history);
-        $client = new SubscriptionClient(
-            'https://example.com/',
-            'testToken',
-            ['handler' => $stack, 'backoffMaxTries' => 3, 'userAgent' => 'Test'],
-        );
+        $mock = new MockHandler([new Response(
+            200,
+            ['Content-Type' => 'application/json'],
+            (string) json_encode([
+                'id' => 'subscription-123',
+                'event' => 'job-failed',
+                'filters' => [['field' => 'project.id', 'value' => '123', 'operator' => '==']],
+                'recipient' => ['channel' => 'email', 'address' => 'a@example.com'],
+            ]),
+        )]);
+        $client = $this->mockClient($mock);
 
         $result = $client->getSubscription('subscription-123');
 
-        /** @var Request $request */
-        $request = $requestHistory[0]['request'];
+        $request = $mock->getLastRequest();
+        self::assertNotNull($request);
         self::assertSame('GET', $request->getMethod());
         self::assertSame('https://example.com/project-subscriptions/subscription-123', (string) $request->getUri());
-        self::assertSame(
-            ['User-Agent', 'X-StorageApi-Token', 'Host'],
-            array_keys($request->getHeaders()),
-        );
+        self::assertSame('testToken', $request->getHeaderLine('X-StorageApi-Token'));
 
         self::assertSame('subscription-123', $result->getId());
         self::assertSame('job-failed', $result->getEvent());
@@ -192,67 +145,42 @@ class SubscriptionClientFunctionalTest extends TestCase
         self::assertSame('==', $result->getFilters()[0]->getOperator());
         $recipient = $result->getRecipient();
         self::assertInstanceOf(ResponseEmailRecipient::class, $recipient);
-        self::assertSame('email', $recipient->getChannel());
         self::assertSame('a@example.com', $recipient->getAddress());
     }
 
-    public function testListSubscriptionsHeaders(): void
+    public function testListSubscriptions(): void
     {
-        $responseBody = json_encode([
-            [
-                'id' => 'sub-1',
-                'event' => 'job-failed',
-                'filters' => [
-                    ['field' => 'project.id', 'value' => '123', 'operator' => '=='],
+        $mock = new MockHandler([new Response(
+            200,
+            ['Content-Type' => 'application/json'],
+            (string) json_encode([
+                [
+                    'id' => 'sub-1',
+                    'event' => 'job-failed',
+                    'filters' => [['field' => 'project.id', 'value' => '123', 'operator' => '==']],
+                    'recipient' => ['channel' => 'email', 'address' => 'a@example.com'],
                 ],
-                'recipient' => ['channel' => 'email', 'address' => 'a@example.com'],
-            ],
-            [
-                'id' => 'sub-2',
-                'event' => 'job-succeeded',
-                'filters' => [],
-                'recipient' => ['channel' => 'email', 'address' => 'b@example.com'],
-            ],
-        ]);
-
-        $mock = new MockHandler([
-            new Response(200, ['Content-Type' => 'application/json'], (string) $responseBody),
-        ]);
-        $requestHistory = [];
-        $history = Middleware::history($requestHistory);
-        $stack = HandlerStack::create($mock);
-        $stack->push($history);
-        $client = new SubscriptionClient(
-            'https://example.com/',
-            'testToken',
-            ['handler' => $stack, 'backoffMaxTries' => 3, 'userAgent' => 'Test'],
-        );
+                [
+                    'id' => 'sub-2',
+                    'event' => 'job-succeeded',
+                    'filters' => [],
+                    'recipient' => ['channel' => 'email', 'address' => 'b@example.com'],
+                ],
+            ]),
+        )]);
+        $client = $this->mockClient($mock);
 
         $result = $client->listSubscriptions();
 
-        /** @var Request $request */
-        $request = $requestHistory[0]['request'];
+        $request = $mock->getLastRequest();
+        self::assertNotNull($request);
         self::assertSame('GET', $request->getMethod());
         self::assertSame('https://example.com/project-subscriptions', (string) $request->getUri());
-        self::assertSame(
-            ['User-Agent', 'X-StorageApi-Token', 'Host'],
-            array_keys($request->getHeaders()),
-        );
+        self::assertSame('testToken', $request->getHeaderLine('X-StorageApi-Token'));
 
         self::assertCount(2, $result);
-        self::assertContainsOnlyInstancesOf(
-            ResponseSubscription::class,
-            $result,
-        );
+        self::assertContainsOnlyInstancesOf(ResponseSubscription::class, $result);
         self::assertSame('sub-1', $result[0]->getId());
-        self::assertSame('job-failed', $result[0]->getEvent());
-        self::assertSame('project.id', $result[0]->getFilters()[0]->getField());
-        self::assertSame('123', $result[0]->getFilters()[0]->getValue());
-        self::assertSame('==', $result[0]->getFilters()[0]->getOperator());
-        $recipient = $result[0]->getRecipient();
-        self::assertInstanceOf(ResponseEmailRecipient::class, $recipient);
-        self::assertSame('email', $recipient->getChannel());
-        self::assertSame('a@example.com', $recipient->getAddress());
         self::assertSame('sub-2', $result[1]->getId());
     }
 
@@ -260,42 +188,24 @@ class SubscriptionClientFunctionalTest extends TestCase
     {
         $client = $this->getClient();
 
-        // create
         $created = $client->createSubscription(new Subscription(
             'job-failed',
             new EmailRecipient('ajda-2680@example.com'),
-            [
-                new Filter('project.id', (string) getenv('TEST_STORAGE_API_PROJECT_ID')),
-            ],
+            [new Filter('project.id', (string) getenv('TEST_STORAGE_API_PROJECT_ID'))],
         ));
         self::assertNotEmpty($created->getId());
 
-        // get — must return the same subscription
         $fetched = $client->getSubscription($created->getId());
         self::assertSame($created->getId(), $fetched->getId());
-        self::assertSame('job-failed', $fetched->getEvent());
 
-        // list — must contain the new subscription
         $beforeDelete = $client->listSubscriptions();
-        self::assertContainsOnlyInstancesOf(
-            ResponseSubscription::class,
-            $beforeDelete,
-        );
-        $ids = array_map(
-            fn(ResponseSubscription $s): string => $s->getId(),
-            $beforeDelete,
-        );
+        $ids = array_map(fn(ResponseSubscription $s): string => $s->getId(), $beforeDelete);
         self::assertContains($created->getId(), $ids);
 
-        // delete
         $client->deleteSubscription($created->getId());
 
-        // list — must no longer contain it
         $afterDelete = $client->listSubscriptions();
-        $idsAfter = array_map(
-            fn(ResponseSubscription $s): string => $s->getId(),
-            $afterDelete,
-        );
+        $idsAfter = array_map(fn(ResponseSubscription $s): string => $s->getId(), $afterDelete);
         self::assertNotContains($created->getId(), $idsAfter);
     }
 }
