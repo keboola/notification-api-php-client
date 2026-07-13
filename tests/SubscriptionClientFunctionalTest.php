@@ -100,6 +100,21 @@ class SubscriptionClientFunctionalTest extends TestCase
         self::assertSame('https://example.com/project-subscriptions', (string) $request->getUri());
         self::assertSame('testToken', $request->getHeaderLine('X-StorageApi-Token'));
         self::assertSame('application/json', $request->getHeaderLine('Content-type'));
+        self::assertSame('Keboola Notification PHP Client', $request->getHeaderLine('User-Agent'));
+    }
+
+    public function testMalformedResponseThrowsClientException(): void
+    {
+        $mock = new MockHandler([new Response(
+            200,
+            ['Content-Type' => 'application/json'],
+            '{"event": "job-failed"}',
+        )]);
+        $client = $this->mockClient($mock);
+
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessageMatches('#Unrecognized response#');
+        $client->getSubscription('sub-1');
     }
 
     public function testDeleteSubscription(): void

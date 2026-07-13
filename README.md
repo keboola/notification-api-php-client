@@ -137,7 +137,6 @@ if ($recipient instanceof EmailRecipient) {
     ```
 
 - Set the following environment variables in `set-env.sh` file (use `set-env.template.sh` as sample):
-    - `HOSTNAME_SUFFIX` - Suffix for the hostname, e.g. `eu-west-1.aws.keboola.dev`.
     - `TEST_STORAGE_API_TOKEN` - Token to a test project. 
     - `TEST_STORAGE_API_PROJECT_ID` - Project ID of the test project.
     - `TEST_MANAGE_API_APPLICATION_TOKEN` - Application token with scope `notifications:push-event`.

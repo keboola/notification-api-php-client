@@ -70,6 +70,7 @@ class NotificationsFunctionalClientTest extends TestCase
         self::assertSame('https://example.com/notifications', (string) $request->getUri());
         self::assertSame('testToken', $request->getHeaderLine('X-KBC-ManageApiToken'));
         self::assertSame('application/json', $request->getHeaderLine('Content-type'));
+        self::assertSame('Keboola Notification PHP Client', $request->getHeaderLine('User-Agent'));
     }
 
     public function testNullTokenSelectsServiceAccountAuth(): void
