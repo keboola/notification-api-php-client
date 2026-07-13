@@ -73,4 +73,20 @@ class FilterTest extends TestCase
         $this->expectExceptionCode(0);
         new Filter(['field' => 'foo', 'value' => 'bar']);
     }
+
+    public function testFromResponseData(): void
+    {
+        $filter = Filter::fromResponseData(['field' => 'foo', 'value' => 'bar', 'operator' => '==']);
+
+        self::assertSame('foo', $filter->getField());
+        self::assertSame('bar', $filter->getValue());
+        self::assertSame('==', $filter->getOperator());
+    }
+
+    public function testFromResponseDataRejectsInvalidData(): void
+    {
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessageMatches('#Unrecognized response#');
+        Filter::fromResponseData(['field' => 'foo', 'value' => 'bar']);
+    }
 }
