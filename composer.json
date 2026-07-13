@@ -27,7 +27,8 @@
     "require": {
         "php": "^8.2",
         "ext-json": "*",
-        "guzzlehttp/guzzle": "^6.3|^7.2",
+        "guzzlehttp/guzzle": "^7.8",
+        "keboola/php-api-client-base": "^1.0",
         "psr/log": "^2|^3",
         "symfony/validator": "^6.4|^7.0"
     },

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Keboola\NotificationClient\Exception;
 
-use RuntimeException;
+use Keboola\ApiClientBase\Exception\ClientException as BaseClientException;
 
-class ClientException extends RuntimeException
+class ClientException extends BaseClientException
 {
 }
