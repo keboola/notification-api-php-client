@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Keboola\NotificationClient\Responses;
 
+use Keboola\ApiClientBase\ResponseModelInterface;
 use Keboola\NotificationClient\Exception\ClientException;
 use Throwable;
 
-class Filter
+final class Filter implements ResponseModelInterface
 {
     private string $field;
     private int|float|bool|string|null $value;
@@ -23,6 +24,11 @@ class Filter
         } catch (Throwable $e) {
             throw new ClientException('Unrecognized response: ' . $e->getMessage(), 0, $e);
         }
+    }
+
+    public static function fromResponseData(array $data): static
+    {
+        return new self($data);
     }
 
     public function getField(): string

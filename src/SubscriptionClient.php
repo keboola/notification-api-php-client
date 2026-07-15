@@ -4,76 +4,98 @@ declare(strict_types=1);
 
 namespace Keboola\NotificationClient;
 
+use Closure;
+use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Request;
 use JsonException;
+use Keboola\ApiClientBase\ApiClient;
+use Keboola\ApiClientBase\ApiClientOptions;
+use Keboola\ApiClientBase\Auth\StorageApiTokenAuthenticator;
 use Keboola\NotificationClient\Exception\ClientException;
 use Keboola\NotificationClient\Requests\Subscription as RequestSubscription;
 use Keboola\NotificationClient\Responses\Subscription as ResponseSubscription;
+use Psr\Log\LoggerInterface;
 
-class SubscriptionClient extends Client
+class SubscriptionClient
 {
-    protected string $tokenHeaderName = 'X-StorageApi-Token';
+    private const FALLBACK_USER_AGENT = 'Keboola Notification PHP Client';
 
-    /** @inheritDoc */
-    public function __construct(string $notificationApiUrl, string $storageApiToken, array $options)
-    {
-        if (empty($storageApiToken)) {
-            throw new ClientException(sprintf(
-                'Storage API token must be non-empty, %s provided.',
-                json_encode($storageApiToken),
-            ));
-        }
-        parent::__construct($notificationApiUrl, $storageApiToken, $options);
+    private readonly ApiClient $apiClient;
+
+    /**
+     * @param non-empty-string $baseUrl
+     * @param non-empty-string $storageApiToken
+     * @param int<0, max> $backoffMaxTries
+     */
+    public function __construct(
+        string $baseUrl,
+        string $storageApiToken,
+        ?LoggerInterface $logger = null,
+        int $backoffMaxTries = ApiClientOptions::DEFAULT_BACKOFF_MAX_TRIES,
+        int $connectTimeout = ApiClientOptions::DEFAULT_CONNECT_TIMEOUT,
+        int $requestTimeout = ApiClientOptions::DEFAULT_REQUEST_TIMEOUT,
+        string $userAgent = self::FALLBACK_USER_AGENT,
+        null|Closure|HandlerStack $requestHandler = null,
+    ) {
+        $this->apiClient = new ApiClient(
+            $baseUrl,
+            new StorageApiTokenAuthenticator($storageApiToken),
+            new ApiClientOptions(
+                userAgent: $userAgent,
+                backoffMaxTries: $backoffMaxTries,
+                connectTimeout: $connectTimeout,
+                requestTimeout: $requestTimeout,
+                requestHandler: $requestHandler,
+                logger: $logger,
+            ),
+            exceptionClass: ClientException::class,
+        );
     }
 
     public function createSubscription(RequestSubscription $requestData): ResponseSubscription
     {
         try {
             $jobDataJson = json_encode($requestData->jsonSerialize(), JSON_THROW_ON_ERROR);
-            $request = new Request(
+        } catch (JsonException $e) {
+            throw new ClientException('Invalid job data: ' . $e->getMessage(), $e->getCode(), $e);
+        }
+
+        return $this->apiClient->sendRequestAndMapResponse(
+            new Request(
                 'POST',
                 'project-subscriptions',
                 ['Content-type' => 'application/json'],
                 $jobDataJson,
-            );
-        } catch (JsonException $e) {
-            throw new ClientException('Invalid job data: ' . $e->getMessage(), $e->getCode(), $e);
-        }
-        return new ResponseSubscription($this->sendRequest($request));
+            ),
+            ResponseSubscription::class,
+        );
     }
 
     public function deleteSubscription(string $id): void
     {
-        $request = new Request(
-            'DELETE',
-            'project-subscriptions/' . rawurlencode($id),
+        $this->apiClient->sendRequest(
+            new Request('DELETE', 'project-subscriptions/' . rawurlencode($id)),
         );
-        $this->sendRequest($request);
     }
 
     public function getSubscription(string $id): ResponseSubscription
     {
-        $request = new Request(
-            'GET',
-            'project-subscriptions/' . rawurlencode($id),
+        return $this->apiClient->sendRequestAndMapResponse(
+            new Request('GET', 'project-subscriptions/' . rawurlencode($id)),
+            ResponseSubscription::class,
         );
-        return new ResponseSubscription($this->sendRequest($request));
     }
 
     /**
-     * @return array<ResponseSubscription>
+     * @return list<ResponseSubscription>
      */
     public function listSubscriptions(): array
     {
-        $request = new Request(
-            'GET',
-            'project-subscriptions',
+        return $this->apiClient->sendRequestAndMapResponse(
+            new Request('GET', 'project-subscriptions'),
+            ResponseSubscription::class,
+            [],
+            true,
         );
-        $response = $this->sendRequest($request);
-
-        return array_values(array_map(
-            fn(array $item): ResponseSubscription => new ResponseSubscription($item),
-            $response,
-        ));
     }
 }

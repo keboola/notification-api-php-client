@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Keboola\NotificationClient\Responses;
 
+use Keboola\ApiClientBase\ResponseModelInterface;
 use Keboola\NotificationClient\Exception\ClientException;
 
-class Notification
+final class Notification implements ResponseModelInterface
 {
     private string $id;
 
@@ -17,6 +18,11 @@ class Notification
         }
 
         $this->id = $data['id'];
+    }
+
+    public static function fromResponseData(array $data): static
+    {
+        return new self($data);
     }
 
     public function getId(): string

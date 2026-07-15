@@ -95,4 +95,29 @@ class SubscriptionTest extends TestCase
         $this->expectExceptionCode(0);
         new Subscription($data);
     }
+
+    public function testFromResponseData(): void
+    {
+        $subscription = Subscription::fromResponseData([
+            'id' => '123',
+            'event' => 'job-failed',
+            'recipient' => ['channel' => 'email', 'address' => 'john.doe@example.com'],
+            'filters' => [
+                ['field' => 'project.id', 'value' => '42', 'operator' => '=='],
+            ],
+        ]);
+
+        self::assertSame('123', $subscription->getId());
+        self::assertSame('job-failed', $subscription->getEvent());
+        self::assertCount(1, $subscription->getFilters());
+        self::assertSame('project.id', $subscription->getFilters()[0]->getField());
+        self::assertInstanceOf(EmailRecipient::class, $subscription->getRecipient());
+    }
+
+    public function testFromResponseDataRejectsInvalidData(): void
+    {
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessageMatches('#Unrecognized response#');
+        Subscription::fromResponseData(['id' => 123, 'event' => 'x']);
+    }
 }

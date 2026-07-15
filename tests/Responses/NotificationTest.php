@@ -29,4 +29,18 @@ class NotificationTest extends TestCase
         $this->expectExceptionCode(0);
         new Notification($data);
     }
+
+    public function testFromResponseData(): void
+    {
+        $notification = Notification::fromResponseData(['id' => '123']);
+
+        self::assertSame('123', $notification->getId());
+    }
+
+    public function testFromResponseDataRejectsInvalidData(): void
+    {
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessage('Unrecognized response');
+        Notification::fromResponseData(['some' => 'value']);
+    }
 }
